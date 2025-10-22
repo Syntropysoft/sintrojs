@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+**/node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+**/dist/
+
+# Test coverage
+coverage/
+.nyc_output/
+**/coverage/
+
+# Vitest
+.vitest/
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Mutation testing
+.stryker-tmp/
+reports/
+
+# Large binary files
+*.pdf
+
+# Lock files (heavy)
+pnpm-lock.yaml
+

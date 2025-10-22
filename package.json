@@ -1,0 +1,93 @@
+{
+  "name": "tinyapi",
+  "version": "0.2.0",
+  "description": "FastAPI for Node.js - Tiny, fast, and type-safe API framework",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:mutation": "stryker run",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit --skipLibCheck",
+    "ci": "pnpm lint && pnpm typecheck && pnpm test:coverage"
+  },
+  "keywords": [
+    "fastapi",
+    "api",
+    "framework",
+    "typescript",
+    "fastify",
+    "zod",
+    "openapi",
+    "swagger",
+    "validation",
+    "type-safe"
+  ],
+  "author": "Gaby",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "dependencies": {
+    "fastify": "^4.26.0",
+    "zod": "^3.22.4",
+    "zod-to-json-schema": "^3.22.4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.5.3",
+    "@fastify/compress": "^7.0.0",
+    "@fastify/cors": "^9.0.0",
+    "@fastify/helmet": "^11.1.1",
+    "@fastify/rate-limit": "^9.1.0",
+    "@stryker-mutator/core": "^8.2.6",
+    "@stryker-mutator/typescript-checker": "^8.2.6",
+    "@stryker-mutator/vitest-runner": "^8.2.6",
+    "@types/node": "^18.19.0",
+    "@vitest/coverage-v8": "^1.2.2",
+    "@vitest/ui": "^1.2.2",
+    "tsup": "^8.0.1",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  },
+  "peerDependencies": {
+    "@fastify/compress": "^7.0.0",
+    "@fastify/cors": "^9.0.0",
+    "@fastify/helmet": "^11.0.0",
+    "@fastify/rate-limit": "^9.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@fastify/compress": {
+      "optional": true
+    },
+    "@fastify/cors": {
+      "optional": true
+    },
+    "@fastify/helmet": {
+      "optional": true
+    },
+    "@fastify/rate-limit": {
+      "optional": true
+    }
+  }
+}
