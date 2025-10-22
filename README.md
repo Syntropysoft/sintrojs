@@ -19,6 +19,7 @@ TinyApi is a modern framework for building APIs in Node.js, heavily inspired by 
 ### The Problem
 
 Building robust APIs in Node.js requires too much boilerplate:
+
 - ❌ **Express** is too basic (no validation, no docs, no types)
 - ❌ **NestJS** is too complex (opinionated DI, steep learning curve)
 - ❌ **Fastify** is fast but requires manual configuration
@@ -403,9 +404,9 @@ TinyApi isn't just "well-tested". We prove it with public quality reports.
 ```
 
 1.  ✅ **98% Test Coverage** - Unit + Integration + E2E tests (554 tests)
-2. 🔄 **>85% Mutation Score target** - Tests that truly validate logic, not just coverage (in development)
-3. ✅ **0 Known Vulnerabilities** - Automated security audits
-4. ✅ **Public Quality Reports** - Mutation testing reports in every release
+2.  🔄 **>85% Mutation Score target** - Tests that truly validate logic, not just coverage (in development)
+3.  ✅ **0 Known Vulnerabilities** - Automated security audits
+4.  ✅ **Public Quality Reports** - Mutation testing reports in every release
 
 **Current Metrics (v0.2.0):**
 - 📊 Statements: 98.05%

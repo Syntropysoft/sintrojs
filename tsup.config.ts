@@ -1,4 +1,5 @@
 import { defineConfig } from 'tsup';
+import { dependencies, devDependencies, peerDependencies } from './package.json';
 
 export default defineConfig({
   entry: {
@@ -14,4 +15,5 @@ export default defineConfig({
   minify: false,
   target: 'es2022',
   outDir: 'dist',
+  external: [...Object.keys(dependencies), ...Object.keys(devDependencies), ...Object.keys(peerDependencies)],
 });
