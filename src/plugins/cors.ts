@@ -1,6 +1,6 @@
 /**
  * CORS Plugin - Wrapper for @fastify/cors
- * 
+ *
  * Cross-Origin Resource Sharing configuration for TinyApi
  */
 
@@ -14,7 +14,12 @@ export interface CorsOptions {
    * Allowed origins
    * @default '*'
    */
-  origin?: string | boolean | RegExp | Array<string | RegExp> | ((origin: string, callback: (err: Error | null, allow?: boolean) => void) => void);
+  origin?:
+    | string
+    | boolean
+    | RegExp
+    | Array<string | RegExp>
+    | ((origin: string, callback: (err: Error | null, allow?: boolean) => void) => void);
 
   /**
    * Allowed methods
@@ -56,17 +61,17 @@ export interface CorsOptions {
 
 /**
  * Register CORS plugin
- * 
+ *
  * @param fastify - Fastify instance
  * @param options - CORS options
- * 
+ *
  * @example
  * ```typescript
  * import { registerCors } from 'tinyapi/plugins';
- * 
+ *
  * // Allow all origins
  * await registerCors(app.getRawFastify(), { origin: '*' });
- * 
+ *
  * // Allow specific origins
  * await registerCors(app.getRawFastify(), {
  *   origin: ['https://example.com', 'https://api.example.com'],
@@ -90,13 +95,11 @@ export async function registerCors(
     fastifyCors = (await import('@fastify/cors')).default;
   } catch (error) {
     throw new Error(
-      'CORS plugin requires @fastify/cors to be installed. ' +
-      'Run: pnpm add @fastify/cors',
+      'CORS plugin requires @fastify/cors to be installed. ' + 'Run: pnpm add @fastify/cors',
     );
   }
 
   // Pass options directly - Fastify handles undefined values correctly
-  // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   await fastify.register(fastifyCors, {
     origin: options.origin ?? true,
     credentials: options.credentials ?? false,
@@ -106,6 +109,6 @@ export async function registerCors(
     maxAge: options.maxAge,
     preflightContinue: options.preflightContinue,
     strictPreflight: options.strictPreflight,
+    // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   } as any);
 }
-

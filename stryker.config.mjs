@@ -1,6 +1,6 @@
 /**
  * Stryker Configuration for TinyApi
- * 
+ *
  * SmartMutator uses this configuration optimized for TinyApi
  * Can also be run in vanilla mode for validation
  */
@@ -10,7 +10,7 @@ const config = {
   packageManager: 'pnpm',
   testRunner: 'vitest',
   coverageAnalysis: 'perTest',
-  
+
   // Mutate only source code (exclude tests, examples, etc.)
   mutate: [
     'src/**/*.ts',
@@ -25,7 +25,7 @@ const config = {
   vitest: {
     configFile: 'vitest.config.ts',
   },
-  
+
   // Thresholds for CI/CD
   thresholds: {
     high: 90,
@@ -35,7 +35,7 @@ const config = {
 
   // Reporters
   reporters: ['html', 'clear-text', 'progress', 'json'],
-  
+
   // HTML report output
   htmlReporter: {
     fileName: 'reports/mutation/index.html',
@@ -47,10 +47,7 @@ const config = {
   },
 
   // Plugins
-  plugins: [
-    '@stryker-mutator/vitest-runner',
-    '@stryker-mutator/typescript-checker',
-  ],
+  plugins: ['@stryker-mutator/vitest-runner', '@stryker-mutator/typescript-checker'],
 
   // TypeScript checker
   checkers: ['typescript'],
@@ -78,4 +75,3 @@ const config = {
 };
 
 export default config;
-

@@ -24,8 +24,8 @@
  * ```
  */
 
+import path from 'node:path';
 import { Stryker } from '@stryker-mutator/core';
-import path from 'path';
 
 /**
  * Mutation analysis result
@@ -121,6 +121,7 @@ export class SmartMutator {
 
     const absoluteTsConfigFile = path.resolve(process.cwd(), 'tsconfig.json');
 
+    // biome-ignore lint/suspicious/noExplicitAny: Stryker configuration object is dynamic and not fully typed
     const baseConfig: any = {
       packageManager: 'pnpm',
       testRunner: 'vitest',
@@ -134,18 +135,14 @@ export class SmartMutator {
       reporters: ['html', 'clear-text', 'progress', 'json'],
       timeoutMS: 60000,
       timeoutFactor: 1.5,
-      plugins: [
-        '@stryker-mutator/vitest-runner',
-        '@stryker-mutator/typescript-checker',
-      ],
+      plugins: ['@stryker-mutator/vitest-runner', '@stryker-mutator/typescript-checker'],
       checkers: ['typescript'],
       tsconfigFile: absoluteTsConfigFile,
-      mutate: [
-        "src/domain/Route.ts"
-      ],
+      mutate: ['src/domain/Route.ts'],
     };
 
-    let strykerConfig: any = baseConfig;
+    // biome-ignore lint/suspicious/noExplicitAny: Stryker configuration object is dynamic and not fully typed
+    const strykerConfig: any = baseConfig;
 
     if (strykerConfigFile) {
       // If a custom config file is provided, load it
@@ -188,12 +185,10 @@ export class SmartMutator {
 
 /**
  * Exported singleton (Module Pattern)
- * // biome-ignore lint/style/useConst: This is a factory function, not a constant.
  */
-export let SmartMutatorSingleton = SmartMutator;
+export const SmartMutatorSingleton = SmartMutator;
 
 /**
  * Factory for testing
  */
 export const createSmartMutator = (): typeof SmartMutator => SmartMutator;
-

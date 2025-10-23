@@ -2,10 +2,10 @@
  * Unit tests for API Key authentication
  */
 
-import { describe, test, expect } from 'vitest';
-import { APIKeyHeader, APIKeyCookie, APIKeyQuery } from '../../../src/security/APIKey';
-import { HTTPException } from '../../../src/domain/HTTPException';
 import type { FastifyRequest } from 'fastify';
+import { describe, expect, test } from 'vitest';
+import { HTTPException } from '../../../src/domain/HTTPException';
+import { APIKeyCookie, APIKeyHeader, APIKeyQuery } from '../../../src/security/APIKey';
 
 describe('APIKeyHeader', () => {
   // ============================================
@@ -383,4 +383,3 @@ describe('APIKeyQuery', () => {
     });
   });
 });
-

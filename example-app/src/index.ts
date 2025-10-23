@@ -3,7 +3,7 @@
  * Demonstrates all core features
  */
 
-import { TinyApi, HTTPException, NotFoundException } from 'tinyapi';
+import { HTTPException, NotFoundException, TinyApi } from 'tinyapi';
 import { z } from 'zod';
 
 // Create app instance
@@ -202,4 +202,3 @@ app.listen(PORT).then((address) => {
   console.log('     -H "Content-Type: application/json" \\');
   console.log('     -d \'{"name":"Gaby","email":"gaby@example.com","age":30}\'\n');
 });
-

@@ -58,12 +58,10 @@ describe('RouteRegistry', () => {
     });
 
     it('should throw error if route is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => registry.register(null as any)).toThrow('Route is required');
     });
 
     it('should throw error if route is undefined', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => registry.register(undefined as any)).toThrow('Route is required');
     });
 
@@ -164,7 +162,6 @@ describe('RouteRegistry', () => {
       const routes = registry.getAll();
 
       // Try to modify returned array
-      // biome-ignore lint/suspicious/noExplicitAny: Testing immutability
       (routes as any).push(createMockRoute('POST', '/fake'));
 
       // Registry should not change

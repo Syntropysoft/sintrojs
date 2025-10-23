@@ -6,11 +6,12 @@ import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { createOpenAPIGenerator } from '../../../src/application/OpenAPIGenerator';
 import { Route } from '../../../src/domain/Route';
+import type { HttpMethod } from '../../../src/domain/types';
 
 describe('OpenAPIGenerator', () => {
   const generator = createOpenAPIGenerator();
 
-  const createMockRoute = (method: any, path: string, config: any = {}) => {
+  const createMockRoute = (method: HttpMethod, path: string, config: any = {}) => {
     return new Route(method, path, {
       handler: async () => ({}),
       ...config,
@@ -64,25 +65,29 @@ describe('OpenAPIGenerator', () => {
     });
 
     it('should throw error if routes is null', () => {
-      expect(() =>
-        generator.generate(null as any, { title: 'Test', version: '1.0.0' }),
-      ).toThrow('Routes array is required');
+      /* config for error cases */
+      expect(() => generator.generate(null as any, { title: 'Test', version: '1.0.0' })).toThrow(
+        'Routes array is required',
+      );
     });
 
     it('should throw error if config is null', () => {
+      /* config for error cases */
       expect(() => generator.generate([], null as any)).toThrow('Config is required');
     });
 
     it('should throw error if title is missing', () => {
-      expect(() =>
-        generator.generate([], { version: '1.0.0' } as any),
-      ).toThrow('Config.title is required');
+      /* config for error cases */
+      expect(() => generator.generate([], { version: '1.0.0' } as any)).toThrow(
+        'Config.title is required',
+      );
     });
 
     it('should throw error if version is missing', () => {
-      expect(() =>
-        generator.generate([], { title: 'Test' } as any),
-      ).toThrow('Config.version is required');
+      /* config for error cases */
+      expect(() => generator.generate([], { title: 'Test' } as any)).toThrow(
+        'Config.version is required',
+      );
     });
   });
 
@@ -146,11 +151,11 @@ describe('OpenAPIGenerator', () => {
 
       const operation = spec.paths['/search'].get;
       expect(operation?.parameters).toBeDefined();
-      
+
       const qParam = operation?.parameters?.find((p) => p.name === 'q');
       expect(qParam?.in).toBe('query');
       expect(qParam?.required).toBe(true);
-      
+
       const pageParam = operation?.parameters?.find((p) => p.name === 'page');
       expect(pageParam?.in).toBe('query');
       expect(pageParam?.required).toBe(false);
@@ -326,4 +331,3 @@ describe('OpenAPIGenerator', () => {
     });
   });
 });
-

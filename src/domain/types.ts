@@ -62,12 +62,15 @@ export interface RequestContext<
 
   /** Background tasks manager */
   background: {
-    addTask: (task: () => void | Promise<void>, options?: {
-      name?: string;
-      timeout?: number;
-      onComplete?: () => void;
-      onError?: (error: Error) => void;
-    }) => void;
+    addTask: (
+      task: () => void | Promise<void>,
+      options?: {
+        name?: string;
+        timeout?: number;
+        onComplete?: () => void;
+        onError?: (error: Error) => void;
+      },
+    ) => void;
   };
 }
 

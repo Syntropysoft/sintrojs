@@ -2,13 +2,12 @@
  * Meta-tests for TinyTest
  * Tests that test the testing wrapper 🤯
  */
-
-import { describe, test, expect, beforeEach, afterEach } from 'vitest';
-import { TinyTest } from '../../../src/testing/TinyTest';
-import { RouteRegistry } from '../../../src/application/RouteRegistry';
-import { DependencyInjector } from '../../../src/application/DependencyInjector';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { z } from 'zod';
+import { DependencyInjector } from '../../../src/application/DependencyInjector';
+import { RouteRegistry } from '../../../src/application/RouteRegistry';
 import { BadRequestException } from '../../../src/domain/HTTPException';
+import { TinyTest } from '../../../src/testing/TinyTest';
 
 describe('TinyTest', () => {
   let api: TinyTest;
@@ -125,7 +124,7 @@ describe('TinyTest', () => {
         headers: { 'x-custom': 'value' },
       });
 
-      expect((response.data as any).received).toBe('value');
+      expect((response.data as { received: string }).received).toBe('value');
     });
 
     test('returns response headers', async () => {
@@ -178,9 +177,9 @@ describe('TinyTest', () => {
         handler: ({ body }) => body,
       });
 
-      await expect(
-        api.expectSuccess('POST', '/fail', { body: { name: 'ab' } }),
-      ).rejects.toThrow('Expected success (2xx) but got 422');
+      await expect(api.expectSuccess('POST', '/fail', { body: { name: 'ab' } })).rejects.toThrow(
+        'Expected success (2xx) but got 422',
+      );
     });
   });
 
@@ -350,8 +349,9 @@ describe('TinyTest', () => {
       api = new TinyTest();
 
       await expect(
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
-        api.testContract('POST', '/test', { responseSchema: z.any() } as any),
+        api.testContract('POST', '/test', {
+          responseSchema: z.any(),
+        } as any),
       ).rejects.toThrow('Input is required for contract testing');
     });
 
@@ -359,8 +359,9 @@ describe('TinyTest', () => {
       api = new TinyTest();
 
       await expect(
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
-        api.testContract('POST', '/test', { input: {} } as any),
+        api.testContract('POST', '/test', {
+          input: {},
+        } as any),
       ).rejects.toThrow('Response schema is required for contract testing');
     });
   });
@@ -403,7 +404,6 @@ describe('TinyTest', () => {
 
       await expect(
         api.testProperty('POST', '/test', {
-          // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
           property: () => true,
         } as any),
       ).rejects.toThrow('Schema is required for property testing');
@@ -414,7 +414,6 @@ describe('TinyTest', () => {
 
       await expect(
         api.testProperty('POST', '/test', {
-          // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
           schema: z.any(),
         } as any),
       ).rejects.toThrow('Property function is required');
@@ -428,12 +427,12 @@ describe('TinyTest', () => {
       api.get('/test', { handler: () => ({}) });
 
       // Server not started yet
-      expect(api['isServerStarted']).toBe(false);
+      expect(api.isServerStarted).toBe(false);
 
       await api.request('GET', '/test');
 
       // Server started automatically
-      expect(api['isServerStarted']).toBe(true);
+      expect(api.isServerStarted).toBe(true);
     });
 
     test('close() stops the server', async () => {
@@ -442,10 +441,10 @@ describe('TinyTest', () => {
       api.get('/test', { handler: () => ({}) });
 
       await api.request('GET', '/test');
-      expect(api['isServerStarted']).toBe(true);
+      expect(api.isServerStarted).toBe(true);
 
       await api.close();
-      expect(api['isServerStarted']).toBe(false);
+      expect(api.isServerStarted).toBe(false);
     });
 
     test('close() can be called multiple times safely', async () => {
@@ -512,7 +511,13 @@ describe('TinyTest', () => {
         query: { q: 'test', limit: 10 },
       });
 
-      expect((response.data as any).query).toEqual({ q: 'test', limit: 10 });
+      interface QueryResponse {
+        query: { q: string; limit: number };
+      }
+      expect((response.data as QueryResponse).query).toEqual({
+        q: 'test',
+        limit: 10,
+      });
     });
 
     test('validates body', async () => {
@@ -552,7 +557,8 @@ describe('TinyTest', () => {
 
       const { inject } = await import('../../../src/application/DependencyInjector');
 
-      const getDb = () => ({
+      type MockDb = { users: { findAll: () => { id: number; name: string }[] } };
+      const getDb = (): MockDb => ({
         users: { findAll: () => [{ id: 1, name: 'Gaby' }] },
       });
 
@@ -560,7 +566,7 @@ describe('TinyTest', () => {
         dependencies: {
           db: inject(getDb),
         },
-        handler: ({ dependencies }) => (dependencies.db as any).users.findAll(),
+        handler: ({ dependencies }) => (dependencies.db as MockDb).users.findAll(),
       });
 
       const response = await api.expectSuccess('GET', '/users');
@@ -593,4 +599,3 @@ describe('TinyTest', () => {
     });
   });
 });
-

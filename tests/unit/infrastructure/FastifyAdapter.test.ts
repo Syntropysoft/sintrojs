@@ -2,11 +2,12 @@
  * Tests for FastifyAdapter
  */
 
-import { describe, test, expect, beforeEach, afterEach } from 'vitest';
-import { createFastifyAdapter } from '../../../src/infrastructure/FastifyAdapter';
-import { Route } from '../../../src/domain/Route';
-import { z } from 'zod';
 import type { FastifyInstance } from 'fastify';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { z } from 'zod';
+import { Route } from '../../../src/domain/Route';
+import type { RequestContext } from '../../../src/domain/types';
+import { createFastifyAdapter } from '../../../src/infrastructure/FastifyAdapter';
 
 describe('FastifyAdapter', () => {
   let adapter: ReturnType<typeof createFastifyAdapter>;
@@ -203,7 +204,10 @@ describe('FastifyAdapter', () => {
           id: z.number(),
           name: z.string(),
         }),
-        handler: () => ({ id: 'invalid' as any, name: 123 as any }),
+        handler: () => ({
+          id: 'invalid' as any,
+          name: 123 as any,
+        }),
       });
 
       adapter.registerRoute(fastify, route);
@@ -252,7 +256,7 @@ describe('FastifyAdapter', () => {
     });
 
     test('builds context with correlation ID from header', async () => {
-      let receivedContext: any;
+      let receivedContext: RequestContext | undefined = undefined;
 
       const route = new Route('GET', '/test', {
         handler: (context) => {
@@ -277,7 +281,7 @@ describe('FastifyAdapter', () => {
     });
 
     test('generates correlation ID if not provided', async () => {
-      let receivedContext: any;
+      let receivedContext: RequestContext | undefined = undefined;
 
       const route = new Route('GET', '/test', {
         handler: (context) => {
@@ -299,7 +303,7 @@ describe('FastifyAdapter', () => {
     });
 
     test('builds context with timestamp', async () => {
-      let receivedContext: any;
+      let receivedContext: RequestContext | undefined = undefined;
 
       const route = new Route('GET', '/test', {
         handler: (context) => {
@@ -327,14 +331,12 @@ describe('FastifyAdapter', () => {
         handler: () => ({ ok: true }),
       });
 
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => adapter.registerRoute(null as any, route)).toThrow(
-        'Fastify instance is required'
+        'Fastify instance is required',
       );
     });
 
     test('throws error if route is not provided', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => adapter.registerRoute(fastify, null as any)).toThrow('Route is required');
     });
   });
@@ -358,21 +360,20 @@ describe('FastifyAdapter', () => {
     });
 
     test('throws error if fastify instance is not provided', async () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       await expect(adapter.listen(null as any, 3000)).rejects.toThrow(
-        'Fastify instance is required'
+        'Fastify instance is required',
       );
     });
 
     test('throws error if port is negative', async () => {
       await expect(adapter.listen(fastify, -1)).rejects.toThrow(
-        'Valid port number is required (0-65535)'
+        'Valid port number is required (0-65535)',
       );
     });
 
     test('throws error if port is too large', async () => {
       await expect(adapter.listen(fastify, 70000)).rejects.toThrow(
-        'Valid port number is required (0-65535)'
+        'Valid port number is required (0-65535)',
       );
     });
 
@@ -401,7 +402,6 @@ describe('FastifyAdapter', () => {
     });
 
     test('throws error if fastify instance is not provided', async () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       await expect(adapter.close(null as any)).rejects.toThrow('Fastify instance is required');
     });
 
@@ -423,21 +423,20 @@ describe('FastifyAdapter', () => {
       });
 
       // registerRoute guards
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+
       expect(() => adapter.registerRoute(null as any, route)).toThrow();
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+
       expect(() => adapter.registerRoute(fastify, null as any)).toThrow();
 
       // listen guards
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+
       expect(adapter.listen(null as any, 3000)).rejects.toThrow();
       expect(adapter.listen(fastify, -1)).rejects.toThrow();
       expect(adapter.listen(fastify, 70000)).rejects.toThrow();
 
       // close guards
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+
       expect(adapter.close(null as any)).rejects.toThrow();
     });
   });
 });
-

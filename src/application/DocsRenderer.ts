@@ -139,4 +139,3 @@ export const DocsRenderer = new DocsRendererImpl();
  * Factory for testing
  */
 export const createDocsRenderer = (): DocsRendererImpl => new DocsRendererImpl();
-

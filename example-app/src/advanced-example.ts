@@ -3,7 +3,7 @@
  * Demonstrates: DI, Background Tasks, All Features
  */
 
-import { TinyApi, HTTPException, NotFoundException, inject } from 'tinyapi';
+import { HTTPException, NotFoundException, TinyApi, inject } from 'tinyapi';
 import { z } from 'zod';
 
 // ============================================
@@ -336,11 +336,12 @@ app
     console.log('Try it:');
     console.log(`  curl ${address}/health`);
     console.log(`  curl ${address}/users`);
-    console.log(`  curl -X POST ${address}/users -H "Content-Type: application/json" -d '{"name":"Gaby","email":"gaby@example.com","age":30}'`);
+    console.log(
+      `  curl -X POST ${address}/users -H "Content-Type: application/json" -d '{"name":"Gaby","email":"gaby@example.com","age":30}'`,
+    );
     console.log('');
   })
   .catch((error) => {
     console.error('❌ Failed to start server:', error);
     process.exit(1);
   });
-

@@ -50,12 +50,10 @@ describe('DocsRenderer', () => {
     });
 
     it('should throw error if config is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => renderer.renderSwaggerUI(null as any)).toThrow('Config is required');
     });
 
     it('should throw error if openApiUrl is missing', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => renderer.renderSwaggerUI({} as any)).toThrow('Config.openApiUrl is required');
     });
   });
@@ -102,12 +100,10 @@ describe('DocsRenderer', () => {
     });
 
     it('should throw error if config is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => renderer.renderReDoc(null as any)).toThrow('Config is required');
     });
 
     it('should throw error if openApiUrl is missing', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => renderer.renderReDoc({} as any)).toThrow('Config.openApiUrl is required');
     });
   });
@@ -128,4 +124,3 @@ describe('DocsRenderer', () => {
     });
   });
 });
-

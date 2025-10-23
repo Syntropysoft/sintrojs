@@ -2,11 +2,11 @@
  * Tests for SmartMutator
  */
 
-import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { SmartMutator } from '../../../src/testing/SmartMutator'; // Cambiado a SmartMutator directamente
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { z } from 'zod';
 import { RouteRegistry } from '../../../src/application/RouteRegistry';
 import { Route } from '../../../src/domain/Route';
-import { z } from 'zod';
+import { SmartMutator } from '../../../src/testing/SmartMutator'; // Cambiado a SmartMutator directamente
 
 // Mock Stryker for unit tests
 const mockStrykerResult = Promise.resolve([
@@ -116,4 +116,3 @@ describe('SmartMutator', { timeout: 30000 }, () => {
     });
   });
 });
-

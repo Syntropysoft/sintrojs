@@ -1,7 +1,8 @@
-import { describe, test, expect } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { SmartMutator } from '../../src/testing/SmartMutator';
 
-describe.skip('SmartMutator E2E - Mínimo', { timeout: 120000 }, () => { // Increased timeout for E2E mutation tests
+describe.skip('SmartMutator E2E - Mínimo', { timeout: 120000 }, () => {
+  // Increased timeout for E2E mutation tests
 
   test('should run in smart mode and not report initial test failures', async () => {
     console.log('Starting SmartMutator in smart mode (E2E) - Mínimo');

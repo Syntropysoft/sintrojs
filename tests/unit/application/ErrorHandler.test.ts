@@ -2,7 +2,8 @@
  * ErrorHandler tests
  */
 
-import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { MockInstance, SpyInstance } from 'vitest';
 import { createErrorHandler } from '../../../src/application/ErrorHandler';
 import {
   BadRequestException,
@@ -14,7 +15,7 @@ import type { RequestContext } from '../../../src/domain/types';
 
 describe('ErrorHandler', () => {
   let handler: ReturnType<typeof createErrorHandler>;
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  let consoleErrorSpy: MockInstance<unknown[], void> | SpyInstance;
   let originalNodeEnv: string | undefined;
 
   beforeEach(() => {
@@ -22,17 +23,17 @@ describe('ErrorHandler', () => {
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     // Save original NODE_ENV and set default for tests
-    originalNodeEnv = process.env['NODE_ENV'];
-    process.env['NODE_ENV'] = 'development';
+    originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
   });
 
   afterEach(() => {
     consoleErrorSpy.mockRestore(); // Restore console.error
     // Restore original NODE_ENV
     if (originalNodeEnv !== undefined) {
-      process.env['NODE_ENV'] = originalNodeEnv;
+      process.env.NODE_ENV = originalNodeEnv;
     } else {
-      delete process.env['NODE_ENV'];
+      process.env.NODE_ENV = undefined;
     }
   });
 
@@ -46,6 +47,8 @@ describe('ErrorHandler', () => {
     cookies: {},
     correlationId: 'test-123',
     timestamp: new Date(),
+    dependencies: {}, // Added for RequestContext compatibility
+    background: {}, // Added for RequestContext compatibility
   });
 
   describe('Default handlers', () => {
@@ -113,7 +116,7 @@ describe('ErrorHandler', () => {
       const context = createMockContext();
 
       // Override NODE_ENV for this specific test
-      process.env['NODE_ENV'] = 'production';
+      process.env.NODE_ENV = 'production';
 
       const response = await handler.handle(error, context);
 
@@ -178,14 +181,12 @@ describe('ErrorHandler', () => {
     });
 
     it('should throw error if error class is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => handler.register(null as any, () => ({}) as any)).toThrow(
         'Error class is required',
       );
     });
 
     it('should throw error if handler function is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => handler.register(Error, null as any)).toThrow('Handler function is required');
     });
   });
@@ -193,15 +194,11 @@ describe('ErrorHandler', () => {
   describe('handle', () => {
     it('should throw error if error is null', async () => {
       const context = createMockContext();
-
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       await expect(handler.handle(null as any, context)).rejects.toThrow('Error is required');
     });
 
     it('should throw error if context is null', async () => {
       const error = new Error('test');
-
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       await expect(handler.handle(error, null as any)).rejects.toThrow('Context is required');
     });
 
@@ -220,7 +217,6 @@ describe('ErrorHandler', () => {
     it('should return true for registered handlers', () => {
       class CustomError extends Error {}
 
-      // biome-ignore lint/suspicious/noExplicitAny: Mock handler for testing
       handler.register(CustomError, () => ({}) as any);
 
       expect(handler.hasHandler(CustomError)).toBe(true);
@@ -239,7 +235,6 @@ describe('ErrorHandler', () => {
     });
 
     it('should throw error if error class is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => handler.hasHandler(null as any)).toThrow('Error class is required');
     });
   });
@@ -256,7 +251,6 @@ describe('ErrorHandler', () => {
     it('should include custom registered classes', () => {
       class CustomError extends Error {}
 
-      // biome-ignore lint/suspicious/noExplicitAny: Mock handler for testing
       handler.register(CustomError, () => ({}) as any);
 
       const classes = handler.getRegisteredErrorClasses();
@@ -268,7 +262,6 @@ describe('ErrorHandler', () => {
       const classes = handler.getRegisteredErrorClasses();
 
       // Try to modify
-      // biome-ignore lint/suspicious/noExplicitAny: Testing immutability
       (classes as any).push(null);
 
       // Should not affect internal state
@@ -281,7 +274,6 @@ describe('ErrorHandler', () => {
     it('should clear custom handlers but keep defaults', () => {
       class CustomError extends Error {}
 
-      // biome-ignore lint/suspicious/noExplicitAny: Mock handler for testing
       handler.register(CustomError, () => ({}) as any);
 
       expect(handler.hasHandler(CustomError)).toBe(true);
@@ -322,7 +314,7 @@ describe('ErrorHandler', () => {
     it('should fall back to parent handler if child not registered', async () => {
       // Create fresh handler to avoid default Error handler interference
       const freshHandler = createErrorHandler();
-      
+
       class ParentError extends Error {}
       class ChildError extends ParentError {}
 
@@ -357,7 +349,6 @@ describe('ErrorHandler', () => {
     it('should handle nested errors', async () => {
       const originalError = new Error('Original');
       const wrappedError = new Error('Wrapped');
-      // biome-ignore lint/suspicious/noExplicitAny: Setting error cause for testing
       (wrappedError as any).cause = originalError;
 
       const context = createMockContext();

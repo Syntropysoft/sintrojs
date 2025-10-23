@@ -2,9 +2,9 @@
  * Tests for ZodAdapter
  */
 
-import { describe, test, expect } from 'vitest';
-import { createZodAdapter } from '../../../src/infrastructure/ZodAdapter';
+import { describe, expect, test } from 'vitest';
 import { z } from 'zod';
+import { createZodAdapter } from '../../../src/infrastructure/ZodAdapter';
 
 describe('ZodAdapter', () => {
   const adapter = createZodAdapter();
@@ -139,12 +139,10 @@ describe('ZodAdapter', () => {
     });
 
     test('throws error if schema is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => adapter.toJsonSchema(null as any)).toThrow('Schema is required');
     });
 
     test('throws error if schema is undefined', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => adapter.toJsonSchema(undefined as any)).toThrow('Schema is required');
     });
 
@@ -184,12 +182,10 @@ describe('ZodAdapter', () => {
     });
 
     test('throws error if schema is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => adapter.isOptional(null as any)).toThrow('Schema is required');
     });
 
     test('throws error if schema is undefined', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => adapter.isOptional(undefined as any)).toThrow('Schema is required');
     });
   });
@@ -208,20 +204,20 @@ describe('ZodAdapter', () => {
     });
 
     test('returns true for nullable object', () => {
-      const schema = z.object({
-        name: z.string(),
-      }).nullable();
+      const schema = z
+        .object({
+          name: z.string(),
+        })
+        .nullable();
 
       expect(adapter.isNullable(schema)).toBe(true);
     });
 
     test('throws error if schema is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => adapter.isNullable(null as any)).toThrow('Schema is required');
     });
 
     test('throws error if schema is undefined', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => adapter.isNullable(undefined as any)).toThrow('Schema is required');
     });
   });
@@ -244,10 +240,12 @@ describe('ZodAdapter', () => {
     });
 
     test('works with complex schemas', () => {
-      const schema = z.object({
-        name: z.string(),
-        age: z.number(),
-      }).describe('User profile data');
+      const schema = z
+        .object({
+          name: z.string(),
+          age: z.number(),
+        })
+        .describe('User profile data');
 
       const description = adapter.getDescription(schema);
 
@@ -255,25 +253,22 @@ describe('ZodAdapter', () => {
     });
 
     test('throws error if schema is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => adapter.getDescription(null as any)).toThrow('Schema is required');
     });
 
     test('throws error if schema is undefined', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => adapter.getDescription(undefined as any)).toThrow('Schema is required');
     });
   });
 
   describe('Guard Clauses', () => {
     test('all methods validate required schema parameter', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => adapter.toJsonSchema(null as any)).toThrow('Schema is required');
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+
       expect(() => adapter.isOptional(null as any)).toThrow('Schema is required');
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+
       expect(() => adapter.isNullable(null as any)).toThrow('Schema is required');
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
+
       expect(() => adapter.getDescription(null as any)).toThrow('Schema is required');
     });
   });
@@ -379,4 +374,3 @@ describe('ZodAdapter', () => {
     });
   });
 });
-

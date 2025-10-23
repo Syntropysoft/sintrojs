@@ -2,7 +2,7 @@
  * Tests for DependencyInjector
  */
 
-import { describe, test, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, test } from 'vitest';
 import { createDependencyInjector, inject } from '../../../src/application/DependencyInjector';
 import type { RequestContext } from '../../../src/domain/types';
 
@@ -51,12 +51,10 @@ describe('DependencyInjector', () => {
     });
 
     test('throws error if factory is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => inject(null as any)).toThrow('Factory function is required');
     });
 
     test('throws error if factory is undefined', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => inject(undefined as any)).toThrow('Factory function is required');
     });
   });
@@ -65,10 +63,7 @@ describe('DependencyInjector', () => {
     test('resolves simple request-scoped dependency', async () => {
       const dep = inject(() => ({ value: 'test' }));
 
-      const { resolved, cleanup } = await injector.resolve(
-        { myDep: dep },
-        mockContext,
-      );
+      const { resolved, cleanup } = await injector.resolve({ myDep: dep }, mockContext);
 
       expect(resolved.myDep).toEqual({ value: 'test' });
       expect(cleanup).toBeInstanceOf(Function);
@@ -90,10 +85,7 @@ describe('DependencyInjector', () => {
       const cache = inject(() => ({ name: 'cache' }));
       const logger = inject(() => ({ name: 'logger' }));
 
-      const { resolved } = await injector.resolve(
-        { db, cache, logger },
-        mockContext,
-      );
+      const { resolved } = await injector.resolve({ db, cache, logger }, mockContext);
 
       expect(resolved.db).toEqual({ name: 'db' });
       expect(resolved.cache).toEqual({ name: 'cache' });
@@ -191,7 +183,6 @@ describe('DependencyInjector', () => {
     });
 
     test('throws error if dependencies object is null', async () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       await expect(injector.resolve(null as any, mockContext)).rejects.toThrow(
         'Dependencies object is required',
       );
@@ -199,22 +190,18 @@ describe('DependencyInjector', () => {
 
     test('throws error if context is null', async () => {
       const dep = inject(() => ({}));
-
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       await expect(injector.resolve({ myDep: dep }, null as any)).rejects.toThrow(
         'Request context is required',
       );
     });
 
     test('throws error if provider is missing', async () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       await expect(injector.resolve({ myDep: {} as any }, mockContext)).rejects.toThrow(
         "Provider for dependency 'myDep' is required",
       );
     });
 
     test('throws error if factory is missing', async () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       await expect(
         injector.resolve({ myDep: { provider: { scope: 'request' } } as any }, mockContext),
       ).rejects.toThrow("Factory function for dependency 'myDep' is required");
@@ -248,9 +235,9 @@ describe('DependencyInjector', () => {
       const dep = inject(() => ({ value: 'test' })); // Request scope
 
       await injector.resolve({ myDep: dep }, mockContext);
-      
+
       injector.clearSingletons();
-      
+
       expect(injector.getSingletonCount()).toBe(0);
     });
   });
@@ -348,4 +335,3 @@ describe('DependencyInjector', () => {
     });
   });
 });
-

@@ -148,8 +148,7 @@ class SchemaValidatorImpl {
     }
 
     // Zod supports partial() for partial validation
-    // biome-ignore lint/suspicious/noExplicitAny: Zod internal method
-    const partialSchema = (schema as any).partial();
+    const partialSchema = schema.partial();
 
     return this.validate(partialSchema, data);
   }

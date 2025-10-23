@@ -72,6 +72,7 @@ export interface ContractTestOptions {
 export interface PropertyTestOptions {
   schema: ZodSchema;
   iterations?: number;
+  // biome-ignore lint/suspicious/noExplicitAny: The response type is dynamic based on route schema
   property: (response: any) => boolean;
 }
 
@@ -245,11 +246,7 @@ export class TinyTest extends TinyApi {
    * @param path - Request path
    * @param cases - Boundary test cases
    */
-  async testBoundaries(
-    method: HttpMethod,
-    path: string,
-    cases: BoundaryTestCase[],
-  ): Promise<void> {
+  async testBoundaries(method: HttpMethod, path: string, cases: BoundaryTestCase[]): Promise<void> {
     // Guard clause
     if (!cases || cases.length === 0) {
       throw new Error('At least one boundary test case is required');
@@ -270,9 +267,7 @@ export class TinyTest extends TinyApi {
         }
 
         if (testCase.expected.status && response.status !== testCase.expected.status) {
-          throw new Error(
-            `Expected status ${testCase.expected.status} but got ${response.status}`,
-          );
+          throw new Error(`Expected status ${testCase.expected.status} but got ${response.status}`);
         }
       } else {
         // Expect error status
@@ -284,9 +279,7 @@ export class TinyTest extends TinyApi {
         }
 
         if (testCase.expected.status && response.status !== testCase.expected.status) {
-          throw new Error(
-            `Expected status ${testCase.expected.status} but got ${response.status}`,
-          );
+          throw new Error(`Expected status ${testCase.expected.status} but got ${response.status}`);
         }
       }
     }
@@ -405,4 +398,3 @@ export class TinyTest extends TinyApi {
     }
   }
 }
-

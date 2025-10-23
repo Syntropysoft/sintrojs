@@ -69,12 +69,10 @@ describe('SchemaValidator', () => {
     });
 
     it('should throw error if schema is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => validator.validate(null as any, {})).toThrow('Schema is required');
     });
 
     it('should throw error if schema is undefined', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => validator.validate(undefined as any, {})).toThrow('Schema is required');
     });
 
@@ -190,7 +188,6 @@ describe('SchemaValidator', () => {
     });
 
     it('should throw error if schema is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => validator.validateOrThrow(null as any, {})).toThrow('Schema is required');
     });
   });
@@ -225,7 +222,6 @@ describe('SchemaValidator', () => {
     });
 
     it('should throw error if validations array is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => validator.validateMany(null as any)).toThrow('Validations array is required');
     });
 
@@ -252,7 +248,6 @@ describe('SchemaValidator', () => {
     });
 
     it('should throw error if schema is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => validator.isValid(null as any, {})).toThrow('Schema is required');
     });
   });
@@ -286,7 +281,6 @@ describe('SchemaValidator', () => {
     });
 
     it('should throw error if schema is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => validator.validatePartial(null as any, {})).toThrow('Schema is required');
     });
   });
@@ -319,7 +313,6 @@ describe('SchemaValidator', () => {
     });
 
     it('should throw error if schema is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => validator.getDefaults(null as any)).toThrow('Schema is required');
     });
   });
@@ -368,7 +361,6 @@ describe('SchemaValidator', () => {
     });
 
     it('should throw error if schema is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => validator.validateAndTransform(null as any, {}, (x) => x)).toThrow(
         'Schema is required',
       );
@@ -377,7 +369,6 @@ describe('SchemaValidator', () => {
     it('should throw error if transform function is null', () => {
       const schema = z.object({ name: z.string() });
 
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => validator.validateAndTransform(schema, {}, null as any)).toThrow(
         'Transform function is required',
       );

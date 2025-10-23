@@ -14,13 +14,7 @@ import type { ExceptionHandler, RequestContext, RouteResponse } from '../domain/
  */
 class ErrorHandlerImpl {
   // Immutable: Map is never replaced
-  private readonly handlers = new Map<
-    new (
-      // biome-ignore lint/suspicious/noExplicitAny: Need to store error constructor with any args
-      ...args: any[]
-    ) => Error,
-    ExceptionHandler
-  >();
+  private readonly handlers = new Map<new (...args: any[]) => Error, ExceptionHandler>();
 
   constructor() {
     // Register default handlers on initialization
@@ -34,7 +28,6 @@ class ErrorHandlerImpl {
    * @param handler - Handler function
    */
   register<E extends Error>(
-    // biome-ignore lint/suspicious/noExplicitAny: Need to accept any error constructor
     errorClass: new (...args: any[]) => E,
     handler: ExceptionHandler<E>,
   ): void {
@@ -90,18 +83,14 @@ class ErrorHandlerImpl {
    */
   private findHandler(error: Error): ExceptionHandler | undefined {
     // Check exact class match first (most specific)
-    // biome-ignore lint/suspicious/noExplicitAny: Need to cast error constructor
     const exactHandler = this.handlers.get(error.constructor as any);
     if (exactHandler) {
       return exactHandler;
     }
 
     // Find all matching handlers in inheritance chain
-    const matches: Array<{
-      // biome-ignore lint/suspicious/noExplicitAny: Need to store error constructor
-      errorClass: new (...args: any[]) => Error;
-      handler: ExceptionHandler;
-    }> = [];
+    const matches: Array<{ errorClass: new (...args: any[]) => Error; handler: ExceptionHandler }> =
+      [];
 
     for (const [errorClass, handler] of this.handlers.entries()) {
       if (error instanceof errorClass) {
@@ -190,7 +179,7 @@ class ErrorHandlerImpl {
       return {
         status: 500,
         body: {
-          detail: process.env['NODE_ENV'] === 'production' ? 'Internal Server Error' : error.message,
+          detail: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : error.message,
           path: context.path,
         },
       };
@@ -210,7 +199,7 @@ class ErrorHandlerImpl {
     return {
       status: 500,
       body: {
-        detail: process.env['NODE_ENV'] === 'production' ? 'Internal Server Error' : error.message,
+        detail: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : error.message,
         path: context.path,
       },
     };
@@ -222,7 +211,6 @@ class ErrorHandlerImpl {
    * @param errorClass - Error class to check
    * @returns true if handler exists
    */
-  // biome-ignore lint/suspicious/noExplicitAny: Need to accept any error constructor
   hasHandler(errorClass: new (...args: any[]) => Error): boolean {
     // Guard clause
     if (!errorClass) {
@@ -237,7 +225,6 @@ class ErrorHandlerImpl {
    *
    * @returns Immutable array of error classes
    */
-  // biome-ignore lint/suspicious/noExplicitAny: Need to return any error constructor
   getRegisteredErrorClasses(): ReadonlyArray<new (...args: any[]) => Error> {
     return [...this.handlers.keys()];
   }

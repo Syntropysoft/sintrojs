@@ -63,7 +63,6 @@ describe('Route', () => {
     });
 
     it('should throw error if config is missing', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => new Route('GET', '/users', null as any)).toThrow('Route config is required');
     });
 

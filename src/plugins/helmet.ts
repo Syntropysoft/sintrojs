@@ -1,6 +1,6 @@
 /**
  * Helmet Plugin - Wrapper for @fastify/helmet
- * 
+ *
  * Security headers configuration for TinyApi
  */
 
@@ -8,7 +8,7 @@ import type { FastifyInstance } from 'fastify';
 
 /**
  * Helmet Configuration Options
- * 
+ *
  * Sets secure HTTP headers to protect against common vulnerabilities
  */
 export interface HelmetOptions {
@@ -51,11 +51,13 @@ export interface HelmetOptions {
   /**
    * Strict-Transport-Security
    */
-  hsts?: boolean | {
-    maxAge?: number;
-    includeSubDomains?: boolean;
-    preload?: boolean;
-  };
+  hsts?:
+    | boolean
+    | {
+        maxAge?: number;
+        includeSubDomains?: boolean;
+        preload?: boolean;
+      };
 
   /**
    * X-Content-Type-Options
@@ -90,17 +92,17 @@ export interface HelmetOptions {
 
 /**
  * Register Helmet plugin
- * 
+ *
  * @param fastify - Fastify instance
  * @param options - Helmet options
- * 
+ *
  * @example
  * ```typescript
  * import { registerHelmet } from 'tinyapi/plugins';
- * 
+ *
  * // Enable all security headers (default)
  * await registerHelmet(app.getRawFastify());
- * 
+ *
  * // Custom configuration
  * await registerHelmet(app.getRawFastify(), {
  *   contentSecurityPolicy: {
@@ -128,13 +130,11 @@ export async function registerHelmet(
     fastifyHelmet = (await import('@fastify/helmet')).default;
   } catch (error) {
     throw new Error(
-      'Helmet plugin requires @fastify/helmet to be installed. ' +
-      'Run: pnpm add @fastify/helmet',
+      'Helmet plugin requires @fastify/helmet to be installed. ' + 'Run: pnpm add @fastify/helmet',
     );
   }
 
   // Pass options directly - Fastify handles undefined values correctly
-  // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   await fastify.register(fastifyHelmet, {
     global: options.global ?? true,
     contentSecurityPolicy: options.contentSecurityPolicy,
@@ -150,6 +150,6 @@ export async function registerHelmet(
     frameguard: options.frameguard,
     permittedCrossDomainPolicies: options.permittedCrossDomainPolicies,
     xssFilter: options.xssFilter,
+    // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   } as any);
 }
-

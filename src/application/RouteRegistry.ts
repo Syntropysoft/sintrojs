@@ -14,8 +14,7 @@ import type { HttpMethod } from '../domain/types';
  */
 class RouteRegistryImpl {
   // Immutable: Map is never replaced, only its entries are modified
-  // biome-ignore lint/suspicious/noExplicitAny: Route can have any generic types
-  private readonly routes = new Map<string, Route<any, any, any, any>>();
+  private readonly routes = new Map<string, Route>();
 
   /**
    * Registers a new route
@@ -23,7 +22,7 @@ class RouteRegistryImpl {
    * @param route - Route to register
    * @throws Error if route already exists
    */
-  register(route: Route<any, any, any, any>): void {
+  register(route: Route): void {
     // Guard clause: validate route exists
     if (!route) {
       throw new Error('Route is required');
@@ -47,7 +46,7 @@ class RouteRegistryImpl {
    * @param path - Route path
    * @returns Route if exists, undefined otherwise
    */
-  get(method: HttpMethod, path: string): Route<any, any, any, any> | undefined {
+  get(method: HttpMethod, path: string): Route | undefined {
     // Guard clauses
     if (!method) {
       throw new Error('Method is required');
@@ -89,7 +88,7 @@ class RouteRegistryImpl {
    *
    * @returns Immutable array of routes
    */
-  getAll(): ReadonlyArray<Route<any, any, any, any>> {
+  getAll(): ReadonlyArray<Route> {
     // Return immutable array (spread creates new copy)
     return [...this.routes.values()];
   }
@@ -100,7 +99,7 @@ class RouteRegistryImpl {
    * @param method - HTTP method to filter by
    * @returns Immutable array of matching routes
    */
-  getByMethod(method: HttpMethod): ReadonlyArray<Route<any, any, any, any>> {
+  getByMethod(method: HttpMethod): ReadonlyArray<Route> {
     // Guard clause
     if (!method) {
       throw new Error('Method is required');
@@ -116,7 +115,7 @@ class RouteRegistryImpl {
    * @param tag - Tag to filter by
    * @returns Immutable array of routes containing the tag
    */
-  getByTag(tag: string): ReadonlyArray<Route<any, any, any, any>> {
+  getByTag(tag: string): ReadonlyArray<Route> {
     // Guard clause
     if (!tag) {
       throw new Error('Tag is required');

@@ -15,5 +15,9 @@ export default defineConfig({
   minify: false,
   target: 'es2022',
   outDir: 'dist',
-  external: [...Object.keys(dependencies), ...Object.keys(devDependencies), ...Object.keys(peerDependencies)],
+  external: [
+    ...Object.keys(dependencies),
+    ...Object.keys(devDependencies),
+    ...Object.keys(peerDependencies),
+  ],
 });

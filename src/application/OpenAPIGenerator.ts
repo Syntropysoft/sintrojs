@@ -98,6 +98,11 @@ export interface OpenAPIConfig {
   servers?: Array<{ url: string; description?: string }>;
 }
 
+interface JsonSchema {
+  properties?: Record<string, unknown>;
+  required?: string[];
+}
+
 /**
  * OpenAPI generator implementation
  */
@@ -175,7 +180,13 @@ class OpenAPIGeneratorImpl {
         continue;
       }
 
-      if (method === 'get' || method === 'post' || method === 'put' || method === 'delete' || method === 'patch') {
+      if (
+        method === 'get' ||
+        method === 'post' ||
+        method === 'put' ||
+        method === 'delete' ||
+        method === 'patch'
+      ) {
         pathItem[method] = this.buildOperation(route);
       }
     }
@@ -277,7 +288,7 @@ class OpenAPIGeneratorImpl {
    * @param schema - Zod schema for params
    * @returns Array of parameter objects
    */
-  private extractPathParameters(path: string, schema: any): ParameterObject[] {
+  private extractPathParameters(path: string, schema: unknown): ParameterObject[] {
     // Extract param names from path (e.g., :id, :userId)
     const paramMatches = path.matchAll(/:([a-zA-Z_][a-zA-Z0-9_]*)/g);
     const paramNames = Array.from(paramMatches, (match) => match[1]);
@@ -299,12 +310,12 @@ class OpenAPIGeneratorImpl {
    * @param schema - Zod schema for query
    * @returns Array of parameter objects
    */
-  private extractQueryParameters(schema: any): ParameterObject[] {
-    const jsonSchema = ZodAdapter.toJsonSchema(schema);
+  private extractQueryParameters(schema: unknown): ParameterObject[] {
+    const jsonSchema = ZodAdapter.toJsonSchema(schema) as JsonSchema;
 
     // Get properties from JSON Schema
-    const properties = (jsonSchema as any).properties || {};
-    const required = (jsonSchema as any).required || [];
+    const properties = jsonSchema.properties || {};
+    const required = jsonSchema.required || [];
 
     // Convert to OpenAPI parameters
     return Object.keys(properties).map((name) => ({
@@ -322,9 +333,9 @@ class OpenAPIGeneratorImpl {
    * @param propertyName - Property name
    * @returns JSON Schema for property
    */
-  private getSchemaForProperty(schema: any, propertyName: string): unknown {
-    const jsonSchema = ZodAdapter.toJsonSchema(schema);
-    const properties = (jsonSchema as any).properties || {};
+  private getSchemaForProperty(schema: unknown, propertyName: string): unknown {
+    const jsonSchema = ZodAdapter.toJsonSchema(schema) as JsonSchema;
+    const properties = jsonSchema.properties || {};
 
     return properties[propertyName] || { type: 'string' };
   }
@@ -339,4 +350,3 @@ export const OpenAPIGenerator = new OpenAPIGeneratorImpl();
  * Factory for testing
  */
 export const createOpenAPIGenerator = (): OpenAPIGeneratorImpl => new OpenAPIGeneratorImpl();
-

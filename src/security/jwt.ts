@@ -333,4 +333,3 @@ export function decodeJWT(token: string): JWTPayload {
     throw new JWTError('Invalid JWT payload (not valid JSON)', 'INVALID_FORMAT');
   }
 }
-

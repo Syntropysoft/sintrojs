@@ -5,9 +5,9 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { TinyApi } from '../../src/core/TinyApi';
-import { RouteRegistry } from '../../src/application/RouteRegistry';
 import { ErrorHandler } from '../../src/application/ErrorHandler';
+import { RouteRegistry } from '../../src/application/RouteRegistry';
+import { TinyApi } from '../../src/core/TinyApi';
 
 describe('OpenAPI E2E', () => {
   let app: TinyApi;
@@ -82,9 +82,9 @@ describe('OpenAPI E2E', () => {
   });
 
   it('should handle multiple routes in spec', async () => {
-    app.get('/users', { handler: () => ([]) });
+    app.get('/users', { handler: () => [] });
     app.post('/users', { handler: () => ({}) });
-    app.get('/posts', { handler: () => ([]) });
+    app.get('/posts', { handler: () => [] });
 
     server = await app.listen(0);
     const port = new URL(server).port;
@@ -116,4 +116,3 @@ describe('OpenAPI E2E', () => {
     expect(operation.responses['200']).toBeUndefined();
   });
 });
-

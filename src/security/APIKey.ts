@@ -165,4 +165,3 @@ export class APIKeyQuery {
     return apiKey.trim();
   }
 }
-

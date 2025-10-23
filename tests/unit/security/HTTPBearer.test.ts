@@ -2,10 +2,10 @@
  * Unit tests for HTTPBearer
  */
 
-import { describe, test, expect } from 'vitest';
-import { HTTPBearer } from '../../../src/security/HTTPBearer';
-import { HTTPException } from '../../../src/domain/HTTPException';
 import type { FastifyRequest } from 'fastify';
+import { describe, expect, test } from 'vitest';
+import { HTTPException } from '../../../src/domain/HTTPException';
+import { HTTPBearer } from '../../../src/security/HTTPBearer';
 
 describe('HTTPBearer', () => {
   const bearer = new HTTPBearer();
@@ -36,7 +36,8 @@ describe('HTTPBearer', () => {
     });
 
     test('should extract complex token (JWT-like)', async () => {
-      const jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
+      const jwtToken =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U';
       const request = {
         headers: {
           authorization: `Bearer ${jwtToken}`,
@@ -124,4 +125,3 @@ describe('HTTPBearer', () => {
     });
   });
 });
-

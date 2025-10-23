@@ -2,10 +2,35 @@
  * E2E tests for Dependency Injection
  */
 
-import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
-import { TinyApi } from '../../src/core/TinyApi';
-import { inject, DependencyInjector } from '../../src/application/DependencyInjector';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
+import { DependencyInjector, inject } from '../../src/application/DependencyInjector';
+import { TinyApi } from '../../src/core/TinyApi';
+
+interface MockDb {
+  users: { findAll: () => { id: number; name: string }[] };
+  instanceId: number;
+}
+
+interface MockDep {
+  name: string;
+}
+
+interface ResponseData {
+  instance: number;
+}
+
+interface AsyncDb {
+  users: { findAll: () => { id: number; name: string }[] };
+}
+
+interface CleanupDb {
+  query: () => string;
+}
+
+interface LoggerContext {
+  correlationId: string;
+}
 
 describe('Dependency Injection E2E', () => {
   let app: TinyApi;
@@ -45,7 +70,10 @@ describe('Dependency Injection E2E', () => {
         db: inject(getDb), // Request scope
       },
       handler: ({ dependencies }) => {
-        return { users: (dependencies.db as any).users.findAll(), instance: (dependencies.db as any).instanceId };
+        return {
+          users: (dependencies.db as MockDb).users.findAll(),
+          instance: (dependencies.db as MockDb).instanceId,
+        };
       },
     });
 
@@ -61,8 +89,8 @@ describe('Dependency Injection E2E', () => {
     const data2 = await response2.json();
 
     // Each request should get a new instance
-    expect((data1 as any).instance).toBe(1);
-    expect((data2 as any).instance).toBe(2);
+    expect((data1 as ResponseData).instance).toBe(1);
+    expect((data2 as ResponseData).instance).toBe(2);
     expect(instanceCount).toBe(2);
   });
 
@@ -116,9 +144,9 @@ describe('Dependency Injection E2E', () => {
       },
       handler: ({ dependencies }) => {
         return {
-          db: (dependencies.db as any).name,
-          cache: (dependencies.cache as any).name,
-          logger: (dependencies.logger as any).name,
+          db: (dependencies.db as MockDep).name,
+          cache: (dependencies.cache as MockDep).name,
+          logger: (dependencies.logger as MockDep).name,
         };
       },
     });
@@ -151,7 +179,7 @@ describe('Dependency Injection E2E', () => {
         db: inject(getDb),
       },
       handler: async ({ dependencies }) => {
-        return (dependencies.db as any).users.findAll();
+        return (dependencies.db as AsyncDb).users.findAll();
       },
     });
 
@@ -181,7 +209,7 @@ describe('Dependency Injection E2E', () => {
         }),
       },
       handler: ({ dependencies }) => {
-        return { result: (dependencies.db as any).query() };
+        return { result: (dependencies.db as CleanupDb).query() };
       },
     });
 
@@ -199,7 +227,7 @@ describe('Dependency Injection E2E', () => {
   test('dependency with request context access', async () => {
     let receivedCorrelationId: string | undefined;
 
-    const getLogger = (context: any) => {
+    const getLogger = (context: LoggerContext) => {
       receivedCorrelationId = context.correlationId;
       return {
         log: (msg: string) => msg,
@@ -295,4 +323,3 @@ describe('Dependency Injection E2E', () => {
     expect(errorBody.detail).toBe('Database connection failed');
   });
 });
-

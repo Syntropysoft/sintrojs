@@ -50,7 +50,9 @@ export class HTTPBasic {
 
     // Guard: Invalid format
     if (!authHeader.startsWith('Basic ')) {
-      throw new HTTPException(401, 'Invalid authentication credentials', { 'WWW-Authenticate': 'Basic' });
+      throw new HTTPException(401, 'Invalid authentication credentials', {
+        'WWW-Authenticate': 'Basic',
+      });
     }
 
     // Extract base64 credentials
@@ -58,7 +60,9 @@ export class HTTPBasic {
 
     // Guard: Empty credentials
     if (base64Credentials === '') {
-      throw new HTTPException(401, 'Invalid authentication credentials', { 'WWW-Authenticate': 'Basic' });
+      throw new HTTPException(401, 'Invalid authentication credentials', {
+        'WWW-Authenticate': 'Basic',
+      });
     }
 
     // Decode credentials
@@ -66,7 +70,9 @@ export class HTTPBasic {
     try {
       credentials = Buffer.from(base64Credentials, 'base64').toString('utf8');
     } catch {
-      throw new HTTPException(401, 'Invalid authentication credentials', { 'WWW-Authenticate': 'Basic' });
+      throw new HTTPException(401, 'Invalid authentication credentials', {
+        'WWW-Authenticate': 'Basic',
+      });
     }
 
     // Parse username:password
@@ -74,7 +80,9 @@ export class HTTPBasic {
 
     // Guard: Invalid format (no colon)
     if (colonIndex === -1) {
-      throw new HTTPException(401, 'Invalid authentication credentials', { 'WWW-Authenticate': 'Basic' });
+      throw new HTTPException(401, 'Invalid authentication credentials', {
+        'WWW-Authenticate': 'Basic',
+      });
     }
 
     const username = credentials.slice(0, colonIndex);
@@ -82,10 +90,11 @@ export class HTTPBasic {
 
     // Guard: Empty username
     if (username === '') {
-      throw new HTTPException(401, 'Invalid authentication credentials', { 'WWW-Authenticate': 'Basic' });
+      throw new HTTPException(401, 'Invalid authentication credentials', {
+        'WWW-Authenticate': 'Basic',
+      });
     }
 
     return { username, password };
   }
 }
-

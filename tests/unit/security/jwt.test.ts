@@ -2,8 +2,14 @@
  * Unit tests for JWT utilities
  */
 
-import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { signJWT, verifyJWT, decodeJWT, JWTError, type JWTPayload } from '../../../src/security/jwt';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
+import {
+  JWTError,
+  type JWTPayload,
+  decodeJWT,
+  signJWT,
+  verifyJWT,
+} from '../../../src/security/jwt';
 
 describe('JWT Utilities', () => {
   const SECRET = 'test-secret-key';
@@ -105,15 +111,12 @@ describe('JWT Utilities', () => {
     });
 
     test('should throw if payload is not an object', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => signJWT(null as any, { secret: SECRET })).toThrow(
         'JWT payload must be an object',
       );
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => signJWT(undefined as any, { secret: SECRET })).toThrow(
         'JWT payload must be an object',
       );
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => signJWT('invalid' as any, { secret: SECRET })).toThrow(
         'JWT payload must be an object',
       );
@@ -190,7 +193,7 @@ describe('JWT Utilities', () => {
 
     test('should throw if signature is invalid', () => {
       const token = signJWT(PAYLOAD, { secret: SECRET });
-      const tamperedToken = token.slice(0, -5) + 'XXXXX'; // Tamper with signature
+      const tamperedToken = `${token.slice(0, -5)}XXXXX`; // Tamper with signature
 
       expect(() => verifyJWT(tamperedToken, { secret: SECRET })).toThrow(JWTError);
       expect(() => verifyJWT(tamperedToken, { secret: SECRET })).toThrow('Invalid JWT signature');
@@ -315,7 +318,7 @@ describe('JWT Utilities', () => {
 
     test('should decode token with invalid signature (no verification)', () => {
       const token = signJWT(PAYLOAD, { secret: SECRET });
-      const tamperedToken = token.slice(0, -5) + 'XXXXX';
+      const tamperedToken = `${token.slice(0, -5)}XXXXX`;
 
       // Should NOT throw (no verification)
       const decoded = decodeJWT(tamperedToken);
@@ -357,7 +360,9 @@ describe('JWT Utilities', () => {
 
     test('should throw if payload is not valid JSON', () => {
       // Create a token with invalid JSON payload manually
-      const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+      const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString(
+        'base64url',
+      );
       const payload = Buffer.from('invalid-json').toString('base64url');
       const token = `${header}.${payload}.signature`;
 
@@ -459,7 +464,7 @@ describe('JWT Utilities', () => {
 
     test('should have INVALID_SIGNATURE code', () => {
       const token = signJWT(PAYLOAD, { secret: SECRET });
-      const tamperedToken = token.slice(0, -5) + 'XXXXX';
+      const tamperedToken = `${token.slice(0, -5)}XXXXX`;
 
       try {
         verifyJWT(tamperedToken, { secret: SECRET });
@@ -485,4 +490,3 @@ describe('JWT Utilities', () => {
     });
   });
 });
-

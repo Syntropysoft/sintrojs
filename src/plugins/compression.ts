@@ -1,6 +1,6 @@
 /**
  * Compression Plugin - Wrapper for @fastify/compress
- * 
+ *
  * Response compression for TinyApi (gzip, deflate, brotli)
  */
 
@@ -63,17 +63,17 @@ export interface CompressionOptions {
 
 /**
  * Register Compression plugin
- * 
+ *
  * @param fastify - Fastify instance
  * @param options - Compression options
- * 
+ *
  * @example
  * ```typescript
  * import { registerCompression } from 'tinyapi/plugins';
- * 
+ *
  * // Enable compression with defaults
  * await registerCompression(app.getRawFastify());
- * 
+ *
  * // Custom threshold and level
  * await registerCompression(app.getRawFastify(), {
  *   threshold: 2048, // Only compress responses > 2KB
@@ -98,12 +98,11 @@ export async function registerCompression(
   } catch (error) {
     throw new Error(
       'Compression plugin requires @fastify/compress to be installed. ' +
-      'Run: pnpm add @fastify/compress',
+        'Run: pnpm add @fastify/compress',
     );
   }
 
   // Pass options directly - Fastify handles undefined values correctly
-  // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   await fastify.register(fastifyCompress, {
     global: options.global ?? true,
     threshold: options.threshold ?? 1024,
@@ -112,6 +111,6 @@ export async function registerCompression(
     zlibOptions: options.zlibOptions,
     brotliOptions: options.brotliOptions,
     customTypes: options.customTypes,
+    // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   } as any);
 }
-

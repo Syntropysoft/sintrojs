@@ -104,8 +104,7 @@ class BackgroundTasksImpl {
         // Warn if task took too long (potential Event Loop blocking)
         if (duration > this.WARNING_THRESHOLD_MS) {
           console.warn(
-            `⚠️  Background task '${taskName}' took ${duration}ms (>${this.WARNING_THRESHOLD_MS}ms threshold). ` +
-              'Consider using a job queue (BullMQ) for heavy operations.',
+            `!🚨 Background task '${taskName}' took ${duration}ms (>${this.WARNING_THRESHOLD_MS}ms threshold). Consider using a job queue (BullMQ) for heavy operations.`,
           );
         }
 
@@ -162,4 +161,3 @@ export const BackgroundTasks = new BackgroundTasksImpl();
  * Factory for testing
  */
 export const createBackgroundTasks = (): BackgroundTasksImpl => new BackgroundTasksImpl();
-

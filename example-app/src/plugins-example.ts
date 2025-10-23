@@ -1,16 +1,22 @@
 /**
  * Plugins Example
- * 
+ *
  * Demonstrates how to use TinyApi plugins for production features
- * 
+ *
  * IMPORTANT: Install the plugin dependencies first:
  * ```bash
  * pnpm add @fastify/cors @fastify/helmet @fastify/compress @fastify/rate-limit
  * ```
  */
 
-import { TinyApi, registerCors, registerHelmet, registerCompression, registerRateLimit } from '../..';
 import { z } from 'zod';
+import {
+  TinyApi,
+  registerCompression,
+  registerCors,
+  registerHelmet,
+  registerRateLimit,
+} from '../..';
 
 async function main() {
   const app = new TinyApi({
@@ -181,4 +187,3 @@ main().catch((error) => {
   console.error('❌ Error starting server:', error);
   process.exit(1);
 });
-

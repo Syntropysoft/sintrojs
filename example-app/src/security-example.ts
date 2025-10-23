@@ -3,18 +3,18 @@
  * Demonstrates OAuth2, JWT, HTTPBearer, HTTPBasic, and APIKey authentication
  */
 
-import { TinyApi, inject, HTTPException } from 'tinyapi';
+import type { FastifyRequest } from 'fastify';
+import { HTTPException, TinyApi, inject } from 'tinyapi';
 import {
-  OAuth2PasswordBearer,
-  HTTPBearer,
-  HTTPBasic,
   APIKeyHeader,
   APIKeyQuery,
+  HTTPBasic,
+  HTTPBearer,
+  type JWTPayload,
+  OAuth2PasswordBearer,
   signJWT,
   verifyJWT,
-  type JWTPayload,
 } from 'tinyapi';
-import type { FastifyRequest } from 'fastify';
 import { z } from 'zod';
 
 const app = new TinyApi();
@@ -24,13 +24,13 @@ const app = new TinyApi();
 // ============================================
 
 const USERS_DB = {
-  'admin': { password: 'secret', role: 'admin' },
-  'user': { password: 'pass', role: 'user' },
+  admin: { password: 'secret', role: 'admin' },
+  user: { password: 'pass', role: 'user' },
 };
 
 const API_KEYS_DB = {
-  'sk_live_abc123': { user: 'admin', scopes: ['read', 'write'] },
-  'sk_live_xyz789': { user: 'user', scopes: ['read'] },
+  sk_live_abc123: { user: 'admin', scopes: ['read', 'write'] },
+  sk_live_xyz789: { user: 'user', scopes: ['read'] },
 };
 
 const JWT_SECRET = process.env.JWT_SECRET || 'change-me-in-production';
@@ -254,4 +254,3 @@ Try these commands:
    curl "http://localhost:${PORT}/public/resource?api_key=sk_live_abc123"
   `);
 });
-

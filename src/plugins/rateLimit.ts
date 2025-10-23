@@ -1,6 +1,6 @@
 /**
  * Rate Limiting Plugin - Wrapper for @fastify/rate-limit
- * 
+ *
  * Request rate limiting for TinyApi
  */
 
@@ -85,23 +85,23 @@ export interface RateLimitOptions {
 
 /**
  * Register Rate Limiting plugin
- * 
+ *
  * @param fastify - Fastify instance
  * @param options - Rate limit options
- * 
+ *
  * @example
  * ```typescript
  * import { registerRateLimit } from 'tinyapi/plugins';
- * 
+ *
  * // Basic rate limiting (100 requests per minute)
  * await registerRateLimit(app.getRawFastify());
- * 
+ *
  * // Custom limits
  * await registerRateLimit(app.getRawFastify(), {
  *   max: 50,
  *   timeWindow: '1 minute',
  * });
- * 
+ *
  * // Per-endpoint rate limiting
  * await registerRateLimit(app.getRawFastify(), {
  *   max: 10,
@@ -130,12 +130,11 @@ export async function registerRateLimit(
   } catch (error) {
     throw new Error(
       'Rate Limiting plugin requires @fastify/rate-limit to be installed. ' +
-      'Run: pnpm add @fastify/rate-limit',
+        'Run: pnpm add @fastify/rate-limit',
     );
   }
 
   // Pass options directly - Fastify handles undefined values correctly
-  // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   await fastify.register(fastifyRateLimit, {
     max: options.max ?? 100,
     timeWindow: options.timeWindow ?? 60000,
@@ -149,6 +148,6 @@ export async function registerRateLimit(
     ban: options.ban,
     onExceeding: options.onExceeding,
     onBanReach: options.onBanReach,
+    // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   } as any);
 }
-

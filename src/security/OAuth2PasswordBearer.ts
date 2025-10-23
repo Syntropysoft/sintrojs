@@ -55,7 +55,9 @@ export class OAuth2PasswordBearer {
 
     // Guard: Invalid format
     if (!authHeader.startsWith('Bearer ')) {
-      throw new HTTPException(401, 'Invalid authentication credentials', { 'WWW-Authenticate': 'Bearer' });
+      throw new HTTPException(401, 'Invalid authentication credentials', {
+        'WWW-Authenticate': 'Bearer',
+      });
     }
 
     // Extract token
@@ -63,10 +65,11 @@ export class OAuth2PasswordBearer {
 
     // Guard: Empty token
     if (token === '') {
-      throw new HTTPException(401, 'Invalid authentication credentials', { 'WWW-Authenticate': 'Bearer' });
+      throw new HTTPException(401, 'Invalid authentication credentials', {
+        'WWW-Authenticate': 'Bearer',
+      });
     }
 
     return token;
   }
 }
-

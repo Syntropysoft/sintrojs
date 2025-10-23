@@ -2,10 +2,10 @@
  * E2E tests for Background Tasks
  */
 
-import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
-import { TinyApi } from '../../src/core/TinyApi';
-import { inject } from '../../src/application/DependencyInjector';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
+import { inject } from '../../src/application/DependencyInjector';
+import { TinyApi } from '../../src/core/TinyApi';
 
 describe('Background Tasks E2E', () => {
   let app: TinyApi;
@@ -270,4 +270,3 @@ describe('Background Tasks E2E', () => {
     expect(consoleWarnSpy.mock.calls.length + consoleErrorSpy.mock.calls.length).toBeGreaterThan(0);
   });
 });
-

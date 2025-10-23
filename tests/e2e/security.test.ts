@@ -2,12 +2,18 @@
  * E2E tests for Security module
  */
 
-import { describe, test, expect, beforeAll, afterAll } from 'vitest';
-import { TinyApi } from '../../src/core/TinyApi';
-import { inject } from '../../src/application/DependencyInjector';
-import { OAuth2PasswordBearer, HTTPBearer, HTTPBasic, APIKeyHeader, APIKeyQuery } from '../../src/security';
-import { signJWT, verifyJWT } from '../../src/security/jwt';
 import type { FastifyRequest } from 'fastify';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { inject } from '../../src/application/DependencyInjector';
+import { TinyApi } from '../../src/core/TinyApi';
+import {
+  APIKeyHeader,
+  APIKeyQuery,
+  HTTPBasic,
+  HTTPBearer,
+  OAuth2PasswordBearer,
+} from '../../src/security';
+import { signJWT, verifyJWT } from '../../src/security/jwt';
 
 describe('Security E2E', () => {
   let app: TinyApi;
@@ -17,131 +23,131 @@ describe('Security E2E', () => {
     try {
       app = new TinyApi();
 
-    // ============================================
-    // OAuth2PasswordBearer Example
-    // ============================================
+      // ============================================
+      // OAuth2PasswordBearer Example
+      // ============================================
 
-    const oauth2Scheme = new OAuth2PasswordBearer('/token', {
-      'read:user': 'Read user data',
-      'write:user': 'Write user data',
-    });
+      const oauth2Scheme = new OAuth2PasswordBearer('/token', {
+        'read:user': 'Read user data',
+        'write:user': 'Write user data',
+      });
 
-    // Token endpoint (issues JWT)
-    app.post('/token', {
-      handler: () => {
-        const token = signJWT(
-          { sub: 'user123', role: 'admin' },
-          { secret: 'test-secret', expiresIn: '1h' },
-        );
-        return { access_token: token, token_type: 'bearer' };
-      },
-    });
+      // Token endpoint (issues JWT)
+      app.post('/token', {
+        handler: () => {
+          const token = signJWT(
+            { sub: 'user123', role: 'admin' },
+            { secret: 'test-secret', expiresIn: '1h' },
+          );
+          return { access_token: token, token_type: 'bearer' };
+        },
+      });
 
-    // Protected endpoint using OAuth2
-    app.get('/oauth2/me', {
-      dependencies: {
-        token: inject(async (req: FastifyRequest) => oauth2Scheme.validate(req)),
-      },
-      handler: ({ dependencies }) => {
-        // Verify JWT
-        const payload = verifyJWT(dependencies.token, { secret: 'test-secret' });
-        return { user: payload.sub, role: payload.role };
-      },
-    });
+      // Protected endpoint using OAuth2
+      app.get('/oauth2/me', {
+        dependencies: {
+          token: inject(async (req: FastifyRequest) => oauth2Scheme.validate(req)),
+        },
+        handler: ({ dependencies }) => {
+          // Verify JWT
+          const payload = verifyJWT(dependencies.token, { secret: 'test-secret' });
+          return { user: payload.sub, role: payload.role };
+        },
+      });
 
-    // ============================================
-    // HTTPBearer Example
-    // ============================================
+      // ============================================
+      // HTTPBearer Example
+      // ============================================
 
-    const bearerScheme = new HTTPBearer();
+      const bearerScheme = new HTTPBearer();
 
-    app.get('/bearer/protected', {
-      dependencies: {
-        token: inject(async (req: FastifyRequest) => bearerScheme.validate(req)),
-      },
-      handler: ({ dependencies }) => {
-        return { message: 'Protected resource', token: dependencies.token };
-      },
-    });
+      app.get('/bearer/protected', {
+        dependencies: {
+          token: inject(async (req: FastifyRequest) => bearerScheme.validate(req)),
+        },
+        handler: ({ dependencies }) => {
+          return { message: 'Protected resource', token: dependencies.token };
+        },
+      });
 
-    // ============================================
-    // HTTPBasic Example
-    // ============================================
+      // ============================================
+      // HTTPBasic Example
+      // ============================================
 
-    const basicScheme = new HTTPBasic();
+      const basicScheme = new HTTPBasic();
 
-    app.get('/basic/protected', {
-      dependencies: {
-        credentials: inject(async (req: FastifyRequest) => basicScheme.validate(req)),
-      },
-      handler: ({ dependencies }) => {
-        const { username, password } = dependencies.credentials;
+      app.get('/basic/protected', {
+        dependencies: {
+          credentials: inject(async (req: FastifyRequest) => basicScheme.validate(req)),
+        },
+        handler: ({ dependencies }) => {
+          const { username, password } = dependencies.credentials;
 
-        // In real app: verify against database
-        if (username === 'admin' && password === 'secret') {
-          return { message: 'Authenticated', username };
-        }
+          // In real app: verify against database
+          if (username === 'admin' && password === 'secret') {
+            return { message: 'Authenticated', username };
+          }
 
-        return { error: 'Invalid credentials' };
-      },
-    });
+          return { error: 'Invalid credentials' };
+        },
+      });
 
-    // ============================================
-    // APIKey Examples (Header, Query)
-    // ============================================
+      // ============================================
+      // APIKey Examples (Header, Query)
+      // ============================================
 
-    const apiKeyHeaderScheme = new APIKeyHeader('X-API-Key');
-    const apiKeyQueryScheme = new APIKeyQuery('api_key');
+      const apiKeyHeaderScheme = new APIKeyHeader('X-API-Key');
+      const apiKeyQueryScheme = new APIKeyQuery('api_key');
 
-    app.get('/apikey/header', {
-      dependencies: {
-        apiKey: inject(async (req: FastifyRequest) => apiKeyHeaderScheme.validate(req)),
-      },
-      handler: ({ dependencies }) => {
-        // In real app: verify against database
-        if (dependencies.apiKey === 'valid-key-123') {
-          return { message: 'Authenticated', apiKey: dependencies.apiKey };
-        }
-        return { error: 'Invalid API key' };
-      },
-    });
+      app.get('/apikey/header', {
+        dependencies: {
+          apiKey: inject(async (req: FastifyRequest) => apiKeyHeaderScheme.validate(req)),
+        },
+        handler: ({ dependencies }) => {
+          // In real app: verify against database
+          if (dependencies.apiKey === 'valid-key-123') {
+            return { message: 'Authenticated', apiKey: dependencies.apiKey };
+          }
+          return { error: 'Invalid API key' };
+        },
+      });
 
-    app.get('/apikey/query', {
-      dependencies: {
-        apiKey: inject(async (req: FastifyRequest) => apiKeyQueryScheme.validate(req)),
-      },
-      handler: ({ dependencies }) => {
-        // In real app: verify against database
-        if (dependencies.apiKey === 'valid-key-456') {
-          return { message: 'Authenticated', apiKey: dependencies.apiKey };
-        }
-        return { error: 'Invalid API key' };
-      },
-    });
+      app.get('/apikey/query', {
+        dependencies: {
+          apiKey: inject(async (req: FastifyRequest) => apiKeyQueryScheme.validate(req)),
+        },
+        handler: ({ dependencies }) => {
+          // In real app: verify against database
+          if (dependencies.apiKey === 'valid-key-456') {
+            return { message: 'Authenticated', apiKey: dependencies.apiKey };
+          }
+          return { error: 'Invalid API key' };
+        },
+      });
 
-    // ============================================
-    // Combined Example: JWT + OAuth2
-    // ============================================
+      // ============================================
+      // Combined Example: JWT + OAuth2
+      // ============================================
 
-    app.get('/protected/user-data', {
-      dependencies: {
-        token: inject(async (req: FastifyRequest) => oauth2Scheme.validate(req)),
-      },
-      handler: ({ dependencies }) => {
-        const payload = verifyJWT(dependencies.token, { secret: 'test-secret' });
+      app.get('/protected/user-data', {
+        dependencies: {
+          token: inject(async (req: FastifyRequest) => oauth2Scheme.validate(req)),
+        },
+        handler: ({ dependencies }) => {
+          const payload = verifyJWT(dependencies.token, { secret: 'test-secret' });
 
-        // Check role
-        if (payload.role !== 'admin') {
-          throw new Error('Insufficient permissions');
-        }
+          // Check role
+          if (payload.role !== 'admin') {
+            throw new Error('Insufficient permissions');
+          }
 
-        return {
-          user: payload.sub,
-          role: payload.role,
-          data: { email: 'gaby@example.com', age: 30 },
-        };
-      },
-    });
+          return {
+            user: payload.sub,
+            role: payload.role,
+            data: { email: 'gaby@example.com', age: 30 },
+          };
+        },
+      });
 
       server = await app.listen(0); // Random port
     } catch (error) {
@@ -475,4 +481,3 @@ describe('Security E2E', () => {
     });
   });
 });
-

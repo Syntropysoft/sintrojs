@@ -2,7 +2,7 @@
  * Tests for BackgroundTasks
  */
 
-import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { createBackgroundTasks } from '../../../src/application/BackgroundTasks';
 
 describe('BackgroundTasks', () => {
@@ -101,14 +101,11 @@ describe('BackgroundTasks', () => {
     test('calls onComplete callback when task succeeds', async () => {
       let completed = false;
 
-      tasks.addTask(
-        () => {},
-        {
-          onComplete: () => {
-            completed = true;
-          },
+      tasks.addTask(() => {}, {
+        onComplete: () => {
+          completed = true;
         },
-      );
+      });
 
       await new Promise((resolve) => setTimeout(resolve, 50));
 
@@ -136,9 +133,12 @@ describe('BackgroundTasks', () => {
     });
 
     test('warns if task takes longer than threshold (>100ms)', async () => {
-      tasks.addTask(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 150));
-      }, { name: 'slow-task' });
+      tasks.addTask(
+        async () => {
+          await new Promise((resolve) => setTimeout(resolve, 150));
+        },
+        { name: 'slow-task' },
+      );
 
       await new Promise((resolve) => setTimeout(resolve, 200));
 
@@ -201,17 +201,14 @@ describe('BackgroundTasks', () => {
     });
 
     test('throws error if task is null', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => tasks.addTask(null as any)).toThrow('Task function is required');
     });
 
     test('throws error if task is undefined', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => tasks.addTask(undefined as any)).toThrow('Task function is required');
     });
 
     test('throws error if task is not a function', () => {
-      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
       expect(() => tasks.addTask('not a function' as any)).toThrow('Task must be a function');
     });
   });
@@ -327,7 +324,7 @@ describe('BackgroundTasks', () => {
         async () => {
           await new Promise((resolve) => setTimeout(resolve, 100));
         },
-        { timeout: 10, name: 'timeout-test' }
+        { timeout: 10, name: 'timeout-test' },
       );
 
       await new Promise((resolve) => setTimeout(resolve, 150));
@@ -338,4 +335,3 @@ describe('BackgroundTasks', () => {
     });
   });
 });
-

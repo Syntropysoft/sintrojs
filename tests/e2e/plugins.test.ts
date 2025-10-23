@@ -3,53 +3,40 @@
  * Tests for TinyApi plugin wrappers
  */
 
-import { describe, test, expect, beforeAll, afterAll } from 'vitest';
+import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { TinyApi } from '../../src/core/TinyApi';
-import { registerCors, registerHelmet, registerCompression, registerRateLimit } from '../../src/plugins';
+import {
+  registerCompression,
+  registerCors,
+  registerHelmet,
+  registerRateLimit,
+} from '../../src/plugins';
 
 describe('Plugins E2E', () => {
   describe('Plugin Registration', () => {
     test('should throw error if Fastify instance is not provided', async () => {
-      await expect(
-        // biome-ignore lint/suspicious/noExplicitAny: Testing error case
-        registerCors(null as any),
-      ).rejects.toThrow('Fastify instance is required');
+      await expect(registerCors(null as any)).rejects.toThrow('Fastify instance is required');
 
-      await expect(
-        // biome-ignore lint/suspicious/noExplicitAny: Testing error case
-        registerHelmet(null as any),
-      ).rejects.toThrow('Fastify instance is required');
+      await expect(registerHelmet(null as any)).rejects.toThrow('Fastify instance is required');
 
-      await expect(
-        // biome-ignore lint/suspicious/noExplicitAny: Testing error case
-        registerCompression(null as any),
-      ).rejects.toThrow('Fastify instance is required');
+      await expect(registerCompression(null as any)).rejects.toThrow(
+        'Fastify instance is required',
+      );
 
-      await expect(
-        // biome-ignore lint/suspicious/noExplicitAny: Testing error case
-        registerRateLimit(null as any),
-      ).rejects.toThrow('Fastify instance is required');
+      await expect(registerRateLimit(null as any)).rejects.toThrow('Fastify instance is required');
     });
 
     test('should register plugins successfully when dependencies are installed', async () => {
       const app = new TinyApi();
 
       // All plugins should register without errors
-      await expect(
-        registerCors(app.getRawFastify()),
-      ).resolves.toBeUndefined();
+      await expect(registerCors(app.getRawFastify())).resolves.toBeUndefined();
 
-      await expect(
-        registerHelmet(app.getRawFastify()),
-      ).resolves.toBeUndefined();
+      await expect(registerHelmet(app.getRawFastify())).resolves.toBeUndefined();
 
-      await expect(
-        registerCompression(app.getRawFastify()),
-      ).resolves.toBeUndefined();
+      await expect(registerCompression(app.getRawFastify())).resolves.toBeUndefined();
 
-      await expect(
-        registerRateLimit(app.getRawFastify()),
-      ).resolves.toBeUndefined();
+      await expect(registerRateLimit(app.getRawFastify())).resolves.toBeUndefined();
 
       // No need to close - server was never started
     });
@@ -127,7 +114,7 @@ describe('Plugins E2E', () => {
       const port = new URL(server).port;
 
       const response = await fetch(`http://localhost:${port}/secure-test`);
-      
+
       expect(response.status).toBe(200);
       // Verify security headers are present
       expect(response.headers.get('x-content-type-options')).toBeTruthy();
@@ -197,4 +184,3 @@ describe('Plugins E2E', () => {
     });
   });
 });
-

@@ -5,10 +5,10 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
+import { ErrorHandler } from '../../src/application/ErrorHandler';
+import { RouteRegistry } from '../../src/application/RouteRegistry';
 import { TinyApi } from '../../src/core/TinyApi';
 import { HTTPException, NotFoundException } from '../../src/domain/HTTPException';
-import { RouteRegistry } from '../../src/application/RouteRegistry';
-import { ErrorHandler } from '../../src/application/ErrorHandler';
 
 describe('TinyApi E2E - Basic API', () => {
   let app: TinyApi;
@@ -366,7 +366,6 @@ describe('TinyApi E2E - Basic API', () => {
     it('should throw error if response does not match schema', async () => {
       app.get('/invalid-response', {
         response: z.object({ id: z.number() }),
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid response
         handler: () => ({ id: 'invalid' as any }), // Wrong type
       });
 
@@ -394,7 +393,7 @@ describe('TinyApi E2E - Basic API', () => {
 
     it('should throw error for invalid port numbers', async () => {
       app.get('/test', { handler: () => ({}) });
-      
+
       await expect(app.listen(-1)).rejects.toThrow('Valid port number is required');
       await expect(app.listen(99999)).rejects.toThrow('Valid port number is required');
     });
@@ -415,9 +414,7 @@ describe('TinyApi E2E - Basic API', () => {
       class Error2 extends Error {}
 
       const result = app
-        // biome-ignore lint/suspicious/noExplicitAny: Mock handlers for testing
         .exceptionHandler(Error1, () => ({}) as any)
-        // biome-ignore lint/suspicious/noExplicitAny: Mock handlers for testing
         .exceptionHandler(Error2, () => ({}) as any);
 
       expect(result).toBe(app);
@@ -427,56 +424,38 @@ describe('TinyApi E2E - Basic API', () => {
   describe('Guard Clauses', () => {
     describe('exceptionHandler validations', () => {
       it('should throw error if error class is null', () => {
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
         expect(() => app.exceptionHandler(null as any, () => ({}) as any)).toThrow(
-          'Error class is required'
+          'Error class is required',
         );
       });
 
       it('should throw error if handler is null', () => {
         class CustomError extends Error {}
-        
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
         expect(() => app.exceptionHandler(CustomError, null as any)).toThrow(
-          'Handler function is required'
+          'Handler function is required',
         );
       });
     });
 
     describe('route registration validations', () => {
       it('should throw error if path is null in GET', () => {
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
-        expect(() => app.get(null as any, { handler: () => ({}) })).toThrow(
-          'Path is required'
-        );
+        expect(() => app.get(null as any, { handler: () => ({}) })).toThrow('Path is required');
       });
 
       it('should throw error if config is null in POST', () => {
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
-        expect(() => app.post('/test', null as any)).toThrow(
-          'Config is required'
-        );
+        expect(() => app.post('/test', null as any)).toThrow('Config is required');
       });
 
       it('should throw error if path is null in PUT', () => {
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
-        expect(() => app.put(null as any, { handler: () => ({}) })).toThrow(
-          'Path is required'
-        );
+        expect(() => app.put(null as any, { handler: () => ({}) })).toThrow('Path is required');
       });
 
       it('should throw error if path is null in DELETE', () => {
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
-        expect(() => app.delete(null as any, { handler: () => ({}) })).toThrow(
-          'Path is required'
-        );
+        expect(() => app.delete(null as any, { handler: () => ({}) })).toThrow('Path is required');
       });
 
       it('should throw error if path is null in PATCH', () => {
-        // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input
-        expect(() => app.patch(null as any, { handler: () => ({}) })).toThrow(
-          'Path is required'
-        );
+        expect(() => app.patch(null as any, { handler: () => ({}) })).toThrow('Path is required');
       });
     });
   });

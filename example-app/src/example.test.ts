@@ -3,9 +3,9 @@
  * Demonstrates how easy testing is with TinyApi
  */
 
-import { describe, test, expect } from 'vitest';
-import { TinyTest } from 'tinyapi/testing';
 import { inject } from 'tinyapi';
+import { TinyTest } from 'tinyapi/testing';
+import { describe, expect, test } from 'vitest';
 import { z } from 'zod';
 
 // ============================================
@@ -368,4 +368,3 @@ describe('Complete CRUD Example', () => {
     await api.close();
   });
 });
-

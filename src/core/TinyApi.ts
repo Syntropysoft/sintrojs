@@ -132,8 +132,7 @@ export class TinyApi {
    * @returns this (for chaining)
    */
   exceptionHandler<E extends Error>(
-    // biome-ignore lint/suspicious/noExplicitAny: Need to accept any error constructor
-    errorClass: new (...args: any[]) => E,
+    errorClass: new (...args: unknown[]) => E,
     handler: ExceptionHandler<E>,
   ): this {
     // Guard clauses
@@ -233,8 +232,7 @@ export class TinyApi {
     const route = new Route(method, path, config);
 
     // Register with RouteRegistry
-    // biome-ignore lint/suspicious/noExplicitAny: Route generics are erased at runtime
-    RouteRegistry.register(route as any);
+    RouteRegistry.register(route);
 
     return this;
   }

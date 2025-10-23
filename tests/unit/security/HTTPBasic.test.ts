@@ -2,10 +2,10 @@
  * Unit tests for HTTPBasic
  */
 
-import { describe, test, expect } from 'vitest';
-import { HTTPBasic } from '../../../src/security/HTTPBasic';
-import { HTTPException } from '../../../src/domain/HTTPException';
 import type { FastifyRequest } from 'fastify';
+import { describe, expect, test } from 'vitest';
+import { HTTPException } from '../../../src/domain/HTTPException';
+import { HTTPBasic } from '../../../src/security/HTTPBasic';
 
 describe('HTTPBasic', () => {
   const basic = new HTTPBasic();
@@ -204,4 +204,3 @@ describe('HTTPBasic', () => {
     });
   });
 });
-
