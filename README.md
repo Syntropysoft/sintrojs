@@ -117,7 +117,7 @@ SyntroJS delivers **excellent performance** while maintaining all its features:
 
 ## 🚀 Quick Start
 
-### Installation
+### 1. Install SyntroJS
 
 ```bash
 npm install syntrojs zod
@@ -125,60 +125,131 @@ npm install syntrojs zod
 pnpm add syntrojs zod
 ```
 
-**Optional Dependencies:**
-- For testing: `npm install --save-dev @stryker-mutator/core @stryker-mutator/typescript-checker @stryker-mutator/vitest-runner`
-- For plugins: `npm install @fastify/compress @fastify/cors @fastify/helmet @fastify/rate-limit`
+### 2. Create Your First API (4 Lines!)
 
-**Smart Testing with Graceful Fallback:**
-```typescript
+Create `app.js`:
+
+```javascript
+/**
+ * Ultra Simple API Example - 4 Lines
+ * 
+ * The simplest possible SyntroJS API.
+ */
+
+import { SyntroJS } from 'syntrojs';
+
+// Create API in 4 lines
+const app = new SyntroJS({ title: 'Simple API' });
+app.get('/hello', { handler: () => ({ message: 'Hello World!' }) });
+app.listen(8080).then((address) => {
+  console.log('\n🚀 Simple API');
+  console.log(`Server running at ${address}\n`);
+  console.log('📖 Interactive Documentation:');
+  console.log(`   Swagger UI: ${address}/docs`);
+  console.log(`   ReDoc:      ${address}/redoc\n`);
+  console.log('🔗 Available Endpoints:');
+  console.log(`   GET    ${address}/hello\n`);
+  console.log('💡 Try this example:');
+  console.log(`   curl ${address}/hello\n`);
+});
+```
+
+### 3. Run Your API
+
+```bash
+node app.js
+```
+
+### 4. Test Your API
+
+```bash
+curl http://localhost:8080/hello
+# Response: {"message":"Hello World!"}
+```
+
+**That's it!** 🎉 You now have a working API with:
+- ✅ Automatic validation
+- ✅ Type safety
+- ✅ Interactive docs at [http://localhost:8080/docs](http://localhost:8080/docs)
+- ✅ High performance (89.3% of Fastify)
+
+**What you'll see when you run the server:**
+```
+🚀 Simple API
+Server running at http://localhost:8080
+
+📖 Interactive Documentation:
+   Swagger UI: http://localhost:8080/docs
+   ReDoc:      http://localhost:8080/redoc
+
+🔗 Available Endpoints:
+   GET    http://localhost:8080/hello
+
+💡 Try this example:
+   curl http://localhost:8080/hello
+```
+
+### 5. Optional: Add Validation
+
+```javascript
+import { SyntroJS } from 'syntrojs';
+import { z } from 'zod';
+
+const app = new SyntroJS({ title: 'API with Validation' });
+
+app.post('/users', {
+  body: z.object({
+    name: z.string().min(1),
+    email: z.string().email(),
+  }),
+  handler: ({ body }) => ({ id: 1, ...body }),
+});
+
+await app.listen(8080);
+```
+
+### 6. Optional: Simple Testing
+
+Create `test.js`:
+
+```javascript
+import { TinyTest } from 'syntrojs/testing';
+
+const test = new TinyTest();
+
+// Test your endpoint
+test.get('/hello', {
+  handler: () => ({ message: 'Hello World!' }),
+});
+
+// Run the test
+const result = await test.expectSuccess('GET', '/hello', {
+  expected: { message: 'Hello World!' }
+});
+
+console.log('✅ Test passed:', result);
+
+await test.close();
+```
+
+### 7. Optional: Advanced Testing
+
+```bash
+# Install testing dependencies (optional)
+npm install --save-dev @stryker-mutator/core @stryker-mutator/typescript-checker @stryker-mutator/vitest-runner
+```
+
+```javascript
 import { SmartMutatorWrapper } from 'syntrojs/testing';
 
 // Automatically handles missing dependencies
 const result = await SmartMutatorWrapper.run({ mode: 'smart' });
 if (result) {
   console.log(`Mutation score: ${result.mutationScore}%`);
-} else {
-  console.log('Install testing dependencies to use SmartMutator');
 }
 ```
 
 See [Optional Dependencies](./docs/OPTIONAL_DEPENDENCIES.md) for details.
-
-### Your First API
-
-```typescript
-import { SyntroJS } from 'syntrojs';
-import { z } from 'zod';
-
-const app = new SyntroJS();
-
-// Simple GET endpoint
-app.get('/hello', {
-  handler: () => ({ message: 'Hello World!' }),
-});
-
-// With validation
-app.post('/users', {
-  body: z.object({
-    name: z.string().min(1),
-    email: z.string().email(),
-  }),
-  response: z.object({
-    id: z.number(),
-    name: z.string(),
-    email: z.string(),
-  }),
-  status: 201,
-  handler: ({ body }) => ({
-    id: 1,
-    ...body,
-  }),
-});
-
-await app.listen(3000);
-```
-
-Visit [http://localhost:3000/docs](http://localhost:3000/docs) to see your interactive API documentation! 📚
 
 ### Fluent API & Advanced Pagination
 
