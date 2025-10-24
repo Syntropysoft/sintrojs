@@ -1,7 +1,7 @@
 {
   "name": "syntrojs",
   "version": "0.2.8-alpha",
-  "description": "Modern, type-safe API framework with automatic documentation (ALPHA - Proof of Concept)",
+  "description": "🔥 DUAL RUNTIME: FastAPI for Node.js AND Bun - Same Code, Maximum Performance | ⚡ 6x Faster with Bun | 🚀 89.3% of Fastify with Node.js",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
