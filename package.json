@@ -1,6 +1,6 @@
 {
   "name": "syntrojs",
-  "version": "0.2.3-alpha",
+  "version": "0.2.4-alpha",
   "description": "Modern, type-safe API framework with automatic documentation (ALPHA - Proof of Concept)",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,7 +17,10 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
