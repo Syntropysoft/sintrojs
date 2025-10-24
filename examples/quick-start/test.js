@@ -1,14 +1,14 @@
 /**
  * Simple Test Example
  * 
- * Test your SyntroJS API with TinyTest.
+ * Test the same 4-line API we created in app.js
  */
 
 import { TinyTest } from 'syntrojs/testing';
 
 const test = new TinyTest();
 
-// Test your endpoint
+// Test the exact same API from app.js
 test.get('/hello', {
   handler: () => ({ message: 'Hello World!' }),
 });
