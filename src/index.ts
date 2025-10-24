@@ -18,13 +18,10 @@ export * from './infrastructure';
 // Security exports
 export * from './security';
 
-// Testing exports
-export * from './testing';
-
 // Plugins exports
 export * from './plugins';
 
 /**
  * Current version
  */
-export const VERSION = '0.2.0';
+export const VERSION = '0.2.5';
