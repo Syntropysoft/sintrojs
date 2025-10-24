@@ -125,6 +125,12 @@ npm install syntrojs zod
 pnpm add syntrojs zod
 ```
 
+**Optional Dependencies:**
+- For testing: `npm install --save-dev @stryker-mutator/core @stryker-mutator/typescript-checker @stryker-mutator/vitest-runner`
+- For plugins: `npm install @fastify/compress @fastify/cors @fastify/helmet @fastify/rate-limit`
+
+See [Optional Dependencies](./docs/OPTIONAL_DEPENDENCIES.md) for details.
+
 ### Your First API
 
 ```typescript

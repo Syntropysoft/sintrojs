@@ -25,7 +25,6 @@
  */
 
 import path from 'node:path';
-import { Stryker } from '@stryker-mutator/core';
 
 /**
  * Mutation analysis result
@@ -117,6 +116,18 @@ export class SmartMutator {
     const startTime = Date.now();
     const { mode = 'smart', strykerConfigFile } = options;
 
+    // Dynamic import of Stryker - only available in development
+    let Stryker: any;
+    try {
+      const strykerModule = await import('@stryker-mutator/core');
+      Stryker = strykerModule.Stryker;
+    } catch (error) {
+      throw new Error(
+        'SmartMutator requires @stryker-mutator/core to be installed. ' +
+        'Please install it as a dev dependency: npm install --save-dev @stryker-mutator/core'
+      );
+    }
+
     console.log(`Starting SmartMutator in ${mode} mode (E2E) - Mínimo`);
 
     const absoluteTsConfigFile = path.resolve(process.cwd(), 'tsconfig.json');
@@ -168,8 +179,8 @@ export class SmartMutator {
 
     // Process Stryker result to fit our MutationReport interface
     const totalMutants = strykerResult.length;
-    const killed = strykerResult.filter((r) => r.status === 'Killed').length;
-    const survived = strykerResult.filter((r) => r.status === 'Survived').length;
+    const killed = strykerResult.filter((r: any) => r.status === 'Killed').length;
+    const survived = strykerResult.filter((r: any) => r.status === 'Survived').length;
     const mutationScore = totalMutants === 0 ? 0 : (killed / totalMutants) * 100;
 
     return {
