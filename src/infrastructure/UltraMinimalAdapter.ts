@@ -41,7 +41,7 @@ class UltraMinimalAdapterImpl {
           query: request.query,
           body: request.body,
           headers: request.headers as Record<string, string>,
-          cookies: (request as any).cookies || {},
+          cookies: (request as { cookies?: Record<string, string> }).cookies || {},
           correlationId: Math.random().toString(36).substring(2, 15),
           timestamp: new Date(),
           dependencies: {} as Record<string, unknown>,

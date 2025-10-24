@@ -1,6 +1,6 @@
 /**
  * Ultra Simple API Example - 4 Lines
- * 
+ *
  * The simplest possible SyntroJS API.
  */
 

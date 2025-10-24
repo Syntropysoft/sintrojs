@@ -9,6 +9,7 @@
  * 5. Contexto mínimo y reutilizable
  */
 
+import { z } from 'zod';
 import Fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
 import type { Route } from '../domain/Route';
 import type { HttpMethod } from '../domain/types';
@@ -63,7 +64,7 @@ interface OptimizedContext {
 
 class UltraFastAdapterImpl {
   private contextPool: ObjectPool<OptimizedContext>;
-  private compiledSchemas = new Map<string, any>();
+  private compiledSchemas = new Map<string, unknown>();
 
   constructor() {
     // Pool de contextos para reducir allocations
@@ -107,19 +108,19 @@ class UltraFastAdapterImpl {
   }
 
   // Pre-compilar schemas Zod para mejor performance
-  private precompileSchema(schema: any, key: string): any {
+  private precompileSchema(schema: unknown, key: string): unknown {
     if (this.compiledSchemas.has(key)) {
       return this.compiledSchemas.get(key);
     }
 
     // Crear función optimizada para validación
     const compiled = {
-      parse: schema.parse.bind(schema),
-      safeParse: schema.safeParse.bind(schema),
+      parse: (schema as any).parse?.bind(schema),
+      safeParse: (schema as any).safeParse?.bind(schema),
       // Función ultra-rápida para casos simples
-      quickValidate: (data: any) => {
+      quickValidate: (data: unknown) => {
         try {
-          return schema.parse(data);
+          return (schema as any).parse?.(data) ?? data;
         } catch {
           return data; // Fallback rápido
         }
@@ -162,19 +163,19 @@ class UltraFastAdapterImpl {
         context.query = request.query;
         context.body = request.body;
         context.headers = request.headers as Record<string, string>;
-        context.cookies = (request as any).cookies || {};
+        context.cookies = (request as { cookies?: Record<string, string> }).cookies || {};
         context.correlationId = Math.random().toString(36).substring(2, 15);
         context.timestamp = new Date();
 
         // Validación ultra-rápida usando schemas pre-compilados
         if (compiledParams) {
-          context.params = compiledParams.quickValidate(request.params);
+          context.params = (compiledParams as any).quickValidate?.(request.params) ?? request.params;
         }
         if (compiledQuery) {
-          context.query = compiledQuery.quickValidate(request.query);
+          context.query = (compiledQuery as any).quickValidate?.(request.query) ?? request.query;
         }
         if (compiledBody) {
-          context.body = compiledBody.quickValidate(request.body);
+          context.body = (compiledBody as any).quickValidate?.(request.body) ?? request.body;
         }
 
         // Ejecutar handler
@@ -182,7 +183,7 @@ class UltraFastAdapterImpl {
 
         // Validación de respuesta ultra-rápida
         if (compiledResponse) {
-          const validatedResult = compiledResponse.quickValidate(result);
+          const validatedResult = (compiledResponse as any).quickValidate?.(result) ?? result;
           const statusCode = route.config.status ?? 200;
           return reply.status(statusCode).send(validatedResult);
         }

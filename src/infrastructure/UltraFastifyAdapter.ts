@@ -8,13 +8,14 @@
  * 4. Reduced function calls
  */
 
+import { z } from 'zod';
 import Fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
 import type { Route } from '../domain/Route';
 import type { HttpMethod } from '../domain/types';
 
 // Global caches for maximum performance
-const SCHEMA_CACHE = new Map<string, any>();
-const ROUTE_CACHE = new Map<string, any>();
+const SCHEMA_CACHE = new Map<string, z.ZodSchema<unknown>>();
+const ROUTE_CACHE = new Map<string, Route>();
 
 export interface UltraFastifyAdapterConfig {
   logger?: boolean;
@@ -49,7 +50,7 @@ class UltraFastifyAdapterImpl {
           query: request.query,
           body: request.body,
           headers: request.headers as Record<string, string>,
-          cookies: (request as any).cookies || {},
+          cookies: (request as { cookies?: Record<string, string> }).cookies || {},
           correlationId: Math.random().toString(36).substring(2, 15),
           timestamp: new Date(),
           dependencies: {} as Record<string, unknown>,
@@ -62,14 +63,14 @@ class UltraFastifyAdapterImpl {
         const cached = ROUTE_CACHE.get(routeKey);
         if (cached) {
           // Direct Zod.parse() - no SchemaValidator overhead
-          if (cached.paramsSchema) {
-            context.params = cached.paramsSchema.parse(request.params);
+          if (route.config.params) {
+            context.params = route.config.params.parse(request.params);
           }
-          if (cached.querySchema) {
-            context.query = cached.querySchema.parse(request.query);
+          if (route.config.query) {
+            context.query = route.config.query.parse(request.query);
           }
-          if (cached.bodySchema) {
-            context.body = cached.bodySchema.parse(request.body);
+          if (route.config.body) {
+            context.body = route.config.body.parse(request.body);
           }
         }
 
@@ -77,8 +78,8 @@ class UltraFastifyAdapterImpl {
         const result = await route.handler(context);
 
         // MINIMAL response validation
-        if (cached?.responseSchema) {
-          const validatedResult = cached.responseSchema.parse(result);
+        if (route.config.response) {
+          const validatedResult = route.config.response.parse(result);
           const statusCode = route.config.status ?? 200;
           return reply.status(statusCode).send(validatedResult);
         }
@@ -94,15 +95,12 @@ class UltraFastifyAdapterImpl {
   }
 
   private preCompileRoute(route: Route, routeKey: string): void {
-    const compiled: any = {};
-
     // Cache compiled schemas for maximum performance
     if (route.config.params) {
       const cacheKey = `params:${routeKey}`;
       if (!SCHEMA_CACHE.has(cacheKey)) {
         SCHEMA_CACHE.set(cacheKey, route.config.params);
       }
-      compiled.paramsSchema = route.config.params;
     }
 
     if (route.config.query) {
@@ -110,7 +108,6 @@ class UltraFastifyAdapterImpl {
       if (!SCHEMA_CACHE.has(cacheKey)) {
         SCHEMA_CACHE.set(cacheKey, route.config.query);
       }
-      compiled.querySchema = route.config.query;
     }
 
     if (route.config.body) {
@@ -118,7 +115,6 @@ class UltraFastifyAdapterImpl {
       if (!SCHEMA_CACHE.has(cacheKey)) {
         SCHEMA_CACHE.set(cacheKey, route.config.body);
       }
-      compiled.bodySchema = route.config.body;
     }
 
     if (route.config.response) {
@@ -126,10 +122,10 @@ class UltraFastifyAdapterImpl {
       if (!SCHEMA_CACHE.has(cacheKey)) {
         SCHEMA_CACHE.set(cacheKey, route.config.response);
       }
-      compiled.responseSchema = route.config.response;
     }
 
-    ROUTE_CACHE.set(routeKey, compiled);
+    // Cache the route for ultra-fast access
+    ROUTE_CACHE.set(routeKey, route);
   }
 }
 

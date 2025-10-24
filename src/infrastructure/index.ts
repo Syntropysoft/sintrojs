@@ -16,3 +16,4 @@ export * from './SmartAdapter';
 export * from './ZodAdapter';
 export * from './BunAdapter';
 export * from './RuntimeOptimizer';
+export * from './FluentAdapter';

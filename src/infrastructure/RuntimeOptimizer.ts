@@ -35,7 +35,7 @@ export class RuntimeOptimizer {
       return {
         runtime: 'Bun',
         engine: 'JavaScriptCore',
-        performance: '6x faster than Fastify',
+        performance: '3.8x faster than Node.js',
         optimizations: [
           'Native HTTP server',
           'Bun.serialize() for JSON',
@@ -49,7 +49,7 @@ export class RuntimeOptimizer {
     return {
       runtime: 'Node.js',
       engine: 'V8',
-      performance: '89.3% of Fastify',
+        performance: 'Optimized with Fastify',
       optimizations: [
         'FastifyAdapter',
         'Zod validation',
@@ -64,17 +64,21 @@ export class RuntimeOptimizer {
    * Optimize JSON serialization for current runtime
    */
   optimizeSerialization(data: unknown): string {
-    if (this.isBun && typeof (globalThis as { Bun?: { serialize?: (data: unknown) => string } }).Bun !== 'undefined') {
+    if (
+      this.isBun &&
+      typeof (globalThis as { Bun?: { serialize?: (data: unknown) => string } }).Bun !== 'undefined'
+    ) {
       // Use Bun's native serialization (faster)
       try {
-        const bun = (globalThis as unknown as { Bun: { serialize: (data: unknown) => string } }).Bun;
+        const bun = (globalThis as unknown as { Bun: { serialize: (data: unknown) => string } })
+          .Bun;
         return bun.serialize(data);
       } catch {
         // Fallback to JSON if Bun.serialize fails
         return JSON.stringify(data);
       }
     }
-    
+
     // Node.js: Use standard JSON.stringify
     return JSON.stringify(data);
   }
@@ -175,9 +179,9 @@ export class RuntimeOptimizer {
     }
 
     console.log('\n📊 Configuration:');
-    Object.entries(config).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(config)) {
       console.log(`   ${value ? '✅' : '❌'} ${key}: ${value}`);
-    });
+    }
     console.log('');
   }
 }

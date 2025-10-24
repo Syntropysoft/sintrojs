@@ -2,13 +2,8 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    include: [
-      'tests/universal/**/*.test.ts',
-      'tests/node/**/*.test.ts'
-    ],
-    exclude: [
-      'tests/bun/**/*.test.ts'
-    ],
+    include: ['tests/universal/**/*.test.ts', 'tests/node/**/*.test.ts'],
+    exclude: ['tests/bun/**/*.test.ts'],
     globals: true,
     environment: 'node',
     coverage: {
@@ -32,8 +27,8 @@ export default defineConfig({
         '**/CHANGELOG.md',
         '**/LICENSE',
         'run-smart-mutator.ts',
-        'src/testing/SmartMutatorWrapper.ts'
-      ]
-    }
-  }
+        'src/testing/SmartMutatorWrapper.ts',
+      ],
+    },
+  },
 });

@@ -162,7 +162,11 @@ export class Guard {
   /**
    * Object property validation
    */
-  static hasProperty<T extends Record<string, any>>(obj: T, property: keyof T, name: string): T {
+  static hasProperty<T extends Record<string, unknown>>(
+    obj: T,
+    property: keyof T,
+    name: string,
+  ): T {
     if (!(property in obj)) {
       throw new Error(`${name} must have property: ${String(property)}`);
     }

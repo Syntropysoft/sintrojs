@@ -16,6 +16,7 @@ import { Route } from '../domain/Route';
 import type { ExceptionHandler, HttpMethod, RouteConfig } from '../domain/types';
 import { BunAdapter } from '../infrastructure/BunAdapter';
 import { FastifyAdapter } from '../infrastructure/FastifyAdapter';
+import { FluentAdapter } from '../infrastructure/FluentAdapter';
 import { RuntimeOptimizer } from '../infrastructure/RuntimeOptimizer';
 import { UltraFastAdapter } from '../infrastructure/UltraFastAdapter';
 import { UltraFastifyAdapter } from '../infrastructure/UltraFastifyAdapter';
@@ -62,6 +63,23 @@ export interface SyntroJSConfig {
   /** Use ultra-fast adapter for maximum performance with features */
   ultraFast?: boolean;
 
+  /** Use fluent adapter for dynamic tree shaking */
+  fluent?: boolean;
+
+  /** Fluent adapter configuration */
+  fluentConfig?: {
+    logger?: boolean;
+    validation?: boolean;
+    errorHandling?: boolean;
+    dependencyInjection?: boolean;
+    backgroundTasks?: boolean;
+    openAPI?: boolean;
+    compression?: boolean;
+    cors?: boolean;
+    helmet?: boolean;
+    rateLimit?: boolean;
+  };
+
   /** Runtime to use: 'auto', 'node', or 'bun' */
   runtime?: 'auto' | 'node' | 'bun';
 }
@@ -78,7 +96,8 @@ export class SyntroJS {
     | typeof UltraFastAdapter
     | typeof UltraFastifyAdapter
     | typeof UltraMinimalAdapter
-    | typeof BunAdapter;
+    | typeof BunAdapter
+    | typeof FluentAdapter;
   private readonly runtime: 'node' | 'bun';
   private readonly optimizer: RuntimeOptimizer;
   private isStarted = false;
@@ -98,10 +117,35 @@ export class SyntroJS {
     // Choose adapter based on runtime and config
     this.adapter = this.selectOptimalAdapter();
 
-    // Create Fastify instance via adapter (ultra-optimized or standard)
-    this.fastify = this.adapter.create({
-      logger: config.logger ?? false,
-    }) as FastifyInstance;
+    // Create Fastify instance via adapter
+    if (this.adapter === FluentAdapter) {
+      // FluentAdapter needs special handling
+      const fluentAdapter = new FluentAdapter();
+      if (config.fluentConfig) {
+        // Apply fluent configuration
+        if (config.fluentConfig.logger !== undefined) fluentAdapter.withLogger(config.fluentConfig.logger);
+        if (config.fluentConfig.validation !== undefined) fluentAdapter.withValidation(config.fluentConfig.validation);
+        if (config.fluentConfig.errorHandling !== undefined) fluentAdapter.withErrorHandling(config.fluentConfig.errorHandling);
+        if (config.fluentConfig.dependencyInjection !== undefined) fluentAdapter.withDependencyInjection(config.fluentConfig.dependencyInjection);
+        if (config.fluentConfig.backgroundTasks !== undefined) fluentAdapter.withBackgroundTasks(config.fluentConfig.backgroundTasks);
+        if (config.fluentConfig.openAPI !== undefined) fluentAdapter.withOpenAPI(config.fluentConfig.openAPI);
+        if (config.fluentConfig.compression !== undefined) fluentAdapter.withCompression(config.fluentConfig.compression);
+        if (config.fluentConfig.cors !== undefined) fluentAdapter.withCors(config.fluentConfig.cors);
+        if (config.fluentConfig.helmet !== undefined) fluentAdapter.withHelmet(config.fluentConfig.helmet);
+        if (config.fluentConfig.rateLimit !== undefined) fluentAdapter.withRateLimit(config.fluentConfig.rateLimit);
+      } else {
+        // Use standard preset
+        fluentAdapter.standard();
+      }
+      this.fastify = fluentAdapter.create();
+    } else {
+      // Other adapters use the standard create method
+      if (this.adapter === FluentAdapter) {
+        this.fastify = this.adapter.create() as FastifyInstance;
+      } else {
+        this.fastify = this.adapter.create() as FastifyInstance;
+      }
+    }
 
     // Register OpenAPI endpoint
     this.registerOpenAPIEndpoint();
@@ -135,8 +179,10 @@ export class SyntroJS {
     | typeof UltraFastAdapter
     | typeof UltraFastifyAdapter
     | typeof UltraMinimalAdapter
-    | typeof BunAdapter {
+    | typeof BunAdapter
+    | typeof FluentAdapter {
     // Force specific adapter if configured
+    if (this.config.fluent) return FluentAdapter;
     if (this.config.ultraMinimal) return UltraMinimalAdapter;
     if (this.config.ultraFast) return UltraFastAdapter;
     if (this.config.ultraOptimized) return UltraFastifyAdapter;
@@ -147,8 +193,8 @@ export class SyntroJS {
       return BunAdapter;
     }
 
-    // Node.js: Use FastifyAdapter as default
-    return FastifyAdapter;
+    // Node.js: Use FluentAdapter as default (tree shaking enabled)
+    return FluentAdapter;
   }
 
   /**

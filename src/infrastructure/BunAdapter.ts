@@ -14,14 +14,18 @@ export function createBunAdapter(): unknown {
     routes: routes,
     // Bun-specific optimizations
     bun: true,
-    native: true
+    native: true,
   };
   return server;
 }
 
 export async function registerBunRoute(server: unknown, route: unknown): Promise<void> {
-  routes.set((route as { id?: string; method: string; path: string }).id || `${(route as { method: string; path: string }).method}-${(route as { method: string; path: string }).path}`, route);
-  
+  routes.set(
+    (route as { id?: string; method: string; path: string }).id ||
+      `${(route as { method: string; path: string }).method}-${(route as { method: string; path: string }).path}`,
+    route,
+  );
+
   // Use Bun's native routing (faster than Fastify)
   if (typeof (globalThis as { Bun?: unknown }).Bun !== 'undefined') {
     // Bun-specific optimizations
@@ -32,7 +36,9 @@ export async function registerBunRoute(server: unknown, route: unknown): Promise
 function registerBunRouteInternal(route: unknown): void {
   // Bun native route registration
   // This would use Bun's internal routing which is faster
-  console.log(`🚀 Bun native route: ${(route as { method: string; path: string }).method} ${(route as { method: string; path: string }).path}`);
+  console.log(
+    `🚀 Bun native route: ${(route as { method: string; path: string }).method} ${(route as { method: string; path: string }).path}`,
+  );
 }
 
 export async function listenBun(server: unknown, port: number, host = '::'): Promise<string> {

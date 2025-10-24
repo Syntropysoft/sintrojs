@@ -1,6 +1,6 @@
 /**
  * Simple Test Example
- * 
+ *
  * Test the same 4-line API we created in app.js
  */
 
@@ -15,7 +15,7 @@ test.get('/hello', {
 
 // Run the test
 const result = await test.expectSuccess('GET', '/hello', {
-  expected: { message: 'Hello World!' }
+  expected: { message: 'Hello World!' },
 });
 
 console.log('✅ Test passed:', result);

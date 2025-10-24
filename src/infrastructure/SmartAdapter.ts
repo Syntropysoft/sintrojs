@@ -11,7 +11,7 @@
 
 import Fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
 import type { Route } from '../domain/Route';
-import type { HttpMethod } from '../domain/types';
+import type { HttpMethod, RequestContext, ExceptionHandler } from '../domain/types';
 
 export interface SmartConfig {
   logger?: boolean;
@@ -34,17 +34,17 @@ class SmartAdapterImpl {
     // SMART handler - lazy loading everything
     fastify[method](route.path, async (request: FastifyRequest, reply: FastifyReply) => {
       // LAZY CONTEXT - only create if needed
-      let context: any = null;
+      let context: RequestContext | null = null;
       const getContext = () => {
         if (!context) {
           context = {
-            method: request.method,
+            method: request.method as HttpMethod,
             path: request.url,
             params: request.params,
             query: request.query,
             body: request.body,
-            headers: request.headers,
-            cookies: (request as any).cookies || {},
+            headers: request.headers as Record<string, string>,
+            cookies: (request as { cookies?: Record<string, string> }).cookies || {},
             correlationId: Math.random().toString(36).substring(2, 15),
             timestamp: new Date(),
             dependencies: {} as Record<string, unknown>,
@@ -58,33 +58,41 @@ class SmartAdapterImpl {
 
       try {
         // LAZY VALIDATION - only if schemas exist
-        if (route.config.params) {
+        if (route.config.params || route.config.query || route.config.body) {
           const ctx = getContext();
-          ctx.params = route.config.params.parse(request.params);
-        }
-        if (route.config.query) {
-          const ctx = getContext();
-          ctx.query = route.config.query.parse(request.query);
-        }
-        if (route.config.body) {
-          const ctx = getContext();
-          ctx.body = route.config.body.parse(request.body);
+          if (ctx) {
+            if (route.config.params) {
+              ctx.params = route.config.params.parse(request.params);
+            }
+            if (route.config.query) {
+              ctx.query = route.config.query.parse(request.query);
+            }
+            if (route.config.body) {
+              ctx.body = route.config.body.parse(request.body);
+            }
+          }
         }
 
         // LAZY DEPENDENCIES - only if dependencies are defined
         if (route.config.dependencies) {
           const ctx = getContext();
-          // Load DependencyInjector only when needed
-          const { DependencyInjector } = await import('../application/DependencyInjector');
-          const { resolved } = await DependencyInjector.resolve(
-            route.config.dependencies as any,
-            ctx,
-          );
-          ctx.dependencies = resolved;
+          if (ctx) {
+            // Load DependencyInjector only when needed
+            const { DependencyInjector } = await import('../application/DependencyInjector');
+            const { resolved } = await DependencyInjector.resolve(
+              route.config.dependencies as any,
+              ctx,
+            );
+            ctx.dependencies = resolved;
+          }
         }
 
         // Execute handler with lazy context
-        const result = await route.handler(getContext());
+        const ctx = getContext();
+        if (!ctx) {
+          throw new Error('Failed to create request context');
+        }
+        const result = await route.handler(ctx);
 
         // LAZY RESPONSE VALIDATION - only if response schema exists
         if (route.config.response) {
@@ -97,10 +105,15 @@ class SmartAdapterImpl {
         return reply.status(statusCode).send(result);
       } catch (error) {
         // LAZY ERROR HANDLING - only if custom error handlers exist
-        if ((route.config as any).errorHandler) {
+        if ((route.config as unknown as { errorHandler?: ExceptionHandler }).errorHandler) {
           const ctx = getContext();
-          const response = await (route.config as any).errorHandler(error as Error, ctx);
-          return reply.status(response.status).send(response.body);
+          if (ctx) {
+            const response = await (route.config as unknown as { errorHandler: ExceptionHandler }).errorHandler(
+              ctx,
+              error as Error,
+            );
+            return reply.status(response.status).send(response.body);
+          }
         }
 
         // MINIMAL error handling
