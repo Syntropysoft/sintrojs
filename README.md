@@ -129,6 +129,19 @@ pnpm add syntrojs zod
 - For testing: `npm install --save-dev @stryker-mutator/core @stryker-mutator/typescript-checker @stryker-mutator/vitest-runner`
 - For plugins: `npm install @fastify/compress @fastify/cors @fastify/helmet @fastify/rate-limit`
 
+**Smart Testing with Graceful Fallback:**
+```typescript
+import { SmartMutatorWrapper } from 'syntrojs/testing';
+
+// Automatically handles missing dependencies
+const result = await SmartMutatorWrapper.run({ mode: 'smart' });
+if (result) {
+  console.log(`Mutation score: ${result.mutationScore}%`);
+} else {
+  console.log('Install testing dependencies to use SmartMutator');
+}
+```
+
 See [Optional Dependencies](./docs/OPTIONAL_DEPENDENCIES.md) for details.
 
 ### Your First API

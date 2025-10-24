@@ -29,18 +29,42 @@ The `SmartMutator` class requires Stryker for mutation testing, but these depend
 2. **Graceful Fallback**: If Stryker is not available, it throws a helpful error
 3. **Clear Instructions**: The error message tells users exactly what to install
 
-### Error Handling
+### SmartMutatorWrapper Usage
 
-When `SmartMutator.run()` is called without Stryker installed:
+The `SmartMutatorWrapper` provides a graceful way to handle optional dependencies:
+
+```typescript
+import { SmartMutatorWrapper } from 'syntrojs/testing';
+
+// Check if SmartMutator is available
+const isAvailable = await SmartMutatorWrapper.isAvailable();
+if (isAvailable) {
+  console.log('✅ SmartMutator is ready to use');
+} else {
+  console.log('⚠️ Install testing dependencies to use SmartMutator');
+}
+
+// Run mutation testing with graceful fallback
+const result = await SmartMutatorWrapper.run({ mode: 'smart' });
+if (result) {
+  console.log(`Mutation score: ${result.mutationScore}%`);
+} else {
+  console.log('SmartMutator dependencies not installed');
+}
+```
+
+### Direct SmartMutator Usage
+
+You can still use `SmartMutator` directly if you prefer:
 
 ```typescript
 import { SmartMutator } from 'syntrojs/testing';
 
 try {
-  await SmartMutator.run();
+  const result = await SmartMutator.run({ mode: 'smart' });
+  console.log(`Mutation score: ${result.mutationScore}%`);
 } catch (error) {
-  // Error: SmartMutator requires @stryker-mutator/core to be installed.
-  // Please install it as a dev dependency: npm install --save-dev @stryker-mutator/core
+  console.error('SmartMutator not available:', error.message);
 }
 ```
 
