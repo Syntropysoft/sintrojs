@@ -1,5 +1,5 @@
 /**
- * TinyApi - FastAPI for Node.js
+ * SyntroJS - FastAPI for Node.js
  * Main entry point
  */
 

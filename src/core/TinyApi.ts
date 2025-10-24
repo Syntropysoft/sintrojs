@@ -1,5 +1,5 @@
 /**
- * TinyApi - Core Facade
+ * SyntroJS - Core Facade
  *
  * Responsibility: Public API and orchestration of all layers
  * Pattern: Facade Pattern
@@ -17,9 +17,22 @@ import type { ExceptionHandler, HttpMethod, RouteConfig } from '../domain/types'
 import { FastifyAdapter } from '../infrastructure/FastifyAdapter';
 
 /**
- * TinyApi configuration
+ * Route definition for object-based API
  */
-export interface TinyApiConfig {
+export interface RouteDefinition {
+  [path: string]: {
+    get?: RouteConfig<unknown, unknown, unknown, unknown>;
+    post?: RouteConfig<unknown, unknown, unknown, unknown>;
+    put?: RouteConfig<unknown, unknown, unknown, unknown>;
+    delete?: RouteConfig<unknown, unknown, unknown, unknown>;
+    patch?: RouteConfig<unknown, unknown, unknown, unknown>;
+  };
+}
+
+/**
+ * SyntroJS configuration
+ */
+export interface SyntroJSConfig {
   /** API title for OpenAPI docs */
   title?: string;
 
@@ -31,18 +44,21 @@ export interface TinyApiConfig {
 
   /** Enable logger */
   logger?: boolean;
+
+  /** Routes defined as object (alternative to method chaining) */
+  routes?: RouteDefinition;
 }
 
 /**
- * TinyApi main class
+ * SyntroJS main class
  * Facade that orchestrates all framework layers
  */
-export class TinyApi {
-  private readonly config: TinyApiConfig;
+export class SyntroJS {
+  private readonly config: SyntroJSConfig;
   private readonly fastify: FastifyInstance;
   private isStarted = false;
 
-  constructor(config: TinyApiConfig = {}) {
+  constructor(config: SyntroJSConfig = {}) {
     this.config = config;
 
     // Create Fastify instance via adapter
@@ -52,6 +68,11 @@ export class TinyApi {
 
     // Register OpenAPI endpoint
     this.registerOpenAPIEndpoint();
+
+    // Register routes from config if provided
+    if (config.routes) {
+      this.registerRoutesFromConfig(config.routes);
+    }
   }
 
   /**
@@ -122,6 +143,65 @@ export class TinyApi {
     config: RouteConfig<TParams, TQuery, TBody, TResponse>,
   ): this {
     return this.registerRoute('PATCH', path, config);
+  }
+
+  /**
+   * Sets the API title for OpenAPI documentation
+   *
+   * @param title - API title
+   * @returns this (for chaining)
+   */
+  title(title: string): this {
+    // Guard clause
+    if (!title) {
+      throw new Error('Title is required');
+    }
+
+    this.config.title = title;
+    return this;
+  }
+
+  /**
+   * Sets the API version for OpenAPI documentation
+   *
+   * @param version - API version
+   * @returns this (for chaining)
+   */
+  version(version: string): this {
+    // Guard clause
+    if (!version) {
+      throw new Error('Version is required');
+    }
+
+    this.config.version = version;
+    return this;
+  }
+
+  /**
+   * Sets the API description for OpenAPI documentation
+   *
+   * @param description - API description
+   * @returns this (for chaining)
+   */
+  description(description: string): this {
+    // Guard clause
+    if (!description) {
+      throw new Error('Description is required');
+    }
+
+    this.config.description = description;
+    return this;
+  }
+
+  /**
+   * Enables or disables logging
+   *
+   * @param enabled - Whether to enable logging
+   * @returns this (for chaining)
+   */
+  logging(enabled: boolean): this {
+    this.config.logger = enabled;
+    return this;
   }
 
   /**
@@ -297,4 +377,49 @@ export class TinyApi {
 
     return OpenAPIGenerator.generate(routes, openApiConfig);
   }
+
+  /**
+   * Registers routes from configuration object
+   *
+   * @param routes - Routes definition object
+   */
+  private registerRoutesFromConfig(routes: RouteDefinition): void {
+    // Guard clause
+    if (!routes) {
+      throw new Error('Routes configuration is required');
+    }
+
+    // Iterate through each path and its methods
+    for (const [path, methods] of Object.entries(routes)) {
+      // Guard clause
+      if (!path) {
+        throw new Error('Route path cannot be empty');
+      }
+
+      if (!methods) {
+        throw new Error(`Route methods for path '${path}' are required`);
+      }
+
+      // Register each HTTP method for this path
+      for (const [method, config] of Object.entries(methods)) {
+        // Guard clause
+        if (!config) {
+          continue; // Skip undefined methods
+        }
+
+        // Validate method is supported
+        const httpMethod = method.toUpperCase() as HttpMethod;
+        if (!['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].includes(httpMethod)) {
+          throw new Error(`Unsupported HTTP method: ${method}`);
+        }
+
+        // Register the route
+        this.registerRoute(httpMethod, path, config);
+      }
+    }
+  }
 }
+
+// Alias para compatibilidad hacia atrás
+export const TinyApi = SyntroJS;
+export type TinyApiConfig = SyntroJSConfig;

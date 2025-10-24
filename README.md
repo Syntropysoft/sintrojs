@@ -1,4 +1,4 @@
-# TinyApi
+# SyntroJS
 
 > **FastAPI for Node.js, with Trust Engineering built-in**
 > The only framework that makes writing high-quality tests as easy as creating endpoints.
@@ -16,7 +16,7 @@
 
 ---
 
-[![npm version](https://img.shields.io/npm/v/tinyapi.svg)](https://www.npmjs.com/package/tinyapi)
+[![npm version](https://img.shields.io/npm/v/syntrojs.svg)](https://www.npmjs.com/package/syntrojs)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)](./coverage)
@@ -25,9 +25,9 @@
 
 ---
 
-## 🎯 What is TinyApi?
+## 🎯 What is SyntroJS?
 
-TinyApi is a modern framework for building APIs in Node.js, heavily inspired by **FastAPI (Python)**. It brings the simplicity and elegance of FastAPI to the Node.js ecosystem with the power of TypeScript, enhanced with our Trust Engineering philosophy.
+SyntroJS is a modern framework for building APIs in Node.js, heavily inspired by **FastAPI (Python)**. It brings the simplicity and elegance of FastAPI to the Node.js ecosystem with the power of TypeScript, enhanced with our Trust Engineering philosophy.
 
 ## 🔬 Current Development Status
 
@@ -59,13 +59,13 @@ Building robust APIs in Node.js requires too much boilerplate:
 - ❌ **Fastify** is fast but requires manual configuration
 - ❌ **No true "FastAPI for Node.js" exists**
 
-### The Solution: TinyApi
+### The Solution: SyntroJS
 
 ```typescript
-import { TinyApi, HTTPException } from 'tinyapi';
+import { SyntroJS, HTTPException } from 'syntrojs';
 import { z } from 'zod';
 
-const app = new TinyApi();
+const app = new SyntroJS();
 
 app.get('/users/:id', {
   params: z.object({ id: z.coerce.number() }),
@@ -137,6 +137,108 @@ await app.listen(3000);
 ```
 
 Visit [http://localhost:3000/docs](http://localhost:3000/docs) to see your interactive API documentation! 📚
+
+### Fluent API & Advanced Pagination
+
+TinyApi now supports a **fluent API** with method chaining and advanced pagination:
+
+```typescript
+import { TinyApi } from 'tinyapi';
+import { z } from 'zod';
+
+// Method Chaining (Encadenamiento de Métodos)
+const api = new TinyApi()
+  .title('Mi API Empresarial')
+  .version('2.0.0')
+  .description('API con paginación avanzada')
+  .logging(true)
+  
+  .get('/users', {
+    query: z.object({
+      page: z.coerce.number().min(1).optional(),
+      limit: z.coerce.number().min(1).max(100).optional(),
+      sortBy: z.enum(['id', 'name', 'email', 'createdAt']).optional(),
+      sortOrder: z.enum(['asc', 'desc']).optional(),
+      search: z.string().optional()
+    }),
+    response: z.object({
+      users: z.array(z.object({
+        id: z.number(),
+        name: z.string(),
+        email: z.string(),
+        createdAt: z.string()
+      })),
+      pagination: z.object({
+        page: z.number(),
+        limit: z.number(),
+        total: z.number(),
+        pages: z.number(),
+        sortBy: z.string(),
+        sortOrder: z.string()
+      })
+    }),
+    handler: ({ query }) => {
+      const page = query.page ?? 1;
+      const limit = query.limit ?? 10;
+      const sortBy = query.sortBy ?? 'id';
+      const sortOrder = query.sortOrder ?? 'asc';
+      
+      // Tu lógica de paginación aquí
+      return {
+        users: [], // Datos paginados
+        pagination: { page, limit, total: 1000, pages: 100, sortBy, sortOrder }
+      };
+    }
+  })
+  
+  .listen(3000);
+```
+
+**Object-based Routes (Definición por Objetos):**
+
+```typescript
+const api = new TinyApi({
+  routes: {
+    '/products': {
+      get: {
+        query: z.object({
+          page: z.coerce.number().min(1).optional(),
+          limit: z.coerce.number().min(1).max(1000).optional(),
+          sortBy: z.enum(['id', 'name', 'price']).optional(),
+          sortOrder: z.enum(['asc', 'desc']).optional()
+        }),
+        handler: ({ query }) => {
+          // Manejar 10,000+ registros eficientemente
+          const page = query.page ?? 1;
+          const limit = query.limit ?? 20;
+          
+          return {
+            products: [], // Datos paginados
+            pagination: { page, limit, total: 10000, pages: 500 }
+          };
+        }
+      },
+      post: {
+        body: z.object({ name: z.string(), price: z.number() }),
+        handler: ({ body }) => ({ id: 1, ...body })
+      }
+    }
+  }
+});
+
+// Configurar metadatos usando encadenamiento
+api
+  .title('API de Productos')
+  .version('1.0.0')
+  .description('Manejo eficiente de grandes volúmenes de datos')
+  .listen(3000);
+```
+
+**Casos de Uso Reales:**
+- 📊 **10,000 registros** en páginas de 100: `?page=1&limit=100`
+- 📊 **10,000 registros** en páginas de 1,000: `?page=1&limit=1000`
+- 🔄 **Ordenamiento** por fecha: `?sortBy=createdAt&sortOrder=desc`
+- 🔍 **Búsqueda** con paginación: `?search=admin&page=1&limit=20`
 
 ### Security Example
 
@@ -229,6 +331,8 @@ await app.listen(3000);
 ### Advanced Features (v0.2.0)
 - 🔥 **Dependency Injection** - Simple, functional DI with singleton and request scopes
 - 🔥 **Background Tasks** - Non-blocking task execution (I/O only)
+- 🔥 **Fluent API** - Method chaining and object-based route definitions
+- 🔥 **Advanced Pagination** - Configurable pagination with sorting and filtering
 - 🔥 **Security & Authentication**:
   - `OAuth2PasswordBearer` - Complete OAuth2 flow
   - `HTTPBearer` - Generic Bearer token authentication
