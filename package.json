@@ -1,6 +1,6 @@
 {
   "name": "syntrojs",
-  "version": "0.2.5-alpha",
+  "version": "0.2.6-alpha",
   "description": "Modern, type-safe API framework with automatic documentation (ALPHA - Proof of Concept)",
   "type": "module",
   "main": "./dist/index.js",
