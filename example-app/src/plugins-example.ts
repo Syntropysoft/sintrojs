@@ -1,7 +1,7 @@
 /**
  * Plugins Example
  *
- * Demonstrates how to use TinyApi plugins for production features
+ * Demonstrates how to use SyntroJS plugins for production features
  *
  * IMPORTANT: Install the plugin dependencies first:
  * ```bash
@@ -11,7 +11,7 @@
 
 import { z } from 'zod';
 import {
-  TinyApi,
+  SyntroJS,
   registerCompression,
   registerCors,
   registerHelmet,
@@ -19,7 +19,7 @@ import {
 } from '../..';
 
 async function main() {
-  const app = new TinyApi({
+  const app = new SyntroJS({
     title: 'Plugins Example API',
     version: '1.0.0',
     description: 'API with CORS, Security Headers, Compression, and Rate Limiting',

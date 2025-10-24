@@ -1,19 +1,19 @@
 /**
- * Advanced TinyApi Example
+ * Advanced SyntroJS Example
  * Demonstrates: DI, Background Tasks, All Features
  */
 
-import { HTTPException, NotFoundException, TinyApi, inject } from 'tinyapi';
+import { HTTPException, NotFoundException, SyntroJS, inject } from 'syntrojs';
 import { z } from 'zod';
 
 // ============================================
 // 1. Setup App
 // ============================================
 
-const app = new TinyApi({
+const app = new SyntroJS({
   title: 'Advanced Users API',
   version: '1.0.0',
-  description: 'Demonstrates DI, Background Tasks, and all TinyApi features',
+  description: 'Demonstrates DI, Background Tasks, and all SyntroJS features',
 });
 
 // ============================================
@@ -318,7 +318,7 @@ app
   .listen(PORT)
   .then((address) => {
     console.log('');
-    console.log('🚀 TinyApi Advanced Example');
+    console.log('🚀 SyntroJS Advanced Example');
     console.log('');
     console.log(`✅ Server: ${address}`);
     console.log(`📚 Docs: ${address}/docs`);

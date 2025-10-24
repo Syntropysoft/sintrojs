@@ -313,7 +313,7 @@ async function demonstrateApis() {
 
   console.log('\n🎉 ¡Todas las APIs están funcionando!');
   console.log('💡 Observa cómo cada enfoque mantiene el Swagger automático');
-  console.log('🚀 La API Avanzada muestra todas las capacidades de TinyApi');
+  console.log('🚀 La API Avanzada muestra todas las capacidades de SyntroJS');
 }
 
 // Ejecutar demostración si es el archivo principal
@@ -333,7 +333,7 @@ const advancedApi = new SyntroJS();
 advancedApi
   .title('Mi API Empresarial')
   .version('2.1.0')
-  .description('API completa con todas las características de TinyApi')
+  .description('API completa con todas las características de SyntroJS')
   .logging(true)
   
   // Rutas principales

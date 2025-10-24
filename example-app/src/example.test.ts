@@ -1,10 +1,10 @@
 /**
  * Example Tests with TinyTest
- * Demonstrates how easy testing is with TinyApi
+ * Demonstrates how easy testing is with SyntroJS
  */
 
-import { inject } from 'tinyapi';
-import { TinyTest } from 'tinyapi/testing';
+import { inject } from 'syntrojs';
+import { TinyTest } from 'syntrojs/testing';
 import { describe, expect, test } from 'vitest';
 import { z } from 'zod';
 

@@ -12,6 +12,9 @@ export * from './application';
 // Core exports
 export * from './core';
 
+// Infrastructure exports
+export * from './infrastructure';
+
 // Security exports
 export * from './security';
 

@@ -15,6 +15,9 @@ import { RouteRegistry } from '../application/RouteRegistry';
 import { Route } from '../domain/Route';
 import type { ExceptionHandler, HttpMethod, RouteConfig } from '../domain/types';
 import { FastifyAdapter } from '../infrastructure/FastifyAdapter';
+import { UltraFastAdapter } from '../infrastructure/UltraFastAdapter';
+import { UltraFastifyAdapter } from '../infrastructure/UltraFastifyAdapter';
+import { UltraMinimalAdapter } from '../infrastructure/UltraMinimalAdapter';
 
 /**
  * Route definition for object-based API
@@ -47,6 +50,15 @@ export interface SyntroJSConfig {
 
   /** Routes defined as object (alternative to method chaining) */
   routes?: RouteDefinition;
+
+  /** Use ultra-optimized adapter for maximum performance */
+  ultraOptimized?: boolean;
+
+  /** Use ultra-minimal adapter for absolute maximum performance */
+  ultraMinimal?: boolean;
+
+  /** Use ultra-fast adapter for maximum performance with features */
+  ultraFast?: boolean;
 }
 
 /**
@@ -56,13 +68,18 @@ export interface SyntroJSConfig {
 export class SyntroJS {
   private readonly config: SyntroJSConfig;
   private readonly fastify: FastifyInstance;
+  private readonly adapter: typeof FastifyAdapter | typeof UltraFastAdapter | typeof UltraFastifyAdapter | typeof UltraMinimalAdapter;
   private isStarted = false;
 
   constructor(config: SyntroJSConfig = {}) {
     this.config = config;
+    this.adapter = config.ultraMinimal ? UltraMinimalAdapter : 
+                   config.ultraFast ? UltraFastAdapter :
+                   config.ultraOptimized ? UltraFastifyAdapter : 
+                   FastifyAdapter;
 
-    // Create Fastify instance via adapter
-    this.fastify = FastifyAdapter.create({
+    // Create Fastify instance via adapter (ultra-optimized or standard)
+    this.fastify = this.adapter.create({
       logger: config.logger ?? false,
     });
 
@@ -327,7 +344,7 @@ export class SyntroJS {
 
     // Functional: forEach for side effects (registration)
     for (const route of routes) {
-      FastifyAdapter.registerRoute(this.fastify, route);
+      this.adapter.registerRoute(this.fastify, route);
     }
   }
 

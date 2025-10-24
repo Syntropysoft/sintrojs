@@ -1,6 +1,6 @@
 {
   "name": "syntrojs",
-  "version": "0.2.0-alpha",
+  "version": "0.2.2-alpha",
   "description": "FastAPI for Node.js - Modern, type-safe API framework with automatic documentation (ALPHA - Proof of Concept)",
   "type": "module",
   "main": "./dist/index.js",
@@ -16,7 +16,9 @@
       "import": "./dist/testing/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "dev": "npm run build -- --watch",
@@ -28,7 +30,12 @@
     "test:mutation": "stryker run",
     "lint:fix": "biome check --write src tests",
     "typecheck": "tsc --noEmit --skipLibCheck",
-    "ci": "pnpm lint && pnpm typecheck && pnpm test:coverage"
+    "ci": "pnpm lint && pnpm typecheck && pnpm test:coverage",
+    "benchmark": "node final-performance-benchmark.cjs",
+    "benchmark:final": "node final-performance-benchmark.cjs",
+    "benchmark:ultrafast": "node ultrafast-optimization-benchmark.cjs",
+    "benchmark:express": "node syntrojs-vs-express.cjs",
+    "benchmark:diagnostic": "node benchmarks/diagnostic-baseline.cjs"
   },
   "keywords": [
     "fastapi",
@@ -73,6 +80,7 @@
     "@types/node": "^18.19.0",
     "@vitest/coverage-v8": "^1.2.2",
     "@vitest/ui": "^1.2.2",
+    "express": "^5.1.0",
     "tsup": "^8.0.1",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3",

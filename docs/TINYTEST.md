@@ -34,7 +34,7 @@ test('GET /users/:id', async () => {
 ## ✨ The Solution: TinyTest
 
 ```typescript
-import { TinyTest } from 'tinyapi/testing';
+import { TinyTest } from 'syntrojs/testing';
 import { z } from 'zod';
 
 test('GET /users/:id', async () => {
@@ -55,7 +55,7 @@ test('GET /users/:id', async () => {
 
 **Benefits:**
 - ✅ Define route and test in one place
-- ✅ Same syntax as TinyApi
+- ✅ Same syntax as SyntroJS
 - ✅ Type-safe (TypeScript infers types from Zod)
 - ✅ Clean, minimal syntax
 - ✅ Auto-starts server on random port
@@ -219,7 +219,7 @@ test('id is always positive', async () => {
 
 ```typescript
 import { describe, test, expect } from 'vitest';
-import { TinyTest } from 'tinyapi/testing';
+import { TinyTest } from 'syntrojs/testing';
 import { z } from 'zod';
 
 describe('Users API', () => {

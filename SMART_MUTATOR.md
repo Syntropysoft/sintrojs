@@ -1,6 +1,6 @@
 # SmartMutator: Mutation Testing en Segundos
 
-> **Stryker optimizado para TinyApi. Mismo resultado, 100x más rápido.**
+> **Stryker optimizado para SyntroJS. Mismo resultado, 100x más rápido.**
 
 ---
 
@@ -37,7 +37,7 @@ npx stryker run
 ### De 30 Minutos a 8 Segundos
 
 **SmartMutator NO es un mutation testing diferente.**  
-**Es Stryker, pero optimizado inteligentemente para TinyApi.**
+**Es Stryker, pero optimizado inteligentemente para SyntroJS.**
 
 ```bash
 # SmartMutator (optimizado)
@@ -68,7 +68,7 @@ class SmartMutatorImpl {
   
   /**
    * Modo rápido: Optimización inteligente
-   * Usa conocimiento de TinyApi para acelerar Stryker
+   * Usa conocimiento de SyntroJS para acelerar Stryker
    */
   async runSmart(options?: MutationOptions): Promise<MutationReport> {
     const config = this.buildOptimizedConfig(options);
@@ -85,7 +85,7 @@ class SmartMutatorImpl {
   }
   
   /**
-   * Nuestra "magia": Análisis de TinyApi
+   * Nuestra "magia": Análisis de SyntroJS
    */
   private buildOptimizedConfig(options?: MutationOptions): StrykerConfig {
     const analysis = this.analyzeRoutes();
@@ -122,7 +122,7 @@ class SmartMutatorImpl {
 - Genera 100-200 mutantes relevantes
 
 ```typescript
-// Ejemplo: TinyApi conoce su estructura
+// Ejemplo: SyntroJS conoce su estructura
 app.post('/users', {
   body: z.object({
     name: z.string().min(3),    // ✅ Mutar: .min(2), .min(4)
@@ -154,11 +154,11 @@ app.post('/users', {
 - 150 tests × 100 mutantes = 15,000 ejecuciones de tests
 
 **SmartMutator:**
-- TinyApi registra qué tests cubren qué rutas
+- SyntroJS registra qué tests cubren qué rutas
 - Solo ejecuta tests relevantes por mutante
 
 ```typescript
-// TinyApi mantiene un registro interno:
+// SyntroJS mantiene un registro interno:
 const testRegistry = {
   'POST /users': [
     'tests/e2e/users.test.ts::POST /users creates user',
@@ -371,20 +371,20 @@ jobs:
 
 ### Zero Config (Recomendado)
 
-SmartMutator funciona out-of-the-box con TinyApi:
+SmartMutator funciona out-of-the-box con SyntroJS:
 
 ```typescript
 // No requiere configuración
-import { TinyApi } from 'tinyapi';
+import { SyntroJS } from 'syntrojs';
 
-const app = new TinyApi();
+const app = new SyntroJS();
 // SmartMutator ya está configurado ✅
 ```
 
 ### Configuración Avanzada
 
 ```typescript
-// tinyapi.config.ts
+// syntrojs.config.ts
 export default {
   mutation: {
     mode: 'smart',           // 'smart' | 'full'
@@ -596,15 +596,15 @@ Comment posted to PR with details.
 
 ## 🚧 Limitaciones Conocidas
 
-### 1. Solo Funciona con TinyApi
+### 1. Solo Funciona con SyntroJS
 
-SmartMutator requiere que el código use TinyApi para funcionar.
+SmartMutator requiere que el código use SyntroJS para funcionar.
 
-**Por qué:** Las optimizaciones dependen de conocer la estructura de rutas, schemas y handlers de TinyApi.
+**Por qué:** Las optimizaciones dependen de conocer la estructura de rutas, schemas y handlers de SyntroJS.
 
 **Alternativa:** Usar Stryker vanilla con cualquier framework.
 
-### 2. No Optimiza Código No-TinyApi
+### 2. No Optimiza Código No-SyntroJS
 
 Si tienes código fuera de rutas (utils, helpers), SmartMutator no lo optimiza.
 
@@ -615,7 +615,7 @@ app.post('/users', {
   handler: ({ body }) => createUser(body),
 });
 
-// ❌ NO optimizado (fuera de TinyApi)
+// ❌ NO optimizado (fuera de SyntroJS)
 function someHelper(data: string) {
   return data.toUpperCase();
 }
@@ -691,8 +691,8 @@ test('POST /users', async () => {
 - [Stryker Documentation](https://stryker-mutator.io/)
 - [Stryker GitHub](https://github.com/stryker-mutator/stryker-js)
 
-### TinyApi
-- [TinyApi Documentation](./README.md)
+### SyntroJS
+- [SyntroJS Documentation](./README.md)
 - [TinyTest Documentation](./TESTING.md)
 - [Architecture](./ROADMAP.md)
 
@@ -700,7 +700,7 @@ test('POST /users', async () => {
 
 ## 🤝 Contributing
 
-SmartMutator es parte del core de TinyApi. Si querés contribuir:
+SmartMutator es parte del core de SyntroJS. Si querés contribuir:
 
 1. **Reportar issues** - Si encontrás mutantes que deberían matarse pero sobreviven
 2. **Optimizaciones** - Si tenés ideas para hacer mutation testing más rápido
@@ -719,7 +719,7 @@ Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
 - De auditoría cara en CI/CD → Feedback instantáneo en desarrollo
 - De 30-60 minutos → 8-30 segundos
 - De "solo grandes equipos" → Cualquier developer
-- De "optional nice-to-have" → Standard en TinyApi
+- De "optional nice-to-have" → Standard en SyntroJS
 
 **Resultado:** Calidad de código verificable, sin compromiso en productividad.
 

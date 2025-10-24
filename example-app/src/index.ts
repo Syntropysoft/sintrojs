@@ -1,13 +1,13 @@
 /**
- * Example TinyApi Application
+ * Example SyntroJS Application
  * Demonstrates all core features
  */
 
-import { HTTPException, NotFoundException, TinyApi } from 'tinyapi';
+import { HTTPException, NotFoundException, SyntroJS } from 'syntrojs';
 import { z } from 'zod';
 
 // Create app instance
-const app = new TinyApi({
+const app = new SyntroJS({
   title: 'Users API',
   version: '1.0.0',
   description: 'A simple API for managing users',
@@ -184,7 +184,7 @@ app.exceptionHandler(DatabaseError, (context, error) => ({
 const PORT = Number(process.env.PORT) || 3000;
 
 app.listen(PORT).then((address) => {
-  console.log('\n🚀 TinyApi Example App');
+  console.log('\n🚀 SyntroJS Example App');
   console.log(`Server running at ${address}\n`);
   console.log('📖 Interactive Documentation:');
   console.log(`   Swagger UI: ${address}/docs`);

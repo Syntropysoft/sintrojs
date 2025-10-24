@@ -9,10 +9,10 @@
 Background tasks are perfect for non-blocking I/O operations that don't require waiting for a response:
 
 ```typescript
-import { TinyApi } from 'tinyapi';
+import { SyntroJS } from 'syntrojs';
 import { z } from 'zod';
 
-const app = new TinyApi();
+const app = new SyntroJS();
 
 app.post('/send-notification', {
   body: z.object({ email: z.string().email(), message: z.string() }),
@@ -121,7 +121,7 @@ worker.on('failed', (job, err) => {
 ### Use in API (api.ts)
 
 ```typescript
-import { TinyApi } from 'tinyapi';
+import { SyntroJS } from 'syntrojs';
 import { Queue } from 'bullmq';
 import Redis from 'ioredis';
 import { z } from 'zod';
@@ -129,7 +129,7 @@ import { z } from 'zod';
 const connection = new Redis({ host: 'localhost', port: 6379 });
 const videoQueue = new Queue('video-processing', { connection });
 
-const app = new TinyApi();
+const app = new SyntroJS();
 
 app.post('/process-video', {
   body: z.object({ url: z.string().url() }),
@@ -158,7 +158,7 @@ app.post('/process-video', {
 
 ## 📊 Performance Warning System
 
-TinyApi automatically warns if a background task takes >100ms:
+SyntroJS automatically warns if a background task takes >100ms:
 
 ```typescript
 app.post('/example', {
@@ -263,7 +263,7 @@ Complete example with BullMQ integration:
 
 ```typescript
 // api.ts
-import { TinyApi, inject } from 'tinyapi';
+import { SyntroJS, inject } from 'syntrojs';
 import { Queue } from 'bullmq';
 import { z } from 'zod';
 
@@ -274,7 +274,7 @@ const getQueue = () => {
   });
 };
 
-const app = new TinyApi();
+const app = new SyntroJS();
 
 app.post('/heavy-operation', {
   body: z.object({ data: z.string() }),

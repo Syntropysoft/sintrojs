@@ -4,7 +4,7 @@
  */
 
 import type { FastifyRequest } from 'fastify';
-import { HTTPException, TinyApi, inject } from 'tinyapi';
+import { HTTPException, SyntroJS, inject } from 'syntrojs';
 import {
   APIKeyHeader,
   APIKeyQuery,
@@ -14,10 +14,10 @@ import {
   OAuth2PasswordBearer,
   signJWT,
   verifyJWT,
-} from 'tinyapi';
+} from 'syntrojs';
 import { z } from 'zod';
 
-const app = new TinyApi();
+const app = new SyntroJS();
 
 // ============================================
 // Mock Database (replace with real DB)
