@@ -1,7 +1,7 @@
 {
   "name": "syntrojs",
-  "version": "0.2.2-alpha",
-  "description": "FastAPI for Node.js - Modern, type-safe API framework with automatic documentation (ALPHA - Proof of Concept)",
+  "version": "0.2.3-alpha",
+  "description": "Modern, type-safe API framework with automatic documentation (ALPHA - Proof of Concept)",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

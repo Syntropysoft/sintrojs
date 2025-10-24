@@ -387,6 +387,41 @@ await app.listen(3000);
   - `registerCompression` - Gzip/Brotli compression
   - `registerRateLimit` - Request rate limiting
 
+### Fluent Plugins API
+
+SyntroJS now includes a fluent API for configuring essential plugins:
+
+```typescript
+// Development setup - one line
+const app = new SyntroJS({ title: 'My API' })
+  .withDevelopmentDefaults()
+  .listen(3000);
+
+// Production setup with custom configuration
+const app = new SyntroJS({ title: 'My API' })
+  .withProductionDefaults()
+  .withCors({ origin: ['https://myapp.com'] })
+  .listen(3000);
+
+// Custom configuration
+const app = new SyntroJS({ title: 'My API' })
+  .withCors({ origin: '*' })
+  .withSecurity()
+  .withCompression()
+  .withRateLimit({ max: 100, timeWindow: '1 minute' })
+  .withOpenAPI()
+  .withLogging()
+  .listen(3000);
+```
+
+**Available Methods:**
+- `.withCors(options?)` - Cross-Origin Resource Sharing
+- `.withSecurity(options?)` - Security headers (Helmet)
+- `.withCompression(options?)` - Response compression
+- `.withRateLimit(options?)` - Rate limiting
+- `.withDevelopmentDefaults()` - Development-friendly defaults
+- `.withProductionDefaults()` - Production-ready defaults
+
 ---
 
 ## 📖 Documentation

@@ -18,6 +18,8 @@ import { RouteRegistry } from '../application/RouteRegistry';
 import { Route } from '../domain/Route';
 import type { ExceptionHandler, HttpMethod, RouteConfig } from '../domain/types';
 import { SmartAdapter } from '../infrastructure/SmartAdapter';
+import { registerCors, registerHelmet, registerCompression, registerRateLimit } from '../plugins';
+import type { CorsOptions, SecurityOptions, CompressionOptions, RateLimitOptions } from '../plugins';
 
 /**
  * Route definition for object-based API
@@ -61,6 +63,16 @@ export class SmartSyntroJS {
   private _withErrorHandling = false;
   private _withOpenAPI = false;
   private _withLogging = false;
+  
+  // Plugin configurations
+  private _withCors = false;
+  private _corsOptions?: CorsOptions;
+  private _withSecurity = false;
+  private _securityOptions?: SecurityOptions;
+  private _withCompression = false;
+  private _compressionOptions?: CompressionOptions;
+  private _withRateLimit = false;
+  private _rateLimitOptions?: RateLimitOptions;
 
   constructor(config: SmartSyntroJSConfig = {}) {
     this.config = config;
@@ -112,9 +124,68 @@ export class SmartSyntroJS {
    */
   withLogging(): this {
     this._withLogging = true;
-    // Recreate Fastify instance with logging
-    this.fastify.log = true;
+    // Note: SmartAdapter handles logging configuration
     return this;
+  }
+
+  /**
+   * Enables CORS with sensible defaults
+   */
+  withCors(options?: CorsOptions): this {
+    this._withCors = true;
+    this._corsOptions = options || this.getDefaultCorsOptions();
+    return this;
+  }
+
+  /**
+   * Enables security headers (Helmet)
+   */
+  withSecurity(options?: SecurityOptions): this {
+    this._withSecurity = true;
+    this._securityOptions = options || {};
+    return this;
+  }
+
+  /**
+   * Enables response compression
+   */
+  withCompression(options?: CompressionOptions): this {
+    this._withCompression = true;
+    this._compressionOptions = options || { threshold: 1024 };
+    return this;
+  }
+
+  /**
+   * Enables rate limiting
+   */
+  withRateLimit(options?: RateLimitOptions): this {
+    this._withRateLimit = true;
+    this._rateLimitOptions = options || { max: 100, timeWindow: '1 minute' };
+    return this;
+  }
+
+  /**
+   * Development defaults - permissive but functional
+   */
+  withDevelopmentDefaults(): this {
+    return this
+      .withCors()
+      .withSecurity({ strict: false })
+      .withCompression()
+      .withLogging()
+      .withOpenAPI();
+  }
+
+  /**
+   * Production defaults - secure and optimized
+   */
+  withProductionDefaults(): this {
+    return this
+      .withCors()
+      .withSecurity({ strict: true })
+      .withCompression()
+      .withRateLimit()
+      .withLogging();
   }
 
   /**
@@ -179,6 +250,9 @@ export class SmartSyntroJS {
       throw new Error('Server is already started');
     }
 
+    // Register all plugins before starting
+    await this.registerPlugins();
+
     // Register all routes
     this.registerAllRoutes();
 
@@ -241,6 +315,43 @@ export class SmartSyntroJS {
     for (const route of routes) {
       SmartAdapter.registerRoute(this.fastify, route);
     }
+  }
+
+  /**
+   * Registers all configured plugins
+   */
+  private async registerPlugins(): Promise<void> {
+    if (this._withCors) {
+      await registerCors(this.fastify, this._corsOptions!);
+    }
+    
+    if (this._withSecurity) {
+      await registerHelmet(this.fastify, this._securityOptions!);
+    }
+    
+    if (this._withCompression) {
+      await registerCompression(this.fastify, this._compressionOptions!);
+    }
+    
+    if (this._withRateLimit) {
+      await registerRateLimit(this.fastify, this._rateLimitOptions!);
+    }
+  }
+
+  /**
+   * Gets default CORS options based on environment
+   */
+  private getDefaultCorsOptions(): CorsOptions {
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    return {
+      origin: isProduction 
+        ? [] // Debe ser configurado explícitamente en producción
+        : ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000'],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    };
   }
 
   /**
