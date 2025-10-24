@@ -25,14 +25,30 @@
       },
       "style": {
         "noNonNullAssertion": "off"
+      },
+      "complexity": {
+        "useLiteralKeys": "off"
       }
     }
   },
   "overrides": [
     {
-      "include": ["tests/**/*.ts", "src/application/ErrorHandler.ts"],
+      "include": ["tests/**/*.ts"],
       "linter": {
         "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["src/application/ErrorHandler.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "useLiteralKeys": "off"
+          },
           "suspicious": {
             "noExplicitAny": "off"
           }

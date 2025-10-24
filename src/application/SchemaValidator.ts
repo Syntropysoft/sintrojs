@@ -6,6 +6,7 @@
  * Principles: SOLID (Single Responsibility), Guard Clauses, Functional
  */
 
+import { ZodObject } from 'zod';
 import type { ZodError, ZodSchema } from 'zod';
 import { ValidationException } from '../domain/HTTPException';
 
@@ -148,9 +149,12 @@ class SchemaValidatorImpl {
     }
 
     // Zod supports partial() for partial validation
+    if (!(schema instanceof ZodObject)) {
+      throw new Error('Schema must be a ZodObject to be partially validated');
+    }
     const partialSchema = schema.partial();
 
-    return this.validate(partialSchema, data);
+    return this.validate(partialSchema, data) as ValidationResult<Partial<T>>;
   }
 
   /**
@@ -167,7 +171,7 @@ class SchemaValidatorImpl {
 
     try {
       // Try parsing empty object to get defaults
-      const result = schema.safeParse({});
+      const result = (schema as ZodSchema<T>).safeParse({});
 
       if (result.success) {
         return result.data as Partial<T>;

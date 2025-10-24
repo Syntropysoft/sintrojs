@@ -176,10 +176,11 @@ class ErrorHandlerImpl {
       // Log error for debugging
       console.error('Unhandled error:', error);
 
+      const isProduction = process.env['NODE_ENV'] === 'production';
       return {
         status: 500,
         body: {
-          detail: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : error.message,
+          detail: isProduction ? 'Internal Server Error' : error.message,
           path: context.path,
         },
       };
@@ -196,10 +197,11 @@ class ErrorHandlerImpl {
   private handleGenericError(error: Error, context: RequestContext): RouteResponse {
     console.error('Unhandled error:', error);
 
+    const isProduction = process.env['NODE_ENV'] === 'production';
     return {
       status: 500,
       body: {
-        detail: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : error.message,
+        detail: isProduction ? 'Internal Server Error' : error.message,
         path: context.path,
       },
     };

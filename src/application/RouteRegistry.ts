@@ -14,7 +14,10 @@ import type { HttpMethod } from '../domain/types';
  */
 class RouteRegistryImpl {
   // Immutable: Map is never replaced, only its entries are modified
-  private readonly routes = new Map<string, Route>();
+  private readonly routes = new Map<
+    string,
+    Route<unknown, unknown, unknown, unknown, Record<string, unknown>>
+  >();
 
   /**
    * Registers a new route

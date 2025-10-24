@@ -6,6 +6,7 @@
  * Principles: SOLID (Single Responsibility), Guard Clauses, Functional
  */
 
+import type { ZodSchema } from 'zod';
 import type { Route } from '../domain/Route';
 import type { HttpMethod } from '../domain/types';
 import { ZodAdapter } from '../infrastructure/ZodAdapter';
@@ -311,7 +312,7 @@ class OpenAPIGeneratorImpl {
    * @returns Array of parameter objects
    */
   private extractQueryParameters(schema: unknown): ParameterObject[] {
-    const jsonSchema = ZodAdapter.toJsonSchema(schema) as JsonSchema;
+    const jsonSchema = ZodAdapter.toJsonSchema(schema as ZodSchema) as JsonSchema;
 
     // Get properties from JSON Schema
     const properties = jsonSchema.properties || {};
@@ -334,7 +335,7 @@ class OpenAPIGeneratorImpl {
    * @returns JSON Schema for property
    */
   private getSchemaForProperty(schema: unknown, propertyName: string): unknown {
-    const jsonSchema = ZodAdapter.toJsonSchema(schema) as JsonSchema;
+    const jsonSchema = ZodAdapter.toJsonSchema(schema as ZodSchema) as JsonSchema;
     const properties = jsonSchema.properties || {};
 
     return properties[propertyName] || { type: 'string' };

@@ -232,7 +232,9 @@ export class TinyApi {
     const route = new Route(method, path, config);
 
     // Register with RouteRegistry
-    RouteRegistry.register(route);
+    RouteRegistry.register(
+      route as Route<unknown, unknown, unknown, unknown, Record<string, unknown>>,
+    );
 
     return this;
   }
