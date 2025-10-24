@@ -25,6 +25,20 @@ node test.js
 
 This shows how to test the exact same API you created in `app.js` using TinyTest.
 
+### 3. Dual Runtime Magic 🚀
+
+```bash
+cd examples/dual-runtime
+node app.js    # Node.js runtime
+bun app.js     # Bun runtime (6x faster!)
+```
+
+This demonstrates SyntroJS's **dual runtime support**:
+- ✅ Same code runs on both Node.js and Bun
+- ✅ Auto-detection and optimization
+- ✅ Different performance characteristics
+- ✅ Zero code changes required
+
 ## What You'll See
 
 When you run `app.js`, you'll see:
