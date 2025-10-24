@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { SmartMutator } from '../../src/testing/SmartMutator';
+import { SmartMutator } from '../../../src/testing/SmartMutator';
 
 describe.skip('SmartMutator E2E - Mínimo', { timeout: 120000 }, () => {
   // Increased timeout for E2E mutation tests

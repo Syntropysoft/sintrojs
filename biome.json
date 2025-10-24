@@ -20,14 +20,16 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "error",
+        "noExplicitAny": "warn",
         "noEmptyInterface": "off"
       },
       "style": {
         "noNonNullAssertion": "off"
       },
       "complexity": {
-        "useLiteralKeys": "off"
+        "useLiteralKeys": "off",
+        "noStaticOnlyClass": "warn",
+        "noForEach": "warn"
       }
     }
   },

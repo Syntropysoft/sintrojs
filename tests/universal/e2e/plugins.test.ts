@@ -4,13 +4,13 @@
  */
 
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { TinyApi } from '../../src/core/TinyApi';
+import { TinyApi } from '../../../src/core/TinyApi';
 import {
   registerCompression,
   registerCors,
   registerHelmet,
   registerRateLimit,
-} from '../../src/plugins';
+} from '../../../src/plugins';
 
 describe('Plugins E2E', () => {
   describe('Plugin Registration', () => {

@@ -5,9 +5,9 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { ErrorHandler } from '../../src/application/ErrorHandler';
-import { RouteRegistry } from '../../src/application/RouteRegistry';
-import { TinyApi } from '../../src/core/TinyApi';
+import { ErrorHandler } from '../../../src/application/ErrorHandler';
+import { RouteRegistry } from '../../../src/application/RouteRegistry';
+import { TinyApi } from '../../../src/core/TinyApi';
 
 describe('Documentation Endpoints E2E', () => {
   let app: TinyApi;

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { SmartSyntroJS } from '../../../src/core/SmartSyntroJS';
 
 describe('SmartSyntroJS Fluent Plugins API', () => {
@@ -40,12 +40,8 @@ describe('SmartSyntroJS Fluent Plugins API', () => {
   });
 
   it('should chain multiple plugins', () => {
-    const result = app
-      .withCors()
-      .withSecurity()
-      .withCompression()
-      .withRateLimit();
-    
+    const result = app.withCors().withSecurity().withCompression().withRateLimit();
+
     expect(result).toBe(app);
     expect((app as any)._withCors).toBe(true);
     expect((app as any)._withSecurity).toBe(true);
@@ -76,21 +72,21 @@ describe('SmartSyntroJS Fluent Plugins API', () => {
   it('should return default CORS options for development', () => {
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
-    
+
     const result = app.withCors();
     expect((app as any)._corsOptions).toMatchObject({
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     });
-    
+
     process.env.NODE_ENV = originalEnv;
   });
 
   it('should return default CORS options for production', () => {
     const originalEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
-    
+
     const result = app.withCors();
     expect((app as any)._corsOptions).toMatchObject({
       origin: [],
@@ -98,7 +94,7 @@ describe('SmartSyntroJS Fluent Plugins API', () => {
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     });
-    
+
     process.env.NODE_ENV = originalEnv;
   });
 });

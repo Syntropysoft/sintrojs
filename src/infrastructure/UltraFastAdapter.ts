@@ -1,6 +1,6 @@
 /**
  * UltraFastAdapter - Optimizaciones Extremas
- * 
+ *
  * Estrategias de optimización:
  * 1. Pre-compilación de schemas Zod
  * 2. Pooling de objetos para reducir allocations
@@ -80,8 +80,8 @@ class UltraFastAdapterImpl {
         timestamp: new Date(),
         dependencies: {},
         background: {
-          addTask: (task: () => void) => setImmediate(task)
-        }
+          addTask: (task: () => void) => setImmediate(task),
+        },
       }),
       (ctx) => {
         // Reset del contexto
@@ -95,7 +95,7 @@ class UltraFastAdapterImpl {
         ctx.correlationId = '';
         ctx.timestamp = new Date();
         ctx.dependencies = {};
-      }
+      },
     );
   }
 
@@ -123,7 +123,7 @@ class UltraFastAdapterImpl {
         } catch {
           return data; // Fallback rápido
         }
-      }
+      },
     };
 
     this.compiledSchemas.set(key, compiled);
@@ -134,22 +134,26 @@ class UltraFastAdapterImpl {
     if (!fastify || !route) return;
 
     const method = route.method.toLowerCase() as Lowercase<HttpMethod>;
-    
+
     // Pre-compilar schemas si existen
-    const compiledParams = route.config.params ? 
-      this.precompileSchema(route.config.params, `${route.path}-params`) : null;
-    const compiledQuery = route.config.query ? 
-      this.precompileSchema(route.config.query, `${route.path}-query`) : null;
-    const compiledBody = route.config.body ? 
-      this.precompileSchema(route.config.body, `${route.path}-body`) : null;
-    const compiledResponse = route.config.response ? 
-      this.precompileSchema(route.config.response, `${route.path}-response`) : null;
+    const compiledParams = route.config.params
+      ? this.precompileSchema(route.config.params, `${route.path}-params`)
+      : null;
+    const compiledQuery = route.config.query
+      ? this.precompileSchema(route.config.query, `${route.path}-query`)
+      : null;
+    const compiledBody = route.config.body
+      ? this.precompileSchema(route.config.body, `${route.path}-body`)
+      : null;
+    const compiledResponse = route.config.response
+      ? this.precompileSchema(route.config.response, `${route.path}-response`)
+      : null;
 
     // Handler ultra-optimizado
     fastify[method](route.path, async (request: FastifyRequest, reply: FastifyReply) => {
       // Obtener contexto del pool
       const context = this.contextPool.get();
-      
+
       try {
         // Llenar contexto de forma optimizada
         context.method = request.method as HttpMethod;
@@ -185,7 +189,6 @@ class UltraFastAdapterImpl {
 
         const statusCode = route.config.status ?? 200;
         return reply.status(statusCode).send(result);
-
       } catch (error) {
         // Error handling mínimo
         const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';

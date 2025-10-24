@@ -1,6 +1,6 @@
 /**
  * ULTRA-OPTIMIZED FastifyAdapter
- * 
+ *
  * Eliminates 95% overhead by:
  * 1. Direct Zod.parse() instead of SchemaValidator
  * 2. Minimal context creation
@@ -34,7 +34,7 @@ class UltraFastifyAdapterImpl {
 
     const method = route.method.toLowerCase() as Lowercase<HttpMethod>;
     const routeKey = `${method}:${route.path}`;
-    
+
     // Pre-compile everything at startup for maximum performance
     this.preCompileRoute(route, routeKey);
 
@@ -54,8 +54,8 @@ class UltraFastifyAdapterImpl {
           timestamp: new Date(),
           dependencies: {} as Record<string, unknown>,
           background: {
-            addTask: (task: () => void) => setImmediate(task)
-          }
+            addTask: (task: () => void) => setImmediate(task),
+          },
         };
 
         // ULTRA-FAST validation using cached schemas
@@ -85,7 +85,6 @@ class UltraFastifyAdapterImpl {
 
         const statusCode = route.config.status ?? 200;
         return reply.status(statusCode).send(result);
-
       } catch (error) {
         // MINIMAL error handling - no ErrorHandler overhead
         const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
@@ -96,7 +95,7 @@ class UltraFastifyAdapterImpl {
 
   private preCompileRoute(route: Route, routeKey: string): void {
     const compiled: any = {};
-    
+
     // Cache compiled schemas for maximum performance
     if (route.config.params) {
       const cacheKey = `params:${routeKey}`;

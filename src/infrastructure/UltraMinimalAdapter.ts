@@ -1,6 +1,6 @@
 /**
  * ULTRA-MINIMAL FastifyAdapter
- * 
+ *
  * Eliminates ALL overhead by:
  * 1. No buildContext() - inline minimal context
  * 2. No DependencyInjector - skip dependencies
@@ -46,8 +46,8 @@ class UltraMinimalAdapterImpl {
           timestamp: new Date(),
           dependencies: {} as Record<string, unknown>,
           background: {
-            addTask: (task: () => void) => setImmediate(task)
-          }
+            addTask: (task: () => void) => setImmediate(task),
+          },
         };
 
         // DIRECT validation - no SchemaValidator overhead
@@ -73,7 +73,6 @@ class UltraMinimalAdapterImpl {
 
         const statusCode = route.config.status ?? 200;
         return reply.status(statusCode).send(result);
-
       } catch (error) {
         // MINIMAL error handling - no ErrorHandler overhead
         const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';

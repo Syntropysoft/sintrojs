@@ -14,7 +14,9 @@ import type { OpenAPIConfig } from '../application/OpenAPIGenerator';
 import { RouteRegistry } from '../application/RouteRegistry';
 import { Route } from '../domain/Route';
 import type { ExceptionHandler, HttpMethod, RouteConfig } from '../domain/types';
+import { BunAdapter } from '../infrastructure/BunAdapter';
 import { FastifyAdapter } from '../infrastructure/FastifyAdapter';
+import { RuntimeOptimizer } from '../infrastructure/RuntimeOptimizer';
 import { UltraFastAdapter } from '../infrastructure/UltraFastAdapter';
 import { UltraFastifyAdapter } from '../infrastructure/UltraFastifyAdapter';
 import { UltraMinimalAdapter } from '../infrastructure/UltraMinimalAdapter';
@@ -71,8 +73,14 @@ export interface SyntroJSConfig {
 export class SyntroJS {
   private readonly config: SyntroJSConfig;
   private readonly fastify: FastifyInstance;
-  private readonly adapter: typeof FastifyAdapter | typeof UltraFastAdapter | typeof UltraFastifyAdapter | typeof UltraMinimalAdapter;
+  private readonly adapter:
+    | typeof FastifyAdapter
+    | typeof UltraFastAdapter
+    | typeof UltraFastifyAdapter
+    | typeof UltraMinimalAdapter
+    | typeof BunAdapter;
   private readonly runtime: 'node' | 'bun';
+  private readonly optimizer: RuntimeOptimizer;
   private isStarted = false;
 
   constructor(config: SyntroJSConfig = {}) {
@@ -80,19 +88,20 @@ export class SyntroJS {
       runtime: 'auto',
       ...config,
     };
-    
+
+    // Initialize runtime optimizer
+    this.optimizer = new RuntimeOptimizer();
+
     // Auto-detect runtime
     this.runtime = this.detectRuntime();
-    
-    this.adapter = config.ultraMinimal ? UltraMinimalAdapter : 
-                   config.ultraFast ? UltraFastAdapter :
-                   config.ultraOptimized ? UltraFastifyAdapter : 
-                   FastifyAdapter;
+
+    // Choose adapter based on runtime and config
+    this.adapter = this.selectOptimalAdapter();
 
     // Create Fastify instance via adapter (ultra-optimized or standard)
     this.fastify = this.adapter.create({
       logger: config.logger ?? false,
-    });
+    }) as FastifyInstance;
 
     // Register OpenAPI endpoint
     this.registerOpenAPIEndpoint();
@@ -110,12 +119,36 @@ export class SyntroJS {
     // If runtime is explicitly set, use it
     if (this.config.runtime === 'bun') return 'bun';
     if (this.config.runtime === 'node') return 'node';
-    
+
     // Auto-detect: Check if we're in Bun
-    if (typeof (globalThis as any).Bun !== 'undefined') {
+    if (typeof (globalThis as { Bun?: unknown }).Bun !== 'undefined') {
       return 'bun';
     }
     return 'node';
+  }
+
+  /**
+   * Select optimal adapter based on runtime and configuration
+   */
+  private selectOptimalAdapter():
+    | typeof FastifyAdapter
+    | typeof UltraFastAdapter
+    | typeof UltraFastifyAdapter
+    | typeof UltraMinimalAdapter
+    | typeof BunAdapter {
+    // Force specific adapter if configured
+    if (this.config.ultraMinimal) return UltraMinimalAdapter;
+    if (this.config.ultraFast) return UltraFastAdapter;
+    if (this.config.ultraOptimized) return UltraFastifyAdapter;
+
+    // Runtime-specific optimal adapter selection
+    if (this.runtime === 'bun') {
+      // Use BunAdapter for maximum Bun performance
+      return BunAdapter;
+    }
+
+    // Node.js: Use FastifyAdapter as default
+    return FastifyAdapter;
   }
 
   /**
@@ -308,13 +341,10 @@ export class SyntroJS {
    * Show runtime information
    */
   private showRuntimeInfo(address: string): void {
-    const runtimeInfo = this.runtime === 'bun' ? 'Bun (JavaScriptCore)' : 'Node.js (V8)';
-    const performanceHint = this.runtime === 'bun' ? '⚡ Ultra-fast' : '🚀 Fast';
-    
-    console.log(`\n🚀 SyntroJS-${this.runtime.toUpperCase()}`);
+    // Use RuntimeOptimizer for detailed runtime information
+    this.optimizer.logRuntimeInfo();
+
     console.log(`Server running at ${address}\n`);
-    console.log(`🔥 Runtime: ${runtimeInfo}`);
-    console.log(`${performanceHint} Performance: ${this.runtime === 'bun' ? '6x faster than Fastify' : '89.3% of Fastify'}\n`);
     console.log('📖 Interactive Documentation:');
     console.log(`   Swagger UI: ${address}/docs`);
     console.log(`   ReDoc:      ${address}/redoc\n`);

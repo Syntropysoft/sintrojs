@@ -124,7 +124,7 @@ export class SmartMutator {
     } catch (error) {
       throw new Error(
         'SmartMutator requires @stryker-mutator/core to be installed. ' +
-        'Please install it as a dev dependency: npm install --save-dev @stryker-mutator/core'
+          'Please install it as a dev dependency: npm install --save-dev @stryker-mutator/core',
       );
     }
 

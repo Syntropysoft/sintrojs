@@ -5,10 +5,10 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { ErrorHandler } from '../../src/application/ErrorHandler';
-import { RouteRegistry } from '../../src/application/RouteRegistry';
-import { TinyApi } from '../../src/core/TinyApi';
-import { HTTPException, NotFoundException } from '../../src/domain/HTTPException';
+import { ErrorHandler } from '../../../src/application/ErrorHandler';
+import { RouteRegistry } from '../../../src/application/RouteRegistry';
+import { TinyApi } from '../../../src/core/TinyApi';
+import { HTTPException, NotFoundException } from '../../../src/domain/HTTPException';
 
 describe('TinyApi E2E - Basic API', () => {
   let app: TinyApi;

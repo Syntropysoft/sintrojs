@@ -4,8 +4,8 @@
 
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
-import { DependencyInjector, inject } from '../../src/application/DependencyInjector';
-import { TinyApi } from '../../src/core/TinyApi';
+import { DependencyInjector, inject } from '../../../src/application/DependencyInjector';
+import { TinyApi } from '../../../src/core/TinyApi';
 
 interface MockDb {
   users: { findAll: () => { id: number; name: string }[] };

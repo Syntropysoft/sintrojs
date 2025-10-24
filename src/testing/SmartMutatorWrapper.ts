@@ -1,6 +1,6 @@
 /**
  * SmartMutator Wrapper - Handles optional Stryker dependency
- * 
+ *
  * This wrapper provides a graceful way to handle the optional Stryker dependencies
  * for mutation testing, making SyntroJS easier to install and use for basic cases.
  */
@@ -34,15 +34,15 @@ export class SmartMutatorWrapper {
 
   /**
    * Runs mutation testing with graceful fallback if dependencies are missing
-   * 
+   *
    * @param options - Configuration options for SmartMutator
    * @returns Promise<MutationReport | undefined> - undefined if dependencies missing
    */
   static async run(options: SmartMutatorOptions = {}): Promise<MutationReport | undefined> {
     const { mode = 'smart' } = options;
-    
-    const isAvailable = await this.checkStrykerAvailability();
-    
+
+    const isAvailable = await SmartMutatorWrapper.checkStrykerAvailability();
+
     if (!isAvailable) {
       console.warn(`
 ⚠️  SmartMutator requires Stryker dependencies:
@@ -64,6 +64,6 @@ export class SmartMutatorWrapper {
    * Checks if SmartMutator is available without running it
    */
   static async isAvailable(): Promise<boolean> {
-    return this.checkStrykerAvailability();
+    return SmartMutatorWrapper.checkStrykerAvailability();
   }
 }

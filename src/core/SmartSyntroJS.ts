@@ -1,9 +1,9 @@
 /**
  * SMART SyntroJS - Fluent Overhead Loading
- * 
+ *
  * Each overhead is loaded via fluent methods:
  * - .withValidation() → Loads SchemaValidator
- * - .withDependencies() → Loads DependencyInjector  
+ * - .withDependencies() → Loads DependencyInjector
  * - .withErrorHandling() → Loads ErrorHandler
  * - .withOpenAPI() → Loads OpenAPI generator
  * - .withLogging() → Loads logging
@@ -18,8 +18,13 @@ import { RouteRegistry } from '../application/RouteRegistry';
 import { Route } from '../domain/Route';
 import type { ExceptionHandler, HttpMethod, RouteConfig } from '../domain/types';
 import { SmartAdapter } from '../infrastructure/SmartAdapter';
-import { registerCors, registerHelmet, registerCompression, registerRateLimit } from '../plugins';
-import type { CorsOptions, SecurityOptions, CompressionOptions, RateLimitOptions } from '../plugins';
+import { registerCompression, registerCors, registerHelmet, registerRateLimit } from '../plugins';
+import type {
+  CompressionOptions,
+  CorsOptions,
+  RateLimitOptions,
+  SecurityOptions,
+} from '../plugins';
 
 /**
  * Route definition for object-based API
@@ -56,14 +61,14 @@ export class SmartSyntroJS {
   private readonly config: SmartSyntroJSConfig;
   private readonly fastify: FastifyInstance;
   private isStarted = false;
-  
+
   // Lazy loaded features
   private _withValidation = false;
   private _withDependencies = false;
   private _withErrorHandling = false;
   private _withOpenAPI = false;
   private _withLogging = false;
-  
+
   // Plugin configurations
   private _withCors = false;
   private _corsOptions?: CorsOptions;
@@ -168,8 +173,7 @@ export class SmartSyntroJS {
    * Development defaults - permissive but functional
    */
   withDevelopmentDefaults(): this {
-    return this
-      .withCors()
+    return this.withCors()
       .withSecurity({ strict: false })
       .withCompression()
       .withLogging()
@@ -180,8 +184,7 @@ export class SmartSyntroJS {
    * Production defaults - secure and optimized
    */
   withProductionDefaults(): this {
-    return this
-      .withCors()
+    return this.withCors()
       .withSecurity({ strict: true })
       .withCompression()
       .withRateLimit()
@@ -324,15 +327,15 @@ export class SmartSyntroJS {
     if (this._withCors) {
       await registerCors(this.fastify, this._corsOptions!);
     }
-    
+
     if (this._withSecurity) {
       await registerHelmet(this.fastify, this._securityOptions!);
     }
-    
+
     if (this._withCompression) {
       await registerCompression(this.fastify, this._compressionOptions!);
     }
-    
+
     if (this._withRateLimit) {
       await registerRateLimit(this.fastify, this._rateLimitOptions!);
     }
@@ -343,9 +346,9 @@ export class SmartSyntroJS {
    */
   private getDefaultCorsOptions(): CorsOptions {
     const isProduction = process.env.NODE_ENV === 'production';
-    
+
     return {
-      origin: isProduction 
+      origin: isProduction
         ? [] // Debe ser configurado explícitamente en producción
         : ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000'],
       credentials: true,
@@ -400,7 +403,7 @@ export class SmartSyntroJS {
   /**
    * Gets OpenAPI specification
    */
-  private getOpenAPISpec(): any {
+  private getOpenAPISpec(): Record<string, unknown> {
     const routes = RouteRegistry.getAll();
     const openApiConfig: OpenAPIConfig = {
       title: this.config.title || 'SyntroJS API',
@@ -408,7 +411,7 @@ export class SmartSyntroJS {
       description: this.config.description || 'SyntroJS API Documentation',
     };
 
-    return OpenAPIGenerator.generate(routes, openApiConfig);
+    return OpenAPIGenerator.generate(routes, openApiConfig) as unknown as Record<string, unknown>;
   }
 }
 

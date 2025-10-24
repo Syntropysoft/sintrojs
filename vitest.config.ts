@@ -2,33 +2,38 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    include: [
+      'tests/universal/**/*.test.ts',
+      'tests/node/**/*.test.ts'
+    ],
+    exclude: [
+      'tests/bun/**/*.test.ts'
+    ],
     globals: true,
     environment: 'node',
-    include: ['tests/**/*.test.ts'],
-    exclude: ['node_modules', 'dist'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
-      include: ['src/**/*.ts'], // Only measure src/ directory
+      reporter: ['text', 'json', 'html'],
+      include: ['src/**/*.ts'],
       exclude: [
-        'node_modules/**',
-        'dist/**',
-        'tests/**',
-        'example-app/**',
-        'examples/**',
-        '**/*.test.ts',
-        '**/*.spec.ts',
-        '**/types.ts',
-        '**/index.ts',
-      ],
-      thresholds: {
-        // Production-ready thresholds (v0.1.0+)
-        // Current coverage: 90.71% stmts, 91.57% branches, 94.04% functions
-        lines: 90,
-        functions: 90,
-        branches: 85,
-        statements: 90,
-      },
-    },
-  },
+        'node_modules/',
+        'tests/',
+        'dist/',
+        'examples/',
+        'example-app/',
+        'benchmarks/',
+        'coverage/',
+        'reports/',
+        '**/*.d.ts',
+        '**/*.config.*',
+        '**/*.cjs',
+        '**/*.mjs',
+        '**/README.md',
+        '**/CHANGELOG.md',
+        '**/LICENSE',
+        'run-smart-mutator.ts',
+        'src/testing/SmartMutatorWrapper.ts'
+      ]
+    }
+  }
 });

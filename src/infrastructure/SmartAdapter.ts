@@ -1,6 +1,6 @@
 /**
  * SMART SyntroJS - Lazy Loading Overheads
- * 
+ *
  * Overheads are loaded ONLY when needed:
  * - buildContext() → Only if context is accessed
  * - DependencyInjector → Only if dependencies are defined
@@ -49,15 +49,14 @@ class SmartAdapterImpl {
             timestamp: new Date(),
             dependencies: {} as Record<string, unknown>,
             background: {
-              addTask: (task: () => void) => setImmediate(task)
-            }
+              addTask: (task: () => void) => setImmediate(task),
+            },
           };
         }
         return context;
       };
 
       try {
-
         // LAZY VALIDATION - only if schemas exist
         if (route.config.params) {
           const ctx = getContext();
@@ -79,7 +78,7 @@ class SmartAdapterImpl {
           const { DependencyInjector } = await import('../application/DependencyInjector');
           const { resolved } = await DependencyInjector.resolve(
             route.config.dependencies as any,
-            ctx
+            ctx,
           );
           ctx.dependencies = resolved;
         }
@@ -96,7 +95,6 @@ class SmartAdapterImpl {
 
         const statusCode = route.config.status ?? 200;
         return reply.status(statusCode).send(result);
-
       } catch (error) {
         // LAZY ERROR HANDLING - only if custom error handlers exist
         if ((route.config as any).errorHandler) {

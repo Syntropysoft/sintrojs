@@ -4,16 +4,16 @@
 
 import type { FastifyRequest } from 'fastify';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { inject } from '../../src/application/DependencyInjector';
-import { TinyApi } from '../../src/core/TinyApi';
+import { inject } from '../../../src/application/DependencyInjector';
+import { TinyApi } from '../../../src/core/TinyApi';
 import {
   APIKeyHeader,
   APIKeyQuery,
   HTTPBasic,
   HTTPBearer,
   OAuth2PasswordBearer,
-} from '../../src/security';
-import { signJWT, verifyJWT } from '../../src/security/jwt';
+} from '../../../src/security';
+import { signJWT, verifyJWT } from '../../../src/security/jwt';
 
 describe('Security E2E', () => {
   let app: TinyApi;

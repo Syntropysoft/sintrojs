@@ -3,9 +3,9 @@
  * Enfoque simplificado para evitar problemas de rutas de módulos
  */
 
-import { describe, it, expect } from 'vitest';
-import { SyntroJS } from '../../../src/core/TinyApi';
+import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
+import { SyntroJS } from '../../../src/core/TinyApi';
 
 describe('SyntroJS Fluent API - Simple Test', () => {
   it('should support method chaining', () => {
@@ -18,10 +18,10 @@ describe('SyntroJS Fluent API - Simple Test', () => {
       .description('API de prueba')
       .logging(false)
       .get('/test', {
-        handler: () => ({ message: 'test' })
+        handler: () => ({ message: 'test' }),
       })
       .post('/test', {
-        handler: () => ({ created: true })
+        handler: () => ({ created: true }),
       });
 
     // Debe retornar la misma instancia
@@ -34,15 +34,15 @@ describe('SyntroJS Fluent API - Simple Test', () => {
         '/products': {
           get: {
             response: z.object({ products: z.array(z.string()) }),
-            handler: () => ({ products: ['product1', 'product2'] })
+            handler: () => ({ products: ['product1', 'product2'] }),
           },
           post: {
             body: z.object({ name: z.string() }),
             response: z.object({ id: z.number(), name: z.string() }),
-            handler: ({ body }) => ({ id: 1, name: body.name })
-          }
-        }
-      }
+            handler: ({ body }) => ({ id: 1, name: body.name }),
+          },
+        },
+      },
     });
 
     // Verificar que la API se creó correctamente
@@ -58,12 +58,12 @@ describe('SyntroJS Fluent API - Simple Test', () => {
       .description('API de prueba')
       .get('/health', {
         response: z.object({ status: z.string() }),
-        handler: () => ({ status: 'ok' })
+        handler: () => ({ status: 'ok' }),
       });
 
     // Verificar que OpenAPI se genera correctamente
     const spec = api.getOpenAPISpec();
-    
+
     expect(spec.info.title).toBe('Mi API');
     expect(spec.info.version).toBe('2.0.0');
     expect(spec.info.description).toBe('API de prueba');
@@ -92,10 +92,10 @@ describe('SyntroJS Fluent API - Simple Test', () => {
         '/api/status': {
           get: {
             response: z.object({ status: z.literal('ok') }),
-            handler: () => ({ status: 'ok' as const })
-          }
-        }
-      }
+            handler: () => ({ status: 'ok' as const }),
+          },
+        },
+      },
     });
 
     // Agregar rutas adicionales con encadenamiento
@@ -104,12 +104,12 @@ describe('SyntroJS Fluent API - Simple Test', () => {
       .version('1.0.0')
       .get('/api/users', {
         response: z.object({ count: z.number() }),
-        handler: () => ({ count: 42 })
+        handler: () => ({ count: 42 }),
       });
 
     // Verificar que todo funciona
     const spec = api.getOpenAPISpec();
-    
+
     expect(spec.info.title).toBe('API Híbrida');
     expect(spec.info.version).toBe('1.0.0');
     expect(spec.paths).toHaveProperty('/api/status');

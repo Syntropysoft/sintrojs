@@ -162,3 +162,170 @@ export type OnResponseHook = (
   response: RouteResponse,
 ) => void | Promise<void>;
 export type OnErrorHook = (context: RequestContext, error: Error) => void | Promise<void>;
+
+/**
+ * SOLID PRINCIPLES INTERFACES
+ * Interface Segregation Principle - Smaller, focused interfaces
+ */
+
+/**
+ * Route handler interface (ISP)
+ */
+export interface RouteHandlerInterface<TResponse = unknown> {
+  handler: (context: RequestContext) => TResponse | Promise<TResponse>;
+}
+
+/**
+ * Route validation interface (ISP)
+ */
+export interface RouteValidationInterface<TParams = unknown, TQuery = unknown, TBody = unknown> {
+  params?: ZodSchema<TParams>;
+  query?: ZodSchema<TQuery>;
+  body?: ZodSchema<TBody>;
+}
+
+/**
+ * Route response interface (ISP)
+ */
+export interface RouteResponseInterface<TResponse = unknown> {
+  response?: ZodSchema<TResponse>;
+  statusCode?: HttpStatusCode;
+}
+
+/**
+ * Route error handling interface (ISP)
+ */
+export interface RouteErrorHandlingInterface {
+  errorHandler?: ExceptionHandler;
+}
+
+/**
+ * Route documentation interface (ISP)
+ */
+export interface RouteDocumentationInterface {
+  summary?: string;
+  description?: string;
+  tags?: string[];
+  operationId?: string;
+  deprecated?: boolean;
+}
+
+/**
+ * DEPENDENCY INVERSION PRINCIPLE INTERFACES
+ * Depend on abstractions, not concretions
+ */
+
+/**
+ * HTTP Adapter interface (DIP)
+ */
+export interface HttpAdapter {
+  create(config?: Record<string, unknown>): unknown;
+  registerRoute(server: unknown, route: unknown): Promise<void>;
+  listen(server: unknown, port: number, host?: string): Promise<string>;
+  close(server: unknown): Promise<void>;
+}
+
+/**
+ * Validation Adapter interface (DIP)
+ */
+export interface ValidationAdapter {
+  validate<T>(schema: ZodSchema<T>, data: unknown): T;
+  validateOrThrow<T>(schema: ZodSchema<T>, data: unknown): T;
+}
+
+/**
+ * Serialization Adapter interface (DIP)
+ */
+export interface SerializationAdapter {
+  serialize(data: unknown): string;
+  deserialize<T>(data: string): T;
+}
+
+/**
+ * FUNCTIONAL PROGRAMMING TYPES
+ * Result/Either pattern for error handling
+ */
+
+export type Result<T, E = Error> = Success<T> | Failure<E>;
+
+export class Success<T> {
+  constructor(public readonly value: T) {}
+
+  isSuccess(): this is Success<T> {
+    return true;
+  }
+
+  isFailure(): this is Failure<never> {
+    return false;
+  }
+}
+
+export class Failure<E> {
+  constructor(public readonly error: E) {}
+
+  isSuccess(): this is Success<never> {
+    return false;
+  }
+
+  isFailure(): this is Failure<E> {
+    return true;
+  }
+}
+
+/**
+ * VALUE OBJECTS
+ * Domain-driven design value objects
+ */
+
+export class Port {
+  private readonly value: number;
+
+  constructor(value: number) {
+    if (value < 0 || value > 65535) {
+      throw new Error('Port must be between 0 and 65535');
+    }
+    this.value = value;
+  }
+
+  getValue(): number {
+    return this.value;
+  }
+
+  equals(other: Port): boolean {
+    return this.value === other.value;
+  }
+}
+
+export class Host {
+  private readonly value: string;
+
+  constructor(value: string) {
+    if (!value || value.trim().length === 0) {
+      throw new Error('Host is required');
+    }
+    this.value = value.trim();
+  }
+
+  getValue(): string {
+    return this.value;
+  }
+
+  equals(other: Host): boolean {
+    return this.value === other.value;
+  }
+}
+
+export class ServerAddress {
+  constructor(
+    private readonly host: Host,
+    private readonly port: Port,
+  ) {}
+
+  toString(): string {
+    return `http://[${this.host.getValue()}]:${this.port.getValue()}`;
+  }
+
+  equals(other: ServerAddress): boolean {
+    return this.host.equals(other.host) && this.port.equals(other.port);
+  }
+}
