@@ -42,8 +42,16 @@
     "validation",
     "type-safe"
   ],
-  "author": "Gaby",
+  "author": "SyntropySoft",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Syntropysoft/sintrojs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Syntropysoft/sintrojs/issues"
+  },
+  "homepage": "https://github.com/Syntropysoft/sintrojs#readme",
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"

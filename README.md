@@ -604,8 +604,8 @@ We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for de
 
 ```bash
 # Clone repo
-git clone https://github.com/yourusername/tinyapi.git
-cd tinyapi
+git clone https://github.com/Syntropysoft/sintrojs.git
+cd syntrojs
 
 # Install dependencies (requires pnpm)
 pnpm install
@@ -630,22 +630,24 @@ Apache 2.0 - See [LICENSE](./LICENSE) for details.
 
 ## 🙏 Acknowledgments
 
-TinyApi is heavily inspired by:
+SyntroJS is heavily inspired by:
 - **[FastAPI](https://fastapi.tiangolo.com/)** (Python) - For the amazing DX
 - **[Fastify](https://www.fastify.io/)** (Node.js) - For the performance
 - **[Zod](https://zod.dev/)** (TypeScript) - For the validation
+
+**SyntroJS** is part of the **SyntropySoft** ecosystem, alongside **[SyntropyLog](https://syntropysoft.com/en)** for structured logging and monitoring.
 
 ---
 
 ## 💬 Community
 
-- **GitHub Issues** - Bug reports and feature requests
-- **Discussions** - Questions and community chat
-- **Twitter** - Follow [@tinyapi_framework](https://twitter.com/tinyapi_framework)
+- **GitHub Issues** - Bug reports and feature requests: [https://github.com/Syntropysoft/sintrojs/issues](https://github.com/Syntropysoft/sintrojs/issues)
+- **Discussions** - Questions and community chat: [https://github.com/Syntropysoft/sintrojs/discussions](https://github.com/Syntropysoft/sintrojs/discussions)
+- **SyntropySoft** - Visit our main website: [https://syntropysoft.com](https://syntropysoft.com)
 
 ---
 
-**Made with ❤️ by developers who value quality over vanity metrics.**
+**Made with ❤️ by [SyntropySoft](https://syntropysoft.com) - developers who value quality over vanity metrics.**
 
-> "Tiny in code. Mighty in impact. The only framework that guarantees your tests actually work." 🚀
+> "SyntroJS: FastAPI for Node.js. The only framework that guarantees your tests actually work." 🚀
 
