@@ -1,7 +1,7 @@
 {
   "name": "tinyapi",
-  "version": "0.2.0",
-  "description": "FastAPI for Node.js - Tiny, fast, and type-safe API framework",
+  "version": "0.2.0-alpha",
+  "description": "FastAPI for Node.js - Tiny, fast, and type-safe API framework (ALPHA - Proof of Concept)",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

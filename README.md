@@ -3,6 +3,19 @@
 > **FastAPI for Node.js, with Trust Engineering built-in**
 > The only framework that makes writing high-quality tests as easy as creating endpoints.
 
+## ⚠️ ALPHA VERSION - PROOF OF CONCEPT
+
+**🚨 IMPORTANT: This is an ALPHA version and proof of concept. Do not use in production!**
+
+- ✅ **Core functionality works** - Basic API creation, validation, and testing
+- ⚠️ **API may change** - Breaking changes expected in future versions
+- ⚠️ **Not production-ready** - Missing features, optimizations, and stability improvements
+- 🔬 **Experimental** - Testing new patterns and approaches to API development
+
+**Current Status:** Early development phase - feedback and contributions welcome!
+
+---
+
 [![npm version](https://img.shields.io/npm/v/tinyapi.svg)](https://www.npmjs.com/package/tinyapi)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
@@ -15,6 +28,27 @@
 ## 🎯 What is TinyApi?
 
 TinyApi is a modern framework for building APIs in Node.js, heavily inspired by **FastAPI (Python)**. It brings the simplicity and elegance of FastAPI to the Node.js ecosystem with the power of TypeScript, enhanced with our Trust Engineering philosophy.
+
+## 🔬 Current Development Status
+
+### What Works (ALPHA)
+- ✅ **Core API functionality** - GET, POST, PUT, DELETE, PATCH routes
+- ✅ **Request/Response validation** - Zod schema validation
+- ✅ **Type safety** - Full TypeScript support
+- ✅ **Automatic documentation** - Swagger UI and ReDoc
+- ✅ **Error handling** - Custom exception handling
+- ✅ **Testing framework** - TinyTest with SmartMutator
+- ✅ **Security plugins** - JWT, API Key, HTTP Basic, OAuth2
+- ✅ **Performance plugins** - Compression, CORS, Helmet, Rate Limiting
+
+### What's Missing (Roadmap)
+- ⚠️ **Middleware system** - Custom middleware support
+- ⚠️ **Database integration** - ORM/ODM adapters
+- ⚠️ **WebSocket support** - Real-time communication
+- ⚠️ **GraphQL support** - GraphQL endpoint generation
+- ⚠️ **Production optimizations** - Performance tuning
+- ⚠️ **Deployment guides** - Docker, Kubernetes, etc.
+- ⚠️ **Advanced features** - Background tasks, caching, etc.
 
 ### The Problem
 
@@ -428,6 +462,33 @@ TinyApi isn't just "well-tested". We prove it with public quality reports.
 - >85% mutation score = high confidence
 
 **This makes TinyApi the framework for teams that need production-ready APIs from day one.**
+
+---
+
+## 🚨 ALPHA Disclaimer
+
+**This is an experimental proof of concept. Please be aware:**
+
+### ⚠️ Not Production Ready
+- **Breaking changes expected** - API may change significantly
+- **Missing features** - Many production features are not yet implemented
+- **Performance not optimized** - Not yet tuned for production workloads
+- **Limited testing** - While we have good test coverage, real-world usage is limited
+
+### 🔬 Experimental Features
+- **Trust Engineering** - New approach to API testing and quality assurance
+- **SmartMutator** - Experimental mutation testing integration
+- **TinyTest** - Custom testing framework (may change significantly)
+
+### 🤝 We Need Your Feedback!
+This is a proof of concept to validate ideas. Your feedback is crucial:
+
+- **Try it out** - Test the core functionality
+- **Report issues** - Help us identify problems
+- **Suggest features** - What would make this useful for you?
+- **Share ideas** - How can we improve the developer experience?
+
+**Goal:** Build a truly production-ready FastAPI for Node.js based on real user feedback.
 
 ---
 
