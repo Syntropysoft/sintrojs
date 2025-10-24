@@ -1,6 +1,6 @@
 {
   "name": "syntrojs",
-  "version": "0.2.6-alpha",
+  "version": "0.2.7-alpha",
   "description": "Modern, type-safe API framework with automatic documentation (ALPHA - Proof of Concept)",
   "type": "module",
   "main": "./dist/index.js",
@@ -23,7 +23,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup",
     "dev": "npm run build -- --watch",
     "lint": "biome check src tests",
     "format": "biome format --write .",

@@ -210,14 +210,14 @@ await app.listen(8080);
 
 ### 6. Optional: Simple Testing
 
-Create `test.js`:
+Create `test.js` to test the same API:
 
 ```javascript
 import { TinyTest } from 'syntrojs/testing';
 
 const test = new TinyTest();
 
-// Test your endpoint
+// Test the exact same API from app.js
 test.get('/hello', {
   handler: () => ({ message: 'Hello World!' }),
 });

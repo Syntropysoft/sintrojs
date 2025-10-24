@@ -23,7 +23,7 @@ cd examples/quick-start
 node test.js
 ```
 
-This shows how to test your SyntroJS API with TinyTest.
+This shows how to test the exact same API you created in `app.js` using TinyTest.
 
 ## What You'll See
 
