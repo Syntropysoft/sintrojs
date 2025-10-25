@@ -12,7 +12,15 @@
 import Fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
 import type { MiddlewareRegistry } from '../application/MiddlewareRegistry';
 import type { Route } from '../domain/Route';
-import type { HttpMethod, Middleware, RequestContext } from '../domain/types';
+import type {
+  DependencyResolverFactory,
+  ErrorHandlerFactory,
+  HttpMethod,
+  Middleware,
+  MiddlewareFactory,
+  RequestContext,
+  SchemaFactory,
+} from '../domain/types';
 
 export interface FluentAdapterConfig {
   logger?: boolean;
@@ -31,6 +39,12 @@ export interface FluentAdapterConfig {
 export class FluentAdapter {
   private readonly config: FluentAdapterConfig;
   private middlewareRegistry?: MiddlewareRegistry;
+
+  // Factory instances for type-safe operations
+  private dependencyFactories: Map<string, DependencyResolverFactory> = new Map();
+  private errorHandlerFactories: Map<string, ErrorHandlerFactory> = new Map();
+  private schemaFactories: Map<string, SchemaFactory> = new Map();
+  private middlewareFactories: Map<string, MiddlewareFactory> = new Map();
 
   constructor() {
     // Initialize immutable default configuration
@@ -379,14 +393,37 @@ export class FluentAdapter {
   }
 
   private async validateRequest(context: RequestContext, route: Route): Promise<void> {
+    // Crear factories para validación si no existen
+    const routeKey = `${route.method}:${route.path}`;
+
     if (route.config.params) {
-      context.params = route.config.params.parse(context.params);
+      let factory = this.schemaFactories.get(`${routeKey}:params`);
+      if (!factory) {
+        const { createSchemaFactory } = await import('../domain/factories');
+        factory = createSchemaFactory(route.config.params);
+        this.schemaFactories.set(`${routeKey}:params`, factory);
+      }
+      context.params = factory.quickValidate(context.params);
     }
+
     if (route.config.query) {
-      context.query = route.config.query.parse(context.query);
+      let factory = this.schemaFactories.get(`${routeKey}:query`);
+      if (!factory) {
+        const { createSchemaFactory } = await import('../domain/factories');
+        factory = createSchemaFactory(route.config.query);
+        this.schemaFactories.set(`${routeKey}:query`, factory);
+      }
+      context.query = factory.quickValidate(context.query);
     }
+
     if (route.config.body) {
-      context.body = route.config.body.parse(context.body);
+      let factory = this.schemaFactories.get(`${routeKey}:body`);
+      if (!factory) {
+        const { createSchemaFactory } = await import('../domain/factories');
+        factory = createSchemaFactory(route.config.body);
+        this.schemaFactories.set(`${routeKey}:body`, factory);
+      }
+      context.body = factory.quickValidate(context.body);
     }
   }
 
@@ -395,10 +432,19 @@ export class FluentAdapter {
     route: Route,
   ): Promise<(() => Promise<void>) | undefined> {
     if (route.config.dependencies) {
-      const { DependencyInjector } = await import('../application/DependencyInjector');
-      // Simplificar para evitar errores de tipos complejos
-      const resolved = await DependencyInjector.resolve(route.config.dependencies as any, context);
-      context.dependencies = resolved.resolved || {};
+      // Crear o obtener factory para esta ruta
+      const routeKey = `${route.method}:${route.path}`;
+      let factory = this.dependencyFactories.get(routeKey);
+
+      if (!factory) {
+        const { createDependencyResolverFactory } = await import('../domain/factories');
+        factory = createDependencyResolverFactory(route.config.dependencies);
+        this.dependencyFactories.set(routeKey, factory);
+      }
+
+      // Usar factory para resolver dependencias de forma type-safe
+      const resolved = await factory.resolve(context);
+      context.dependencies = resolved.resolved;
 
       // Devolver la función de cleanup
       return resolved.cleanup;
@@ -430,7 +476,18 @@ export class FluentAdapter {
       if ((route.config as unknown as { errorHandler?: unknown }).errorHandler) {
         const errorHandler = (route.config as unknown as { errorHandler: unknown }).errorHandler;
         if (context && typeof errorHandler === 'function') {
-          const response = await (errorHandler as any)(context, error);
+          // Crear o obtener factory para este error handler
+          const routeKey = `${route.method}:${route.path}`;
+          let factory = this.errorHandlerFactories.get(routeKey);
+
+          if (!factory) {
+            const { createErrorHandlerFactory } = await import('../domain/factories');
+            factory = createErrorHandlerFactory(errorHandler as any);
+            this.errorHandlerFactories.set(routeKey, factory);
+          }
+
+          // Usar factory para manejar error de forma type-safe
+          const response = await factory.handle(context, error as Error);
           return reply.status(response.status).send(response.body);
         }
       }

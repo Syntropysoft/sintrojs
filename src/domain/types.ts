@@ -385,3 +385,6 @@ export class ServerAddress {
     return this.host.equals(other.host) && this.port.equals(other.port);
   }
 }
+
+// Export factories
+export * from './factories';
