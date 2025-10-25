@@ -95,10 +95,7 @@
     "@fastify/compress": "^7.0.0",
     "@fastify/cors": "^9.0.0",
     "@fastify/helmet": "^11.0.0",
-    "@fastify/rate-limit": "^9.0.0",
-    "@stryker-mutator/core": "^8.0.0",
-    "@stryker-mutator/typescript-checker": "^8.0.0",
-    "@stryker-mutator/vitest-runner": "^8.0.0"
+    "@fastify/rate-limit": "^9.0.0"
   },
   "peerDependenciesMeta": {
     "@fastify/compress": {
@@ -111,15 +108,6 @@
       "optional": true
     },
     "@fastify/rate-limit": {
-      "optional": true
-    },
-    "@stryker-mutator/core": {
-      "optional": true
-    },
-    "@stryker-mutator/typescript-checker": {
-      "optional": true
-    },
-    "@stryker-mutator/vitest-runner": {
       "optional": true
     }
   }
