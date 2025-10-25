@@ -1,5 +1,5 @@
 /**
- * Comprehensive tests for TinyApi.ts to increase coverage
+ * Comprehensive tests for SyntroJS.ts to increase coverage
  *
  * Principles Applied:
  * - SOLID: Single Responsibility, Open/Closed, Dependency Inversion
@@ -10,10 +10,9 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { SyntroJS } from '../../../src/core/TinyApi';
-import type { SyntroJSConfig } from '../../../src/core/TinyApi';
+import { SyntroJS, type SyntroJSConfig } from '../../../src/core';
 
-describe('TinyApi - Comprehensive Coverage Tests', () => {
+describe('SyntroJS - Comprehensive Coverage Tests', () => {
   let api: SyntroJS;
 
   beforeEach(() => {

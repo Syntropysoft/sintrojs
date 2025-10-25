@@ -23,7 +23,7 @@
 
 import { ErrorHandler } from '../../../src/application/ErrorHandler';
 import { RouteRegistry } from '../../../src/application/RouteRegistry';
-import { TinyApi } from '../../../src/core/TinyApi';
+import { SyntroJS } from '../../../src/core';
 
 // ===== DOMAIN ENTITIES (DDD) =====
 
@@ -32,7 +32,7 @@ import { TinyApi } from '../../../src/core/TinyApi';
  * Principio: Inmutabilidad total
  */
 export interface TestServer {
-  readonly app: TinyApi;
+  readonly app: SyntroJS;
   readonly url: string;
   readonly port: string;
 }
@@ -88,9 +88,9 @@ const guardServer = (server: TestServer | null | undefined): TestServer => {
 /**
  * Guard Clause: Validar que la app no sea null/undefined
  */
-const guardApp = (app: TinyApi | null | undefined): TinyApi => {
+const guardApp = (app: SyntroJS | null | undefined): SyntroJS => {
   if (!app) {
-    throw new Error('TinyApi is required and cannot be null or undefined');
+    throw new Error('SyntroJS is required and cannot be null or undefined');
   }
   return app;
 };
@@ -200,18 +200,18 @@ export const createTestRoutes = (
  * Higher-Order Function: Crear app limpia
  * Principio: Función pura, sin efectos secundarios
  */
-export const createTestApp = (): TinyApi => {
+export const createTestApp = (): SyntroJS => {
   // Limpiar estado global antes de cada test
   RouteRegistry.clear();
   ErrorHandler.clearCustomHandlers();
-  return new TinyApi();
+  return new SyntroJS();
 };
 
 /**
  * Higher-Order Function: Crear servidor de test
  * Principio: Función pura, composición
  */
-export const createTestServer = async (app: TinyApi, port = 0): Promise<TestServer> => {
+export const createTestServer = async (app: SyntroJS, port = 0): Promise<TestServer> => {
   // Guard Clauses
   guardApp(app);
   guardPort(port);
@@ -296,7 +296,7 @@ export const expectResponse = <T>(
  * Principio: Composición funcional, manejo de recursos
  */
 export const withTestServer = async <T>(
-  app: TinyApi,
+  app: SyntroJS,
   testFn: (server: TestServer) => Promise<T>,
 ): Promise<T> => {
   // Guard Clauses
@@ -318,7 +318,7 @@ export const withTestServer = async <T>(
  * Composition Function: Setup de test sin servidor
  * Principio: Composición funcional, inmutabilidad
  */
-export const withTestApp = <T>(testFn: (app: TinyApi) => T): T => {
+export const withTestApp = <T>(testFn: (app: SyntroJS) => T): T => {
   // Guard Clause
   if (!testFn || typeof testFn !== 'function') {
     throw new Error('Test function is required and must be a function');

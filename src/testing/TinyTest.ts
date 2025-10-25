@@ -24,7 +24,7 @@
  */
 
 import type { ZodSchema } from 'zod';
-import { TinyApi } from '../core/TinyApi';
+import { SyntroJS } from '../core';
 import type { HttpMethod } from '../domain/types';
 
 /**
@@ -77,10 +77,10 @@ export interface PropertyTestOptions {
 }
 
 /**
- * TinyTest - Testing wrapper for TinyApi
- * Extends TinyApi with testing utilities
+ * TinyTest - Testing wrapper for SyntroJS
+ * Extends SyntroJS with testing utilities
  */
-export class TinyTest extends TinyApi {
+export class TinyTest extends SyntroJS {
   private serverAddress: string | null = null;
   private isServerStarted = false;
 

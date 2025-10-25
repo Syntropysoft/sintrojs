@@ -5,7 +5,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
 import { DependencyInjector, inject } from '../../../src/application/DependencyInjector';
-import { TinyApi } from '../../../src/core/TinyApi';
+import { SyntroJS, SyntroJS } from '../../../src/core';
 
 interface MockDb {
   users: { findAll: () => { id: number; name: string }[] };
@@ -33,12 +33,12 @@ interface LoggerContext {
 }
 
 describe('Dependency Injection E2E', () => {
-  let app: TinyApi;
+  let app: SyntroJS;
   let server: string | null = null;
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    app = new TinyApi();
+    app = new SyntroJS();
     DependencyInjector.clearSingletons();
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });

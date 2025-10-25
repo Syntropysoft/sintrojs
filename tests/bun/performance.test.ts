@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { SyntroJS } from '../../src/core/TinyApi';
+import { SyntroJS } from '../../src/core';
 
 describe('Bun Performance Tests', () => {
   test('should handle high concurrency requests', async () => {

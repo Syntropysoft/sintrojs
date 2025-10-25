@@ -7,15 +7,15 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { ErrorHandler } from '../../../src/application/ErrorHandler';
 import { RouteRegistry } from '../../../src/application/RouteRegistry';
-import { TinyApi } from '../../../src/core/TinyApi';
+import { SyntroJS, SyntroJS } from '../../../src/core';
 import { HTTPException, NotFoundException } from '../../../src/domain/HTTPException';
 
-describe('TinyApi E2E - Basic API', () => {
-  let app: TinyApi;
+describe('SyntroJS E2E - Basic API', () => {
+  let app: SyntroJS;
   let server: string;
 
   beforeEach(() => {
-    app = new TinyApi();
+    app = new SyntroJS();
     // Clear registry to avoid duplicate routes between tests
     RouteRegistry.clear();
     // Reset error handler to defaults

@@ -3,4 +3,4 @@
  * Main public API
  */
 
-export * from './TinyApi';
+export * from './SyntroJS';

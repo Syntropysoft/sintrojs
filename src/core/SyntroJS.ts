@@ -594,7 +594,7 @@ export class SyntroJS {
     const routes = RouteRegistry.getAll();
 
     const openApiConfig: OpenAPIConfig = {
-      title: this.config.title ?? 'TinyApi Application',
+      title: this.config.title ?? 'SyntroJS Application',
       version: this.config.version ?? '1.0.0',
       description: this.config.description,
     };
@@ -722,7 +722,3 @@ export class SyntroJS {
     return this.websocketRegistry;
   }
 }
-
-// Alias para compatibilidad hacia atrás
-export const TinyApi = SyntroJS;
-export type TinyApiConfig = SyntroJSConfig;

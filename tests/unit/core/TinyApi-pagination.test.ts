@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { SyntroJS } from '../../../src/core/TinyApi';
+import { SyntroJS } from '../../../src/core';
 
 describe('SyntroJS Pagination with Sorting', () => {
   it('should handle pagination with sorting', () => {

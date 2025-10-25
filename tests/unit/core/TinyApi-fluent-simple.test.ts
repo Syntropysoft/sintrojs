@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
-import { SyntroJS } from '../../../src/core/TinyApi';
+import { SyntroJS } from '../../../src/core';
 
 describe('SyntroJS Fluent API - Simple Test', () => {
   it('should support method chaining', () => {

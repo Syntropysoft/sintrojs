@@ -5,7 +5,7 @@
 import type { FastifyRequest } from 'fastify';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { inject } from '../../../src/application/DependencyInjector';
-import { TinyApi } from '../../../src/core/TinyApi';
+import { SyntroJS } from '../../../src/core';
 import {
   APIKeyHeader,
   APIKeyQuery,
@@ -16,12 +16,12 @@ import {
 import { signJWT, verifyJWT } from '../../../src/security/jwt';
 
 describe('Security E2E', () => {
-  let app: TinyApi;
+  let app: SyntroJS;
   let server: string;
 
   beforeAll(async () => {
     try {
-      app = new TinyApi();
+      app = new SyntroJS();
 
       // ============================================
       // OAuth2PasswordBearer Example

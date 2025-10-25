@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { MiddlewareRegistry } from '../../../src/application/MiddlewareRegistry';
-import { SyntroJS } from '../../../src/core/TinyApi';
+import { SyntroJS } from '../../../src/core';
 
 // ===== GUARD CLAUSES =====
 

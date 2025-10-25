@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { WebSocketRegistry } from '../../../src/application/WebSocketRegistry';
-import { SyntroJS } from '../../../src/core/TinyApi';
+import { SyntroJS } from '../../../src/core';
 
 // Helper funcional para crear app limpia
 const createApp = () => new SyntroJS();

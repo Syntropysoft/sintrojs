@@ -5,16 +5,16 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
 import { inject } from '../../../src/application/DependencyInjector';
-import { TinyApi } from '../../../src/core/TinyApi';
+import { SyntroJS } from '../../../src/core';
 
 describe('Background Tasks E2E', () => {
-  let app: TinyApi;
+  let app: SyntroJS;
   let server: string | null = null;
   let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
-    app = new TinyApi();
+    app = new SyntroJS();
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
   });

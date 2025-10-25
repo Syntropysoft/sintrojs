@@ -25,7 +25,7 @@ describe('TinyTest', () => {
   });
 
   describe('Basic functionality', () => {
-    test('extends TinyApi', () => {
+    test('extends SyntroJS', () => {
       api = new TinyTest();
 
       expect(api).toBeInstanceOf(TinyTest);
@@ -33,7 +33,7 @@ describe('TinyTest', () => {
       expect(api.post).toBeInstanceOf(Function);
     });
 
-    test('can define routes like TinyApi', () => {
+    test('can define routes like SyntroJS', () => {
       api = new TinyTest();
 
       const result = api.get('/test', {

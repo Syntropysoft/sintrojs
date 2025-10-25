@@ -1,10 +1,10 @@
 /**
  * Plugins E2E Tests
- * Tests for TinyApi plugin wrappers
+ * Tests for SyntroJS plugin wrappers
  */
 
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { TinyApi } from '../../../src/core/TinyApi';
+import { SyntroJS } from '../../../src/core';
 import {
   registerCompression,
   registerCors,
@@ -27,7 +27,7 @@ describe('Plugins E2E', () => {
     });
 
     test('should register plugins successfully when dependencies are installed', async () => {
-      const app = new TinyApi();
+      const app = new SyntroJS();
 
       // All plugins should register without errors
       await expect(registerCors(app.getRawFastify())).resolves.toBeUndefined();
@@ -43,12 +43,12 @@ describe('Plugins E2E', () => {
   });
 
   describe('Plugin Integration Example', () => {
-    test('should work with TinyApi when plugins are installed', async () => {
+    test('should work with SyntroJS when plugins are installed', async () => {
       // This test serves as documentation for how to use plugins
       // In real usage, install the dependencies first:
       // pnpm add @fastify/cors @fastify/helmet @fastify/compress @fastify/rate-limit
 
-      const app = new TinyApi();
+      const app = new SyntroJS();
 
       // Register a simple route
       app.get('/hello', {
@@ -72,7 +72,7 @@ describe('Plugins E2E', () => {
 
   describe('Plugin Usage Documentation', () => {
     test('CORS plugin adds headers', async () => {
-      const app = new TinyApi();
+      const app = new SyntroJS();
 
       // Register CORS plugin
       await registerCors(app.getRawFastify(), {
@@ -101,7 +101,7 @@ describe('Plugins E2E', () => {
     });
 
     test('Helmet plugin adds security headers', async () => {
-      const app = new TinyApi();
+      const app = new SyntroJS();
 
       // Register Helmet plugin
       await registerHelmet(app.getRawFastify());
@@ -124,7 +124,7 @@ describe('Plugins E2E', () => {
     });
 
     test('Compression plugin compresses large responses', async () => {
-      const app = new TinyApi();
+      const app = new SyntroJS();
 
       // Register Compression plugin
       await registerCompression(app.getRawFastify(), {
@@ -153,7 +153,7 @@ describe('Plugins E2E', () => {
     });
 
     test('Rate Limiting plugin enforces limits', async () => {
-      const app = new TinyApi();
+      const app = new SyntroJS();
 
       // Register Rate Limiting plugin with low limit for testing
       await registerRateLimit(app.getRawFastify(), {
