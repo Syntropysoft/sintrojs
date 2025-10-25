@@ -662,11 +662,31 @@ export class SyntroJS {
     }
 
     // Actualizar referencia interna con nueva instancia inmutable
-    this.middlewareRegistry = this.middlewareRegistry.add(
-      middlewareOrPath,
-      middlewareOrConfig,
-      config,
-    );
+    if (typeof middlewareOrPath === 'string') {
+      // app.use('/path', middleware, config?)
+      if (config) {
+        this.middlewareRegistry = this.middlewareRegistry.add(
+          middlewareOrPath,
+          middlewareOrConfig as Middleware,
+          config,
+        );
+      } else {
+        this.middlewareRegistry = this.middlewareRegistry.add(
+          middlewareOrPath,
+          middlewareOrConfig as Middleware,
+        );
+      }
+    } else {
+      // app.use(middleware, config?)
+      if (middlewareOrConfig) {
+        this.middlewareRegistry = this.middlewareRegistry.add(
+          middlewareOrPath,
+          middlewareOrConfig as MiddlewareConfig,
+        );
+      } else {
+        this.middlewareRegistry = this.middlewareRegistry.add(middlewareOrPath);
+      }
+    }
     return this;
   }
 
