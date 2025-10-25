@@ -49,7 +49,7 @@ export class RuntimeOptimizer {
     return {
       runtime: 'Node.js',
       engine: 'V8',
-        performance: 'Optimized with Fastify',
+      performance: 'Optimized with Fastify',
       optimizations: [
         'FastifyAdapter',
         'Zod validation',

@@ -9,8 +9,8 @@
  * 5. Contexto mínimo y reutilizable
  */
 
-import { z } from 'zod';
 import Fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
+import { z } from 'zod';
 import type { Route } from '../domain/Route';
 import type { HttpMethod } from '../domain/types';
 
@@ -169,7 +169,8 @@ class UltraFastAdapterImpl {
 
         // Validación ultra-rápida usando schemas pre-compilados
         if (compiledParams) {
-          context.params = (compiledParams as any).quickValidate?.(request.params) ?? request.params;
+          context.params =
+            (compiledParams as any).quickValidate?.(request.params) ?? request.params;
         }
         if (compiledQuery) {
           context.query = (compiledQuery as any).quickValidate?.(request.query) ?? request.query;

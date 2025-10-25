@@ -180,23 +180,23 @@ export interface MiddlewareEntry {
 export interface WebSocketConnection {
   /** Send message to client */
   send(data: string | object): void;
-  
+
   /** Send message to specific room */
   to(room: string): WebSocketConnection;
-  
+
   /** Broadcast to room */
   broadcast(room: string, event: string, data: any): void;
-  
+
   /** Join a room */
   join(room: string): void;
-  
+
   /** Leave a room */
   leave(room: string): void;
-  
+
   /** Event listeners */
   on(event: 'message', handler: (data: any) => void): void;
   on(event: 'disconnect', handler: () => void): void;
-  
+
   /** Close connection */
   close(): void;
 }
@@ -206,7 +206,7 @@ export interface WebSocketConnection {
  */
 export type WebSocketHandler = (
   ws: WebSocketConnection,
-  context: RequestContext
+  context: RequestContext,
 ) => Promise<void> | void;
 
 /**

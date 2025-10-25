@@ -1,4 +1,4 @@
-import type { WebSocketHandler, RequestContext, HttpMethod } from '../domain/types';
+import type { HttpMethod, RequestContext, WebSocketHandler } from '../domain/types';
 
 // ===== GUARD CLAUSES =====
 
@@ -31,11 +31,11 @@ const guardHandler = (handler: WebSocketHandler | null | undefined): WebSocketHa
 const createWebSocketEntry = (
   path: string,
   handler: WebSocketHandler,
-  id: string
+  id: string,
 ): WebSocketEntry => {
   guardPath(path);
   guardHandler(handler);
-  
+
   if (!id || typeof id !== 'string') {
     throw new Error('ID must be a valid string');
   }
@@ -58,13 +58,13 @@ const matchesPath = (pattern: string, path: string): boolean => {
   }
 
   if (pattern === path) return true;
-  
+
   // Handle path parameters like /chat/:room
   const pathSegments = path.split('/');
   const patternSegments = pattern.split('/');
-  
+
   if (pathSegments.length !== patternSegments.length) return false;
-  
+
   return patternSegments.every((segment, index) => {
     return segment.startsWith(':') || segment === pathSegments[index];
   });
@@ -77,20 +77,20 @@ const matchesPath = (pattern: string, path: string): boolean => {
 const extractParams = (path: string, pattern: string): Record<string, string> => {
   const pathSegments = path.split('/');
   const patternSegments = pattern.split('/');
-  
+
   if (pathSegments.length !== patternSegments.length) {
     return {};
   }
-  
+
   const params: Record<string, string> = {};
-  
+
   patternSegments.forEach((segment, index) => {
     if (segment.startsWith(':')) {
       const paramName = segment.slice(1);
       params[paramName] = pathSegments[index];
     }
   });
-  
+
   return params;
 };
 
@@ -106,19 +106,19 @@ export interface WebSocketEntry {
 
 /**
  * WebSocketRegistry - Registry de WebSocket con principios SOLID + DDD + Funcional
- * 
+ *
  * SOLID:
  * - S: Single Responsibility - Solo maneja registro y ejecución de WebSocket
  * - O: Open/Closed - Extensible via configuración sin modificar código
  * - L: Liskov Substitution - Implementa interfaces consistentes
  * - I: Interface Segregation - Interfaces específicas para cada operación
  * - D: Dependency Inversion - Depende de abstracciones, no implementaciones
- * 
+ *
  * DDD:
  * - Domain Service: WebSocketRegistry como servicio de dominio
  * - Value Objects: WebSocketEntry inmutables
  * - Aggregate: WebSocketRegistry como agregado raíz
- * 
+ *
  * Funcional:
  * - Pure Functions: Métodos sin efectos secundarios
  * - Immutability: Datos inmutables donde sea posible
@@ -160,7 +160,7 @@ export class WebSocketRegistry {
     // Guard Clause
     guardPath(path);
 
-    const entry = this.websockets.find(ws => matchesPath(ws.path, path));
+    const entry = this.websockets.find((ws) => matchesPath(ws.path, path));
     return entry?.handler;
   }
 
@@ -210,7 +210,7 @@ export class WebSocketRegistry {
       throw new Error('ID must be a valid string');
     }
 
-    return this.websockets.find(entry => entry.id === id);
+    return this.websockets.find((entry) => entry.id === id);
   }
 
   /**
@@ -231,7 +231,7 @@ export class WebSocketRegistry {
       throw new Error('ID must be a valid string');
     }
 
-    const filtered = this.websockets.filter(entry => entry.id !== id);
+    const filtered = this.websockets.filter((entry) => entry.id !== id);
     return new WebSocketRegistry(filtered);
   }
 

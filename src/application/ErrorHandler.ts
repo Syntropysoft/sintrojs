@@ -6,9 +6,9 @@
  * Principles: SOLID (Single Responsibility), Guard Clauses, Functional
  */
 
+import { z } from 'zod';
 import { HTTPException, ValidationException } from '../domain/HTTPException';
 import type { ExceptionHandler, RequestContext, RouteResponse } from '../domain/types';
-import { z } from 'zod';
 
 /**
  * Error handler implementation
@@ -180,9 +180,9 @@ class ErrorHandlerImpl {
         status: 422,
         body: {
           detail: 'Validation Error',
-          errors: zodError.errors.map(err => ({
+          errors: zodError.errors.map((err) => ({
             field: err.path.join('.'),
-            ...err
+            ...err,
           })),
           path: context.path,
         },
@@ -192,13 +192,13 @@ class ErrorHandlerImpl {
     // JWTError handler (401) - Convert JWTError to HTTPException format
     this.register(Error, (context, error) => {
       const err = error as Error;
-      
+
       // Check if it's a JWT error
       if (err.message.includes('JWT token is required') || err.message.includes('INVALID_TOKEN')) {
         return {
           status: 401,
           headers: {
-            'WWW-Authenticate': 'Bearer'
+            'WWW-Authenticate': 'Bearer',
           },
           body: {
             detail: 'Authentication required',
@@ -207,13 +207,16 @@ class ErrorHandlerImpl {
           },
         };
       }
-      
+
       // Check if it's a security error (missing credentials)
-      if (err.message.includes('Cannot destructure property') && err.message.includes('credentials')) {
+      if (
+        err.message.includes('Cannot destructure property') &&
+        err.message.includes('credentials')
+      ) {
         return {
           status: 401,
           headers: {
-            'WWW-Authenticate': 'Basic'
+            'WWW-Authenticate': 'Basic',
           },
           body: {
             detail: 'Authentication required',
@@ -222,7 +225,7 @@ class ErrorHandlerImpl {
           },
         };
       }
-      
+
       // Default error handling
       return {
         status: 500,

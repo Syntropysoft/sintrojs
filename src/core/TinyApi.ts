@@ -9,18 +9,25 @@
 import type { FastifyInstance } from 'fastify';
 import { DocsRenderer } from '../application/DocsRenderer';
 import { ErrorHandler } from '../application/ErrorHandler';
+import { MiddlewareRegistry } from '../application/MiddlewareRegistry';
 import { OpenAPIGenerator } from '../application/OpenAPIGenerator';
 import type { OpenAPIConfig } from '../application/OpenAPIGenerator';
 import { RouteRegistry } from '../application/RouteRegistry';
+import { WebSocketRegistry } from '../application/WebSocketRegistry';
 import { Route } from '../domain/Route';
-import type { ExceptionHandler, HttpMethod, RouteConfig, Middleware, MiddlewareConfig, WebSocketHandler } from '../domain/types';
+import type {
+  ExceptionHandler,
+  HttpMethod,
+  Middleware,
+  MiddlewareConfig,
+  RouteConfig,
+  WebSocketHandler,
+} from '../domain/types';
 import { BunAdapter } from '../infrastructure/BunAdapter';
 import { FastifyAdapter } from '../infrastructure/FastifyAdapter';
 import { FluentAdapter } from '../infrastructure/FluentAdapter';
 import { RuntimeOptimizer } from '../infrastructure/RuntimeOptimizer';
 import { UltraFastAdapter } from '../infrastructure/UltraFastAdapter';
-import { MiddlewareRegistry } from '../application/MiddlewareRegistry';
-import { WebSocketRegistry } from '../application/WebSocketRegistry';
 import { UltraFastifyAdapter } from '../infrastructure/UltraFastifyAdapter';
 import { UltraMinimalAdapter } from '../infrastructure/UltraMinimalAdapter';
 
@@ -90,7 +97,7 @@ export interface SyntroJSConfig {
 /**
  * SyntroJS main class
  * Facade that orchestrates all framework layers
- * 
+ *
  * Principles Applied:
  * - SOLID: Single Responsibility, Open/Closed, Dependency Inversion
  * - DDD: Domain Services, Value Objects, Aggregates
@@ -116,7 +123,7 @@ export class SyntroJS {
   constructor(config: SyntroJSConfig = {}) {
     // Guard clause: validate config
     const validatedConfig = this.validateConfig(config);
-    
+
     // Initialize immutable configuration
     this.config = Object.freeze({
       runtime: 'auto',
@@ -148,7 +155,7 @@ export class SyntroJS {
 
   /**
    * Guard clause: Validate configuration
-   * 
+   *
    * @param config - Configuration to validate
    * @returns Validated configuration
    * @throws Error if configuration is invalid
@@ -175,43 +182,43 @@ export class SyntroJS {
 
   /**
    * Create Fastify instance using composition pattern
-   * 
+   *
    * @returns Configured Fastify instance
    */
   private createFastifyInstance(): FastifyInstance {
     if (this.adapter === FluentAdapter) {
       return this.createFluentAdapter();
     }
-    
+
     return this.adapter.create() as FastifyInstance;
   }
 
   /**
    * Create FluentAdapter with configuration
-   * 
+   *
    * @returns Configured FluentAdapter instance
    */
   private createFluentAdapter(): FastifyInstance {
     const fluentAdapter = new FluentAdapter();
-    
+
     // Apply fluent configuration using functional composition
     const configuredAdapter = this.applyFluentConfig(fluentAdapter);
-    
+
     // Configure middleware registry
     configuredAdapter.withMiddlewareRegistry(this.middlewareRegistry);
-    
+
     return configuredAdapter.create();
   }
 
   /**
    * Apply fluent configuration using functional composition
-   * 
+   *
    * @param adapter - FluentAdapter instance
    * @returns Configured adapter
    */
   private applyFluentConfig(adapter: FluentAdapter): FluentAdapter {
     const fluentConfig = this.config.fluentConfig;
-    
+
     if (!fluentConfig) {
       return adapter.standard();
     }
@@ -219,7 +226,8 @@ export class SyntroJS {
     // Apply configuration using functional composition
     return Object.entries(fluentConfig).reduce((acc, [key, value]) => {
       if (value !== undefined) {
-        const methodName = `with${key.charAt(0).toUpperCase()}${key.slice(1)}` as keyof FluentAdapter;
+        const methodName =
+          `with${key.charAt(0).toUpperCase()}${key.slice(1)}` as keyof FluentAdapter;
         if (typeof acc[methodName] === 'function') {
           return (acc[methodName] as (value: boolean) => FluentAdapter)(value);
         }
@@ -230,7 +238,7 @@ export class SyntroJS {
 
   /**
    * Auto-detect runtime (Bun or Node.js) - Pure function
-   * 
+   *
    * @returns Detected runtime
    */
   private detectRuntime(): 'node' | 'bun' {
@@ -655,9 +663,9 @@ export class SyntroJS {
 
     // Actualizar referencia interna con nueva instancia inmutable
     this.middlewareRegistry = this.middlewareRegistry.add(
-      middlewareOrPath as any,
-      middlewareOrConfig as any,
-      config as any,
+      middlewareOrPath,
+      middlewareOrConfig,
+      config,
     );
     return this;
   }

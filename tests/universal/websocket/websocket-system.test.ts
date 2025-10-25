@@ -3,9 +3,9 @@
  * Principios: Inmutabilidad, Pureza, Composición
  */
 
-import { describe, it, expect } from 'vitest';
-import { SyntroJS } from '../../../src/core/TinyApi';
+import { describe, expect, it } from 'vitest';
 import { WebSocketRegistry } from '../../../src/application/WebSocketRegistry';
+import { SyntroJS } from '../../../src/core/TinyApi';
 
 // Helper funcional para crear app limpia
 const createApp = () => new SyntroJS();
@@ -24,7 +24,7 @@ const verifyRegistry = (app: SyntroJS, expectedCount: number) => {
 };
 
 // Helper funcional para extraer parámetros
-const extractParams = (registry: WebSocketRegistry, path: string, pattern: string) => 
+const extractParams = (registry: WebSocketRegistry, path: string, pattern: string) =>
   registry.extractParams(path, pattern);
 
 describe('WebSocket System', () => {
@@ -37,12 +37,12 @@ describe('WebSocket System', () => {
   it('should register websocket handler functionally', () => {
     const app = createApp();
     const handler = createPureHandler('Hello!');
-    
+
     app.ws('/chat', handler);
-    
+
     const registry = app.getWebSocketRegistry();
     const registeredHandler = registry.getHandler('/chat');
-    
+
     expect(registeredHandler).toBeDefined();
     expect(registeredHandler).toBe(handler);
   });
@@ -50,14 +50,14 @@ describe('WebSocket System', () => {
   it('should handle path parameters functionally', () => {
     const app = createApp();
     const handler = createPureHandler('Room message');
-    
+
     app.ws('/chat/:room', handler);
-    
+
     const registry = app.getWebSocketRegistry();
     const registeredHandler = registry.getHandler('/chat/general');
-    
+
     expect(registeredHandler).toBeDefined();
-    
+
     // Test parameter extraction funcional
     const params = extractParams(registry, '/chat/general', '/chat/:room');
     expect(params).toEqual({ room: 'general' });
@@ -67,12 +67,10 @@ describe('WebSocket System', () => {
     const app = createApp();
     const chatHandler = createPureHandler('Chat message');
     const notificationHandler = createPureHandler('Notification');
-    
+
     // Composición funcional
-    const result = app
-      .ws('/chat', chatHandler)
-      .ws('/notifications', notificationHandler);
-    
+    const result = app.ws('/chat', chatHandler).ws('/notifications', notificationHandler);
+
     expect(result).toBe(app);
     verifyRegistry(app, 2);
   });
@@ -80,12 +78,16 @@ describe('WebSocket System', () => {
   it('should handle complex path patterns functionally', () => {
     const app = createApp();
     const handler = createPureHandler('Complex pattern');
-    
+
     app.ws('/users/:userId/rooms/:roomId', handler);
-    
+
     const registry = app.getWebSocketRegistry();
-    const params = extractParams(registry, '/users/123/rooms/general', '/users/:userId/rooms/:roomId');
-    
+    const params = extractParams(
+      registry,
+      '/users/123/rooms/general',
+      '/users/:userId/rooms/:roomId',
+    );
+
     expect(params).toEqual({ userId: '123', roomId: 'general' });
   });
 });

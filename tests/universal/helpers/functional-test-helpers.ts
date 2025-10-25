@@ -1,19 +1,19 @@
 /**
  * Helpers funcionales para tests
  * Principios: SOLID, DDD, Programación Funcional, Guard Clauses
- * 
+ *
  * SOLID:
  * - S: Single Responsibility - Cada función tiene una responsabilidad específica
  * - O: Open/Closed - Extensible sin modificar código existente
  * - L: Liskov Substitution - Interfaces consistentes
  * - I: Interface Segregation - Interfaces específicas y pequeñas
  * - D: Dependency Inversion - Dependencias inyectadas
- * 
+ *
  * DDD:
  * - Domain: TestServer, TestResponse como entidades de dominio
  * - Value Objects: TestData, TestContext inmutables
  * - Services: TestService para operaciones complejas
- * 
+ *
  * Funcional:
  * - Pure Functions: Sin efectos secundarios
  * - Immutability: Datos inmutables
@@ -21,9 +21,9 @@
  * - Higher-Order Functions: Funciones que retornan funciones
  */
 
-import { TinyApi } from '../../../src/core/TinyApi';
-import { RouteRegistry } from '../../../src/application/RouteRegistry';
 import { ErrorHandler } from '../../../src/application/ErrorHandler';
+import { RouteRegistry } from '../../../src/application/RouteRegistry';
+import { TinyApi } from '../../../src/core/TinyApi';
 
 // ===== DOMAIN ENTITIES (DDD) =====
 
@@ -126,7 +126,7 @@ export const createTestData = <T>(data: T): Readonly<T> => {
   if (data === null || data === undefined) {
     throw new Error('Data cannot be null or undefined');
   }
-  
+
   return Object.freeze({ ...data });
 };
 
@@ -168,7 +168,7 @@ export const createTestContext = (overrides: Partial<TestContext> = {}): TestCon
 export const createTestRoute = (path: string, handler: Function): TestRoute => {
   // Guard Clauses
   guardPath(path);
-  
+
   if (!handler || typeof handler !== 'function') {
     throw new Error('Handler must be a valid function');
   }
@@ -183,13 +183,15 @@ export const createTestRoute = (path: string, handler: Function): TestRoute => {
  * Pure Function: Crear múltiples rutas inmutables
  * Principio: Composición funcional, inmutabilidad
  */
-export const createTestRoutes = (routes: Array<{ path: string; handler: Function }>): ReadonlyArray<TestRoute> => {
+export const createTestRoutes = (
+  routes: Array<{ path: string; handler: Function }>,
+): ReadonlyArray<TestRoute> => {
   // Guard Clause
   if (!Array.isArray(routes)) {
     throw new Error('Routes must be an array');
   }
 
-  return Object.freeze(routes.map(route => createTestRoute(route.path, route.handler)));
+  return Object.freeze(routes.map((route) => createTestRoute(route.path, route.handler)));
 };
 
 // ===== HIGHER-ORDER FUNCTIONS (Funcional) =====
@@ -209,14 +211,14 @@ export const createTestApp = (): TinyApi => {
  * Higher-Order Function: Crear servidor de test
  * Principio: Función pura, composición
  */
-export const createTestServer = async (app: TinyApi, port: number = 0): Promise<TestServer> => {
+export const createTestServer = async (app: TinyApi, port = 0): Promise<TestServer> => {
   // Guard Clauses
   guardApp(app);
   guardPort(port);
 
   const url = await app.listen(port);
   const portNumber = new URL(url).port;
-  
+
   return Object.freeze({
     app,
     url,
@@ -231,7 +233,7 @@ export const createTestServer = async (app: TinyApi, port: number = 0): Promise<
 export const makeRequest = async <T = any>(
   server: TestServer,
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<TestResponse<T>> => {
   // Guard Clauses
   guardServer(server);
@@ -240,7 +242,7 @@ export const makeRequest = async <T = any>(
   const url = `http://localhost:${server.port}${path}`;
   const response = await fetch(url, options);
   const data = await response.json();
-  
+
   return Object.freeze({
     status: response.status,
     data,
@@ -270,13 +272,13 @@ export const cleanupServer = async (server: TestServer): Promise<void> => {
 export const expectResponse = <T>(
   response: TestResponse<T>,
   expectedStatus: number,
-  expectedData?: T
+  expectedData?: T,
 ): void => {
   // Guard Clauses
   if (!response) {
     throw new Error('Response is required');
   }
-  
+
   if (!Number.isInteger(expectedStatus) || expectedStatus < 100 || expectedStatus > 599) {
     throw new Error('Expected status must be a valid HTTP status code');
   }
@@ -295,11 +297,11 @@ export const expectResponse = <T>(
  */
 export const withTestServer = async <T>(
   app: TinyApi,
-  testFn: (server: TestServer) => Promise<T>
+  testFn: (server: TestServer) => Promise<T>,
 ): Promise<T> => {
   // Guard Clauses
   guardApp(app);
-  
+
   if (!testFn || typeof testFn !== 'function') {
     throw new Error('Test function is required and must be a function');
   }
@@ -316,9 +318,7 @@ export const withTestServer = async <T>(
  * Composition Function: Setup de test sin servidor
  * Principio: Composición funcional, inmutabilidad
  */
-export const withTestApp = <T>(
-  testFn: (app: TinyApi) => T
-): T => {
+export const withTestApp = <T>(testFn: (app: TinyApi) => T): T => {
   // Guard Clause
   if (!testFn || typeof testFn !== 'function') {
     throw new Error('Test function is required and must be a function');
@@ -339,37 +339,39 @@ export class TestService {
    * Crear suite de tests funcional
    * Principio: Composición funcional
    */
-  static createTestSuite = <T>(
-    setup: () => Promise<T>,
-    teardown: (context: T) => Promise<void>,
-    tests: (context: T) => Promise<void>
-  ) => async (): Promise<void> => {
-    // Guard Clauses
-    if (!setup || typeof setup !== 'function') {
-      throw new Error('Setup function is required');
-    }
-    if (!teardown || typeof teardown !== 'function') {
-      throw new Error('Teardown function is required');
-    }
-    if (!tests || typeof tests !== 'function') {
-      throw new Error('Tests function is required');
-    }
+  static createTestSuite =
+    <T>(
+      setup: () => Promise<T>,
+      teardown: (context: T) => Promise<void>,
+      tests: (context: T) => Promise<void>,
+    ) =>
+    async (): Promise<void> => {
+      // Guard Clauses
+      if (!setup || typeof setup !== 'function') {
+        throw new Error('Setup function is required');
+      }
+      if (!teardown || typeof teardown !== 'function') {
+        throw new Error('Teardown function is required');
+      }
+      if (!tests || typeof tests !== 'function') {
+        throw new Error('Tests function is required');
+      }
 
-    const context = await setup();
-    try {
-      await tests(context);
-    } finally {
-      await teardown(context);
-    }
-  };
+      const context = await setup();
+      try {
+        await tests(context);
+      } finally {
+        await teardown(context);
+      }
+    };
 
   /**
    * Crear test de integración funcional
    * Principio: Composición funcional
    */
-  static createIntegrationTest = <T>(
-    testFn: (server: TestServer) => Promise<T>
-  ) => async (): Promise<T> => {
-    return withTestServer(createTestApp(), testFn);
-  };
+  static createIntegrationTest =
+    <T>(testFn: (server: TestServer) => Promise<T>) =>
+    async (): Promise<T> => {
+      return withTestServer(createTestApp(), testFn);
+    };
 }

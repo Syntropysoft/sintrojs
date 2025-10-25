@@ -1,4 +1,10 @@
-import type { Middleware, MiddlewareConfig, MiddlewareEntry, RequestContext, HttpMethod } from '../domain/types';
+import type {
+  HttpMethod,
+  Middleware,
+  MiddlewareConfig,
+  MiddlewareEntry,
+  RequestContext,
+} from '../domain/types';
 
 // ===== GUARD CLAUSES =====
 
@@ -36,7 +42,11 @@ const guardMethod = (method: HttpMethod | null | undefined): HttpMethod | undefi
  * Guard Clause: Validar priority
  */
 const guardPriority = (priority: number | null | undefined): number => {
-  if (priority !== undefined && priority !== null && (!Number.isInteger(priority) || priority < 0)) {
+  if (
+    priority !== undefined &&
+    priority !== null &&
+    (!Number.isInteger(priority) || priority < 0)
+  ) {
     throw new Error('Priority must be a non-negative integer');
   }
   return priority ?? 100;
@@ -73,10 +83,10 @@ const createMiddlewareConfig = (config: Partial<MiddlewareConfig> = {}): Middlew
 const createMiddlewareEntry = (
   middleware: Middleware,
   config: MiddlewareConfig,
-  id: string
+  id: string,
 ): MiddlewareEntry => {
   guardMiddleware(middleware);
-  
+
   if (!id || typeof id !== 'string') {
     throw new Error('ID must be a valid string');
   }
@@ -106,7 +116,7 @@ const matchesPath = (pattern: string | undefined, path: string): boolean => {
     return path.startsWith(prefix);
   }
 
-  return path === pattern || path.startsWith(pattern + '/');
+  return path === pattern || path.startsWith(`${pattern}/`);
 };
 
 /**
@@ -125,11 +135,10 @@ const matchesMethod = (pattern: HttpMethod | undefined, method: HttpMethod): boo
 const filterMiddlewares = (
   middlewares: ReadonlyArray<MiddlewareEntry>,
   path: string,
-  method: HttpMethod
+  method: HttpMethod,
 ): ReadonlyArray<MiddlewareEntry> => {
-  return middlewares.filter(entry => 
-    matchesPath(entry.config.path, path) && 
-    matchesMethod(entry.config.method, method)
+  return middlewares.filter(
+    (entry) => matchesPath(entry.config.path, path) && matchesMethod(entry.config.method, method),
   );
 };
 
@@ -138,11 +147,9 @@ const filterMiddlewares = (
  * Principio: Función pura, inmutabilidad
  */
 const sortMiddlewaresByPriority = (
-  middlewares: ReadonlyArray<MiddlewareEntry>
+  middlewares: ReadonlyArray<MiddlewareEntry>,
 ): ReadonlyArray<MiddlewareEntry> => {
-  return [...middlewares].sort((a, b) => 
-    (a.config.priority || 100) - (b.config.priority || 100)
-  );
+  return [...middlewares].sort((a, b) => (a.config.priority || 100) - (b.config.priority || 100));
 };
 
 /**
@@ -150,26 +157,26 @@ const sortMiddlewaresByPriority = (
  * Principio: Composición funcional
  */
 const extractMiddlewareFunctions = (
-  entries: ReadonlyArray<MiddlewareEntry>
+  entries: ReadonlyArray<MiddlewareEntry>,
 ): ReadonlyArray<Middleware> => {
-  return entries.map(entry => entry.middleware);
+  return entries.map((entry) => entry.middleware);
 };
 
 /**
  * MiddlewareRegistry - Registry de middleware con principios SOLID + DDD + Funcional
- * 
+ *
  * SOLID:
  * - S: Single Responsibility - Solo maneja registro y ejecución de middleware
  * - O: Open/Closed - Extensible via configuración sin modificar código
  * - L: Liskov Substitution - Implementa interfaces consistentes
  * - I: Interface Segregation - Interfaces específicas para cada operación
  * - D: Dependency Inversion - Depende de abstracciones, no implementaciones
- * 
+ *
  * DDD:
  * - Domain Service: MiddlewareRegistry como servicio de dominio
  * - Value Objects: MiddlewareEntry, MiddlewareConfig inmutables
  * - Aggregate: MiddlewareRegistry como agregado raíz
- * 
+ *
  * Funcional:
  * - Pure Functions: Métodos sin efectos secundarios
  * - Immutability: Datos inmutables donde sea posible
@@ -218,7 +225,7 @@ export class MiddlewareRegistry {
     } else {
       // app.use(middleware) or app.use(middleware, config)
       middleware = guardMiddleware(middlewareOrPath);
-      finalConfig = createMiddlewareConfig(middlewareOrConfig as MiddlewareConfig || {});
+      finalConfig = createMiddlewareConfig((middlewareOrConfig as MiddlewareConfig) || {});
     }
 
     const id = `middleware_${this.nextId}`;
@@ -246,10 +253,13 @@ export class MiddlewareRegistry {
    * Execute middlewares in sequence - función pura
    * Principio: Single Responsibility, composición funcional
    */
-  async executeMiddlewares(middlewares: ReadonlyArray<Middleware>, context: RequestContext): Promise<void> {
+  async executeMiddlewares(
+    middlewares: ReadonlyArray<Middleware>,
+    context: RequestContext,
+  ): Promise<void> {
     // Guard Clauses
     guardContext(context);
-    
+
     if (!Array.isArray(middlewares)) {
       throw new Error('Middlewares must be an array');
     }
@@ -270,7 +280,7 @@ export class MiddlewareRegistry {
       throw new Error('ID must be a valid string');
     }
 
-    const filtered = this.middlewares.filter(entry => entry.id !== id);
+    const filtered = this.middlewares.filter((entry) => entry.id !== id);
     return new MiddlewareRegistry(filtered);
   }
 
@@ -316,7 +326,7 @@ export class MiddlewareRegistry {
       throw new Error('ID must be a valid string');
     }
 
-    return this.middlewares.find(entry => entry.id === id);
+    return this.middlewares.find((entry) => entry.id === id);
   }
 
   /**

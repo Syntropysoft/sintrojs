@@ -1,18 +1,18 @@
 /**
  * FluentAdapter - Tree Shaking Fluent para SyntroJS
- * 
+ *
  * Responsibility: Dynamic feature configuration with fluent API
  * Pattern: Builder Pattern + Fluent Interface
  * Principles: SOLID, DDD, Functional Programming, Guard Clauses
- * 
+ *
  * Permite configurar dinámicamente qué funcionalidades incluir/excluir
- * usando un API fluido similar a 
+ * usando un API fluido similar a
  */
 
 import Fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
-import type { Route } from '../domain/Route';
-import type { HttpMethod, RequestContext, Middleware } from '../domain/types';
 import type { MiddlewareRegistry } from '../application/MiddlewareRegistry';
+import type { Route } from '../domain/Route';
+import type { HttpMethod, Middleware, RequestContext } from '../domain/types';
 
 export interface FluentAdapterConfig {
   logger?: boolean;
@@ -78,7 +78,7 @@ export class FluentAdapter {
     if (typeof enabled !== 'boolean') {
       throw new Error('Logger enabled must be a boolean');
     }
-    
+
     // Create new instance with updated config (immutability)
     return this.createWithConfig({ logger: enabled });
   }
@@ -88,7 +88,7 @@ export class FluentAdapter {
     if (typeof enabled !== 'boolean') {
       throw new Error('Validation enabled must be a boolean');
     }
-    
+
     return this.createWithConfig({ validation: enabled });
   }
 
@@ -97,7 +97,7 @@ export class FluentAdapter {
     if (typeof enabled !== 'boolean') {
       throw new Error('Error handling enabled must be a boolean');
     }
-    
+
     return this.createWithConfig({ errorHandling: enabled });
   }
 
@@ -106,7 +106,7 @@ export class FluentAdapter {
     if (typeof enabled !== 'boolean') {
       throw new Error('Dependency injection enabled must be a boolean');
     }
-    
+
     return this.createWithConfig({ dependencyInjection: enabled });
   }
 
@@ -115,7 +115,7 @@ export class FluentAdapter {
     if (typeof enabled !== 'boolean') {
       throw new Error('Background tasks enabled must be a boolean');
     }
-    
+
     return this.createWithConfig({ backgroundTasks: enabled });
   }
 
@@ -124,7 +124,7 @@ export class FluentAdapter {
     if (typeof enabled !== 'boolean') {
       throw new Error('OpenAPI enabled must be a boolean');
     }
-    
+
     return this.createWithConfig({ openAPI: enabled });
   }
 
@@ -133,7 +133,7 @@ export class FluentAdapter {
     if (typeof enabled !== 'boolean') {
       throw new Error('Compression enabled must be a boolean');
     }
-    
+
     return this.createWithConfig({ compression: enabled });
   }
 
@@ -142,7 +142,7 @@ export class FluentAdapter {
     if (typeof enabled !== 'boolean') {
       throw new Error('CORS enabled must be a boolean');
     }
-    
+
     return this.createWithConfig({ cors: enabled });
   }
 
@@ -151,7 +151,7 @@ export class FluentAdapter {
     if (typeof enabled !== 'boolean') {
       throw new Error('Helmet enabled must be a boolean');
     }
-    
+
     return this.createWithConfig({ helmet: enabled });
   }
 
@@ -160,7 +160,7 @@ export class FluentAdapter {
     if (typeof enabled !== 'boolean') {
       throw new Error('Rate limit enabled must be a boolean');
     }
-    
+
     return this.createWithConfig({ rateLimit: enabled });
   }
 
@@ -169,13 +169,13 @@ export class FluentAdapter {
     if (typeof enabled !== 'boolean') {
       throw new Error('Middleware enabled must be a boolean');
     }
-    
+
     return this.createWithConfig({ middleware: enabled });
   }
 
   /**
    * Create new instance with updated configuration (Functional Programming)
-   * 
+   *
    * @param updates - Configuration updates
    * @returns New FluentAdapter instance
    */
@@ -189,8 +189,7 @@ export class FluentAdapter {
 
   // Presets comunes - Functional Composition
   minimal(): this {
-    return this
-      .withLogger(false)
+    return this.withLogger(false)
       .withValidation(false)
       .withErrorHandling(false)
       .withDependencyInjection(false)
@@ -203,8 +202,7 @@ export class FluentAdapter {
   }
 
   standard(): this {
-    return this
-      .withLogger(true)
+    return this.withLogger(true)
       .withValidation(true)
       .withErrorHandling(true)
       .withDependencyInjection(false)
@@ -217,8 +215,7 @@ export class FluentAdapter {
   }
 
   production(): this {
-    return this
-      .withLogger(true)
+    return this.withLogger(true)
       .withValidation(true)
       .withErrorHandling(true)
       .withDependencyInjection(true)
@@ -285,7 +282,6 @@ export class FluentAdapter {
     return this;
   }
 
-
   // Registrar ruta con funcionalidades dinámicas
   async registerRoute(fastify: FastifyInstance, route: Route): Promise<void> {
     if (!fastify || !route) return;
@@ -294,7 +290,7 @@ export class FluentAdapter {
 
     fastify[method](route.path, async (request: FastifyRequest, reply: FastifyReply) => {
       // Crear contexto básico fuera del try block para que esté disponible en el catch
-      let context: RequestContext = {
+      const context: RequestContext = {
         method: request.method as HttpMethod,
         path: request.url,
         params: request.params,
@@ -302,7 +298,9 @@ export class FluentAdapter {
         body: request.body,
         headers: request.headers as Record<string, string>,
         cookies: (request as { cookies?: Record<string, string> }).cookies || {},
-        correlationId: (request.headers['x-correlation-id'] as string) || Math.random().toString(36).substring(2, 15),
+        correlationId:
+          (request.headers['x-correlation-id'] as string) ||
+          Math.random().toString(36).substring(2, 15),
         timestamp: new Date(),
         dependencies: {} as Record<string, unknown>,
         background: {
@@ -327,7 +325,6 @@ export class FluentAdapter {
       }
 
       try {
-
         // VALIDACIÓN - Solo si está habilitada
         if (this.config.validation) {
           await this.validateRequest(context, route);
@@ -351,24 +348,23 @@ export class FluentAdapter {
         if (this.config.validation && route.config.response) {
           const validatedResult = route.config.response.parse(result);
           const statusCode = route.config.status ?? 200;
-          
+
           // Ejecutar cleanup después de enviar la respuesta
           if (cleanupFn) {
             setImmediate(() => cleanupFn!());
           }
-          
+
           return reply.status(statusCode).send(validatedResult);
         }
 
         const statusCode = route.config.status ?? 200;
-        
+
         // Ejecutar cleanup después de enviar la respuesta
         if (cleanupFn) {
           setImmediate(() => cleanupFn!());
         }
-        
-        return reply.status(statusCode).send(result);
 
+        return reply.status(statusCode).send(result);
       } catch (error) {
         // ERROR HANDLING - Solo si está habilitado
         if (this.config.errorHandling) {
@@ -383,45 +379,37 @@ export class FluentAdapter {
   }
 
   private async validateRequest(context: RequestContext, route: Route): Promise<void> {
-    try {
-      if (route.config.params) {
-        context.params = route.config.params.parse(context.params);
-      }
-      if (route.config.query) {
-        context.query = route.config.query.parse(context.query);
-      }
-      if (route.config.body) {
-        context.body = route.config.body.parse(context.body);
-      }
-    } catch (error) {
-      // Si la validación falla, lanzar error para que sea manejado por el ErrorHandler
-      throw error;
+    if (route.config.params) {
+      context.params = route.config.params.parse(context.params);
+    }
+    if (route.config.query) {
+      context.query = route.config.query.parse(context.query);
+    }
+    if (route.config.body) {
+      context.body = route.config.body.parse(context.body);
     }
   }
 
-  private async injectDependencies(context: RequestContext, route: Route): Promise<(() => Promise<void>) | undefined> {
+  private async injectDependencies(
+    context: RequestContext,
+    route: Route,
+  ): Promise<(() => Promise<void>) | undefined> {
     if (route.config.dependencies) {
-      try {
-        const { DependencyInjector } = await import('../application/DependencyInjector');
-        // Simplificar para evitar errores de tipos complejos
-        const resolved = await DependencyInjector.resolve(
-          route.config.dependencies as any,
-          context,
-        );
-        context.dependencies = resolved.resolved || {};
-        
-        // Devolver la función de cleanup
-        return resolved.cleanup;
-      } catch (error) {
-        // Si hay un error en la resolución de dependencias, propagarlo
-        // Esto es importante para errores de seguridad (401, 403, etc.)
-        throw error;
-      }
+      const { DependencyInjector } = await import('../application/DependencyInjector');
+      // Simplificar para evitar errores de tipos complejos
+      const resolved = await DependencyInjector.resolve(route.config.dependencies as any, context);
+      context.dependencies = resolved.resolved || {};
+
+      // Devolver la función de cleanup
+      return resolved.cleanup;
     }
     return undefined;
   }
 
-  private async addBackgroundTask(task: () => void, options?: { name?: string; timeout?: number }): Promise<void> {
+  private async addBackgroundTask(
+    task: () => void,
+    options?: { name?: string; timeout?: number },
+  ): Promise<void> {
     try {
       const { BackgroundTasks } = await import('../application/BackgroundTasks');
       BackgroundTasks.addTask(task, options);
@@ -431,7 +419,12 @@ export class FluentAdapter {
     }
   }
 
-  private async handleError(error: unknown, reply: FastifyReply, route: Route, context?: RequestContext): Promise<FastifyReply> {
+  private async handleError(
+    error: unknown,
+    reply: FastifyReply,
+    route: Route,
+    context?: RequestContext,
+  ): Promise<FastifyReply> {
     try {
       // Error handling personalizado si existe
       if ((route.config as unknown as { errorHandler?: unknown }).errorHandler) {
@@ -447,14 +440,14 @@ export class FluentAdapter {
         const { ErrorHandler } = await import('../application/ErrorHandler');
         if (context) {
           const response = await ErrorHandler.handle(error as Error, context);
-          
+
           // Aplicar headers si existen
           if (response.headers) {
             for (const [key, value] of Object.entries(response.headers)) {
               reply.header(key, value as string);
             }
           }
-          
+
           return reply.status(response.status).send(response.body);
         }
       } catch {

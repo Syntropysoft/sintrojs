@@ -8,8 +8,8 @@
  * 4. Reduced function calls
  */
 
-import { z } from 'zod';
 import Fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
+import type { z } from 'zod';
 import type { Route } from '../domain/Route';
 import type { HttpMethod } from '../domain/types';
 
