@@ -98,10 +98,10 @@
     "vitest": "^1.2.2"
   },
   "peerDependencies": {
-    "@fastify/compress": "^7.0.0",
-    "@fastify/cors": "^9.0.0",
-    "@fastify/helmet": "^11.0.0",
-    "@fastify/rate-limit": "^9.0.0"
+    "@fastify/compress": "^7.0.0 || ^8.0.0",
+    "@fastify/cors": "^9.0.0 || ^10.0.0 || ^11.0.0",
+    "@fastify/helmet": "^11.0.0 || ^12.0.0 || ^13.0.0",
+    "@fastify/rate-limit": "^9.0.0 || ^10.0.0"
   },
   "peerDependenciesMeta": {
     "@fastify/compress": {
