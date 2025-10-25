@@ -431,25 +431,18 @@ export class FluentAdapter {
     context: RequestContext,
     route: Route,
   ): Promise<(() => Promise<void>) | undefined> {
-    if (route.config.dependencies) {
-      // Crear o obtener factory para esta ruta
-      const routeKey = `${route.method}:${route.path}`;
-      let factory = this.dependencyFactories.get(routeKey);
+    if (!route.config.dependencies) return undefined;
 
-      if (!factory) {
-        const { createDependencyResolverFactory } = await import('../domain/factories');
-        factory = createDependencyResolverFactory(route.config.dependencies);
-        this.dependencyFactories.set(routeKey, factory);
-      }
-
-      // Usar factory para resolver dependencias de forma type-safe
-      const resolved = await factory.resolve(context);
-      context.dependencies = resolved.resolved;
-
-      // Devolver la función de cleanup
-      return resolved.cleanup;
+    const routeKey = `${route.method}:${route.path}`;
+    let factory = this.dependencyFactories.get(routeKey);
+    
+    if (!factory) {
+      const { createDependencyResolverFactory } = await import('../domain/factories');
+      factory = createDependencyResolverFactory(route.config.dependencies);
+      this.dependencyFactories.set(routeKey, factory);
     }
-    return undefined;
+
+    return factory.resolve(context);
   }
 
   private async addBackgroundTask(
@@ -476,47 +469,40 @@ export class FluentAdapter {
       if ((route.config as unknown as { errorHandler?: unknown }).errorHandler) {
         const errorHandler = (route.config as unknown as { errorHandler: unknown }).errorHandler;
         if (context && typeof errorHandler === 'function') {
-          // Crear o obtener factory para este error handler
-          const routeKey = `${route.method}:${route.path}`;
-          let factory = this.errorHandlerFactories.get(routeKey);
-
-          if (!factory) {
-            const { createErrorHandlerFactory } = await import('../domain/factories');
-            factory = createErrorHandlerFactory(errorHandler as any);
-            this.errorHandlerFactories.set(routeKey, factory);
-          }
-
-          // Usar factory para manejar error de forma type-safe
-          const response = await factory.handle(context, error as Error);
+          const response = await (errorHandler as any)(context, error);
           return reply.status(response.status).send(response.body);
         }
       }
 
-      // Usar ErrorHandler de SyntroJS si está disponible
-      try {
-        const { ErrorHandler } = await import('../application/ErrorHandler');
-        if (context) {
-          const response = await ErrorHandler.handle(error as Error, context);
-
-          // Aplicar headers si existen
-          if (response.headers) {
-            for (const [key, value] of Object.entries(response.headers)) {
-              reply.header(key, value as string);
-            }
-          }
-
-          return reply.status(response.status).send(response.body);
-        }
-      } catch {
-        // ErrorHandler no disponible, usar manejo básico
+      // Usar Factory Pattern para ErrorHandler
+      const routeKey = `${route.method}:${route.path}`;
+      let factory = this.errorHandlerFactories.get(routeKey);
+      
+      if (!factory) {
+        const { createErrorHandlerFactory } = await import('../domain/factories');
+        factory = createErrorHandlerFactory();
+        this.errorHandlerFactories.set(routeKey, factory);
       }
 
-      // Error handling básico como fallback
+      if (context) {
+        const response = await factory.handle(context, error as Error);
+        
+        // Aplicar headers si existen
+        if (response.headers) {
+          for (const [key, value] of Object.entries(response.headers)) {
+            reply.header(key, value as string);
+          }
+        }
+        
+        return reply.status(response.status).send(response.body);
+      }
+
+      // Fallback básico
       const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
       return reply.status(500).send({ error: errorMessage });
-    } catch {
+    } catch (handlerError) {
       // Fallback final
-      const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
+      const errorMessage = handlerError instanceof Error ? handlerError.message : 'Internal Server Error';
       return reply.status(500).send({ error: errorMessage });
     }
   }

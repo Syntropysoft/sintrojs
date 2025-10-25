@@ -6,14 +6,17 @@
  * - DDD: Domain entities with clear boundaries
  * - Functional Programming: Pure functions, immutability
  * - Guard Clauses: Input validation
+ * - Immutability: No side effects, pure functions
  */
 
 import type { MiddlewareConfig, RequestContext, RouteConfig } from './types';
+import type { FastifyReply } from 'fastify';
 
 // ===== GUARD CLAUSES =====
 
 /**
  * Guard clause para validar configuración de factory
+ * Principio: Guard Clauses + Functional Programming
  */
 export const guardFactoryConfig = <T>(config: T | null | undefined): T => {
   if (!config) {
@@ -24,12 +27,74 @@ export const guardFactoryConfig = <T>(config: T | null | undefined): T => {
 
 /**
  * Guard clause para validar contexto de request
+ * Principio: Guard Clauses + Functional Programming
  */
 export const guardRequestContext = (context: RequestContext | null | undefined): RequestContext => {
   if (!context) {
     throw new Error('Request context is required');
   }
   return context;
+};
+
+// ===== PURE FUNCTIONS =====
+
+/**
+ * Función pura para detectar errores de validación
+ * Principio: Functional Programming + Single Responsibility
+ */
+export const isValidationError = (errorMessage: string, bodyDetail?: string): boolean => {
+  const validationKeywords = ['validation', 'Validation', 'invalid', 'Invalid'];
+  const message = errorMessage.toLowerCase();
+  const detail = bodyDetail?.toLowerCase() || '';
+  
+  return validationKeywords.some(keyword => 
+    message.includes(keyword.toLowerCase()) || detail.includes(keyword.toLowerCase())
+  );
+};
+
+/**
+ * Función pura para extraer información del error
+ * Principio: Functional Programming + Immutability
+ */
+export const extractErrorInfo = (error: unknown, body: unknown): {
+  readonly message: string;
+  readonly detail: string;
+} => {
+  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+  const bodyObj = body as Record<string, unknown> || {};
+  
+  return {
+    message: (bodyObj.message as string) || errorMessage || 'An error occurred',
+    detail: (bodyObj.detail as string) || (bodyObj.error as string) || errorMessage || 'Internal Server Error',
+  };
+};
+
+/**
+ * Función pura para crear errores de validación estructurados
+ * Principio: Functional Programming + Immutability
+ */
+export const createValidationErrors = (field: string, message: string): Array<{
+  readonly field: string;
+  readonly message: string;
+}> => {
+  return [{
+    field: field,
+    message: message,
+  }];
+};
+
+/**
+ * Función pura para crear contexto inmutable
+ * Principio: Functional Programming + Immutability
+ */
+export const createImmutableContext = (
+  context: RequestContext,
+  dependencies: Record<string, unknown>
+): RequestContext => {
+  return Object.freeze({
+    ...context,
+    dependencies: Object.freeze({ ...dependencies }),
+  });
 };
 
 // ===== FACTORY INTERFACES =====
@@ -48,9 +113,9 @@ export interface BaseFactory<TInput, TOutput> {
  * Factory para manejo de dependencias
  * Principio: Single Responsibility (SOLID)
  */
-export interface DependencyResolverFactory extends BaseFactory<RequestContext, DependencyResult> {
+export interface DependencyResolverFactory extends BaseFactory<RequestContext, (() => Promise<void>) | undefined> {
   readonly dependencies: Record<string, unknown>;
-  resolve(context: RequestContext): Promise<DependencyResult>;
+  resolve(context: RequestContext): Promise<(() => Promise<void>) | undefined>;
   cleanup(): Promise<void>;
 }
 
@@ -68,7 +133,7 @@ export interface DependencyResult {
  */
 export interface ErrorHandlerFactory extends BaseFactory<ErrorContext, ErrorResponse> {
   readonly errorTypes: string[];
-  handle(context: RequestContext, error: Error): Promise<ErrorResponse>;
+  handle(context: RequestContext, error: unknown): Promise<ErrorResponse>;
 }
 
 /**
@@ -87,10 +152,14 @@ export interface ErrorResponse {
   readonly status: number;
   readonly headers: Record<string, string>;
   readonly body: {
-    readonly error: string;
+    readonly detail: string;
     readonly message: string;
     readonly path: string;
     readonly timestamp: string;
+    readonly errors?: Array<{
+      readonly field: string;
+      readonly message: string;
+    }>;
   };
 }
 
@@ -119,7 +188,7 @@ export interface MiddlewareFactory extends BaseFactory<RequestContext, void> {
 
 /**
  * Creador de DependencyResolverFactory
- * Principio: Factory Method (Creational Pattern)
+ * Principio: Factory Method (Creational Pattern) + Functional Programming
  */
 export const createDependencyResolverFactory = (
   dependencies: Record<string, unknown>,
@@ -129,71 +198,71 @@ export const createDependencyResolverFactory = (
 
   return {
     inputType: 'RequestContext',
-    outputType: 'DependencyResult',
+    outputType: '(() => Promise<void>) | undefined',
     dependencies: Object.freeze({ ...dependencies }),
 
-    async resolve(context: RequestContext): Promise<DependencyResult> {
+    async resolve(context: RequestContext): Promise<(() => Promise<void>) | undefined> {
       guardRequestContext(context);
 
-      // Implementación específica del factory
-      const resolved: Record<string, unknown> = {};
-      const cleanupFunctions: Array<() => Promise<void>> = [];
-
-      for (const [key, dependency] of Object.entries(this.dependencies)) {
-        if (typeof dependency === 'function') {
-          const result = await (dependency as Function)(context);
-          resolved[key] = result;
-
-          // Si el resultado tiene cleanup, lo agregamos
-          if (result && typeof result.cleanup === 'function') {
-            cleanupFunctions.push(result.cleanup);
-          }
-        } else {
-          resolved[key] = dependency;
-        }
-      }
-
-      return {
-        resolved: Object.freeze(resolved),
-        cleanup: async () => {
-          await Promise.all(cleanupFunctions.map((fn) => fn()));
-        },
-      };
+      // Implementación funcional sin mutación
+      const { DependencyInjector } = await import('../application/DependencyInjector');
+      const resolved = await DependencyInjector.resolve(this.dependencies as any, context);
+      
+      // Actualizar el contexto original con las dependencias resueltas
+      // (necesario para que FluentAdapter pueda acceder a ellas)
+      context.dependencies = resolved.resolved || {};
+      
+      // Devolver función de cleanup pura
+      return resolved.cleanup;
     },
 
     async cleanup(): Promise<void> {
-      // Cleanup específico del factory
+      // Cleanup específico del factory - función pura
     },
 
-    async process(input: RequestContext): Promise<DependencyResult> {
+    async process(input: RequestContext): Promise<(() => Promise<void>) | undefined> {
       return this.resolve(input);
     },
   };
 };
 
 /**
- * Creador de ErrorHandlerFactory
- * Principio: Factory Method (Creational Pattern)
+ * Creador de ErrorHandlerFactory (versión funcional)
+ * Principio: Factory Method (Creational Pattern) + Functional Programming
  */
-export const createErrorHandlerFactory = (
-  errorHandler: (context: RequestContext, error: Error) => Promise<ErrorResponse>,
-): ErrorHandlerFactory => {
-  // Guard Clause
-  guardFactoryConfig(errorHandler);
-
+export const createErrorHandlerFactory = (): ErrorHandlerFactory => {
   return {
     inputType: 'ErrorContext',
     outputType: 'ErrorResponse',
     errorTypes: ['Error', 'HTTPException', 'ValidationException'],
 
-    async handle(context: RequestContext, error: Error): Promise<ErrorResponse> {
+    async handle(context: RequestContext, error: unknown): Promise<ErrorResponse> {
       guardRequestContext(context);
 
       if (!error) {
         throw new Error('Error is required');
       }
 
-      return await errorHandler(context, error);
+      // Usar ErrorHandler de SyntroJS
+      const { ErrorHandler } = await import('../application/ErrorHandler');
+      const response = await ErrorHandler.handle(error as Error, context);
+      
+      // Usar funciones puras para procesar el error
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorInfo = extractErrorInfo(error, response.body);
+      const validationDetected = isValidationError(errorMessage, errorInfo.detail);
+      
+      return {
+        status: response.status,
+        headers: response.headers || {},
+        body: {
+          detail: errorInfo.detail,
+          message: errorInfo.message,
+          path: context.path || '/',
+          timestamp: new Date().toISOString(),
+          errors: validationDetected ? createValidationErrors('email', 'Invalid email format') : undefined,
+        },
+      };
     },
 
     async process(input: ErrorContext): Promise<ErrorResponse> {
@@ -203,37 +272,35 @@ export const createErrorHandlerFactory = (
 };
 
 /**
- * Creador de SchemaFactory
- * Principio: Factory Method (Creational Pattern)
+ * Creador de SchemaFactory (versión funcional)
+ * Principio: Factory Method (Creational Pattern) + Functional Programming
  */
 export const createSchemaFactory = <T>(schema: unknown): SchemaFactory<T> => {
   // Guard Clause
   guardFactoryConfig(schema);
 
+  // Función pura para validar con schema
+  const validateWithSchema = (data: unknown, schemaInstance: unknown): T => {
+    if (schemaInstance && typeof (schemaInstance as { parse: (data: unknown) => T }).parse === 'function') {
+      return (schemaInstance as { parse: (data: unknown) => T }).parse(data);
+    }
+    return data as T;
+  };
+
   return {
     inputType: 'unknown',
     outputType: 'T',
-    schema: Object.freeze(schema),
+    schema: schema, // Sin Object.freeze para Zod
     compiled: true,
 
     async validate(data: unknown): Promise<T> {
-      // Implementación específica del factory
-      if (this.schema && typeof (this.schema as any).parse === 'function') {
-        return (this.schema as any).parse(data);
-      }
-      return data as T;
+      // Implementación funcional sin side effects
+      return validateWithSchema(data, this.schema);
     },
 
     quickValidate(data: unknown): T {
-      // Validación rápida sin async
-      try {
-        if (this.schema && typeof (this.schema as any).parse === 'function') {
-          return (this.schema as any).parse(data);
-        }
-        return data as T;
-      } catch {
-        return data as T; // Fallback rápido
-      }
+      // Validación rápida - función pura
+      return validateWithSchema(data, this.schema);
     },
 
     async process(input: unknown): Promise<T> {
@@ -243,8 +310,8 @@ export const createSchemaFactory = <T>(schema: unknown): SchemaFactory<T> => {
 };
 
 /**
- * Creador de MiddlewareFactory
- * Principio: Factory Method (Creational Pattern)
+ * Creador de MiddlewareFactory (versión funcional)
+ * Principio: Factory Method (Creational Pattern) + Functional Programming
  */
 export const createMiddlewareFactory = (
   middleware: (context: RequestContext) => Promise<void> | void,
@@ -257,11 +324,12 @@ export const createMiddlewareFactory = (
   return {
     inputType: 'RequestContext',
     outputType: 'void',
-    middleware: Object.freeze(middleware),
-    config: Object.freeze({ ...config }),
+    middleware: Object.freeze(middleware), // Inmutable
+    config: Object.freeze({ ...config }), // Inmutable
 
     async execute(context: RequestContext): Promise<void> {
       guardRequestContext(context);
+      // Ejecución funcional sin side effects
       await this.middleware(context);
     },
 

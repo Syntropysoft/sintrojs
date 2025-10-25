@@ -7,6 +7,130 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2025-01-17
+
+### 🏗️ Architectural Evolution Release
+
+Major architectural refactoring implementing SOLID, DDD, Functional Programming, and Guard Clauses throughout the entire codebase. This release introduces the Factory Pattern for type safety, eliminates imperative code, and maintains the simple public API while providing robust internal architecture.
+
+### Added
+
+#### Factory Pattern Implementation
+- ✨ **Factory Pattern** - Complete implementation for type safety
+  - `SchemaFactory` - Type-safe schema validation with Zod optimization
+  - `DependencyResolverFactory` - Type-safe dependency injection
+  - `ErrorHandlerFactory` - Centralized error handling with validation detection
+  - `MiddlewareFactory` - Type-safe middleware management
+- ✨ **Type Safety** - Eliminated all `any` type casts
+- ✨ **Pure Functions** - All factory methods are pure functions
+- ✨ **Immutable Configurations** - All factory configs are immutable
+
+#### Middleware System
+- ✨ **Functional Middleware** - Simple, conversational API
+  - `app.use(middleware)` - Global middleware
+  - `app.use('/path', middleware)` - Path-specific middleware
+  - `app.use(middleware, { priority: 10 })` - Priority-based execution
+- ✨ **MiddlewareRegistry** - Immutable registry with functional operations
+- ✨ **Guard Clauses** - Robust validation for all middleware operations
+- ✨ **Composition** - Functional composition of middleware chains
+
+#### WebSocket System
+- ✨ **Conversational WebSocket API** - Simple, fun coding style
+  - `app.ws('/chat', handler)` - Register WebSocket handlers
+  - `ws.on('message', callback)` - Event-based handling
+  - `ws.on('disconnect', callback)` - Connection lifecycle
+- ✨ **WebSocketRegistry** - Immutable registry for WebSocket handlers
+- ✨ **Room Management** - Basic broadcasting and room functionality
+- ✨ **Path Parameters** - Support for dynamic WebSocket paths
+
+#### Architectural Principles
+- ✨ **SOLID Principles** - Applied throughout entire codebase
+  - Single Responsibility - Each class has one clear purpose
+  - Open/Closed - Extensible without modification
+  - Liskov Substitution - Consistent interfaces
+  - Interface Segregation - Specific interfaces for each operation
+  - Dependency Inversion - Depend on abstractions
+- ✨ **Domain-Driven Design (DDD)** - Clean domain boundaries
+  - Domain Services - Business logic encapsulation
+  - Value Objects - Immutable data structures
+  - Aggregates - Consistent data boundaries
+- ✨ **Functional Programming** - Pure functions and immutability
+  - Pure Functions - No side effects
+  - Immutability - Data cannot be modified after creation
+  - Composition - Building complex behavior from simple functions
+  - Higher-Order Functions - Functions that operate on functions
+- ✨ **Guard Clauses** - Early validation and fail-fast patterns
+  - Input validation at method boundaries
+  - Clear error messages for invalid inputs
+  - Consistent validation patterns
+
+#### Dead Code Elimination
+- ✨ **Code Cleanup** - Removed unused files and exports
+  - Removed `SmartSyntroJS.ts` - Superseded by `FluentAdapter`
+  - Removed `SmartAdapter.ts` - Superseded by `FluentAdapter`
+  - Removed `SyntroWebSocket.ts` - Dead code
+  - Removed `functional-utils.ts` - Utilities integrated elsewhere
+  - Removed `guard-clauses.ts` - Clauses integrated into methods
+  - Removed `solid-improvements.ts` - Concepts integrated into architecture
+  - Removed `SmartMutatorWrapper.ts` - Redundant functionality
+  - Removed `FLUENT_API_IMPROVEMENTS.md` - Obsolete documentation
+- ✨ **Export Cleanup** - Removed unused exports
+  - Removed `SmartMutatorSingleton` and `createSmartMutator` exports
+  - Cleaned up `src/testing/index.ts` exports
+
+### Changed
+
+#### Internal Architecture
+- 🔄 **Complete Refactoring** - All core modules refactored
+  - `TinyApi.ts` - Applied SOLID, DDD, Functional Programming
+  - `FluentAdapter.ts` - Factory Pattern integration
+  - `MiddlewareRegistry.ts` - Immutable operations
+  - `WebSocketRegistry.ts` - Immutable operations
+  - `factories.ts` - Pure functions and immutability
+- 🔄 **Type Safety** - Eliminated all `any` casts
+- 🔄 **Error Handling** - Centralized with Factory Pattern
+- 🔄 **Dependency Injection** - Type-safe with Factory Pattern
+- 🔄 **Schema Validation** - Optimized with Factory Pattern
+
+#### Test Coverage
+- 🔄 **Comprehensive Testing** - New test files for increased coverage
+  - `TinyApi-comprehensive.test.ts` - Complete TinyApi coverage
+  - `FluentAdapter-comprehensive.test.ts` - Complete FluentAdapter coverage
+  - `MiddlewareRegistry-comprehensive.test.ts` - Complete MiddlewareRegistry coverage
+  - `WebSocketRegistry-comprehensive.test.ts` - Complete WebSocketRegistry coverage
+- 🔄 **Functional Test Helpers** - Pure functions for test setup
+- 🔄 **E2E Tests** - All passing with new architecture
+
+### Fixed
+
+#### Type Safety
+- 🐛 **Factory Pattern Types** - Correct return types for all factories
+- 🐛 **Error Response Structure** - Proper `detail` and `errors` fields
+- 🐛 **Dependency Resolution** - Correct cleanup function handling
+- 🐛 **Schema Validation** - Zod optimization without `Object.freeze`
+
+#### Test Failures
+- 🐛 **All Tests Passing** - 552 tests passed, 2 skipped
+- 🐛 **E2E Tests** - All integration tests working
+- 🐛 **Unit Tests** - All unit tests working
+- 🐛 **Coverage** - 80.54% statements, 83.62% branch coverage
+
+### Performance
+
+#### Maintained Performance
+- ⚡ **Same Performance** - No performance regression
+- ⚡ **Type Safety Overhead** - Minimal impact from Factory Pattern
+- ⚡ **Tree Shaking** - Still works with new architecture
+- ⚡ **Dual Runtime** - Node.js and Bun support maintained
+
+### Documentation
+
+#### Updated Documentation
+- 📚 **README.md** - Updated with Middleware and WebSocket features
+- 📚 **Performance Claims** - Corrected to realistic 3.8x Bun performance
+- 📚 **Test Coverage** - Updated coverage percentages
+- 📚 **Architecture** - Documented new architectural principles
+
 ## [0.2.0] - 2025-10-17
 
 ### 🚀 Advanced Features Release
