@@ -27,8 +27,8 @@ export class FluentAdapter {
     logger: false,
     validation: true,
     errorHandling: true,
-    dependencyInjection: false,
-    backgroundTasks: false,
+    dependencyInjection: true, // Habilitado por defecto
+    backgroundTasks: true, // Habilitado por defecto
     openAPI: true,
     compression: false,
     cors: false,
@@ -209,23 +209,32 @@ export class FluentAdapter {
     const method = route.method.toLowerCase() as Lowercase<HttpMethod>;
 
     fastify[method](route.path, async (request: FastifyRequest, reply: FastifyReply) => {
-      try {
-        // Crear contexto básico
-        const context: RequestContext = {
-          method: request.method as HttpMethod,
-          path: request.url,
-          params: request.params,
-          query: request.query,
-          body: request.body,
-          headers: request.headers as Record<string, string>,
-          cookies: (request as { cookies?: Record<string, string> }).cookies || {},
-          correlationId: Math.random().toString(36).substring(2, 15),
-          timestamp: new Date(),
-          dependencies: {} as Record<string, unknown>,
-          background: {
-            addTask: (task: () => void) => setImmediate(task),
+      // Crear contexto básico fuera del try block para que esté disponible en el catch
+      let context: RequestContext = {
+        method: request.method as HttpMethod,
+        path: request.url,
+        params: request.params,
+        query: request.query,
+        body: request.body,
+        headers: request.headers as Record<string, string>,
+        cookies: (request as { cookies?: Record<string, string> }).cookies || {},
+        correlationId: (request.headers['x-correlation-id'] as string) || Math.random().toString(36).substring(2, 15),
+        timestamp: new Date(),
+        dependencies: {} as Record<string, unknown>,
+        background: {
+          addTask: async (task: () => void, options?: { name?: string; timeout?: number }) => {
+            if (this.config.backgroundTasks) {
+              // Usar BackgroundTasks real si está habilitado
+              await this.addBackgroundTask(task, options);
+            } else {
+              // Fallback básico
+              setImmediate(task);
+            }
           },
-        };
+        },
+      };
+
+      try {
 
         // VALIDACIÓN - Solo si está habilitada
         if (this.config.validation) {
@@ -233,8 +242,9 @@ export class FluentAdapter {
         }
 
         // DEPENDENCY INJECTION - Solo si está habilitada
+        let cleanupFn: (() => Promise<void>) | undefined;
         if (this.config.dependencyInjection && route.config.dependencies) {
-          await this.injectDependencies(context, route);
+          cleanupFn = await this.injectDependencies(context, route);
         }
 
         // BACKGROUND TASKS - Solo si están habilitadas
@@ -249,16 +259,28 @@ export class FluentAdapter {
         if (this.config.validation && route.config.response) {
           const validatedResult = route.config.response.parse(result);
           const statusCode = route.config.status ?? 200;
+          
+          // Ejecutar cleanup después de enviar la respuesta
+          if (cleanupFn) {
+            setImmediate(() => cleanupFn!());
+          }
+          
           return reply.status(statusCode).send(validatedResult);
         }
 
         const statusCode = route.config.status ?? 200;
+        
+        // Ejecutar cleanup después de enviar la respuesta
+        if (cleanupFn) {
+          setImmediate(() => cleanupFn!());
+        }
+        
         return reply.status(statusCode).send(result);
 
       } catch (error) {
         // ERROR HANDLING - Solo si está habilitado
         if (this.config.errorHandling) {
-          return this.handleError(error, reply, route);
+          return await this.handleError(error, reply, route, context);
         }
 
         // Error handling mínimo
@@ -269,18 +291,23 @@ export class FluentAdapter {
   }
 
   private async validateRequest(context: RequestContext, route: Route): Promise<void> {
-    if (route.config.params) {
-      context.params = route.config.params.parse(context.params);
-    }
-    if (route.config.query) {
-      context.query = route.config.query.parse(context.query);
-    }
-    if (route.config.body) {
-      context.body = route.config.body.parse(context.body);
+    try {
+      if (route.config.params) {
+        context.params = route.config.params.parse(context.params);
+      }
+      if (route.config.query) {
+        context.query = route.config.query.parse(context.query);
+      }
+      if (route.config.body) {
+        context.body = route.config.body.parse(context.body);
+      }
+    } catch (error) {
+      // Si la validación falla, lanzar error para que sea manejado por el ErrorHandler
+      throw error;
     }
   }
 
-  private async injectDependencies(context: RequestContext, route: Route): Promise<void> {
+  private async injectDependencies(context: RequestContext, route: Route): Promise<(() => Promise<void>) | undefined> {
     if (route.config.dependencies) {
       try {
         const { DependencyInjector } = await import('../application/DependencyInjector');
@@ -290,27 +317,66 @@ export class FluentAdapter {
           context,
         );
         context.dependencies = resolved.resolved || {};
-      } catch {
-        // DependencyInjector no disponible, continuar sin él
+        
+        // Devolver la función de cleanup
+        return resolved.cleanup;
+      } catch (error) {
+        // Si hay un error en la resolución de dependencias, propagarlo
+        // Esto es importante para errores de seguridad (401, 403, etc.)
+        throw error;
       }
+    }
+    return undefined;
+  }
+
+  private async addBackgroundTask(task: () => void, options?: { name?: string; timeout?: number }): Promise<void> {
+    try {
+      const { BackgroundTasks } = await import('../application/BackgroundTasks');
+      BackgroundTasks.addTask(task, options);
+    } catch {
+      // BackgroundTasks no disponible, usar fallback básico
+      setImmediate(task);
     }
   }
 
-  private handleError(error: unknown, reply: FastifyReply, route: Route): FastifyReply {
-    // Error handling personalizado si existe
-    if ((route.config as unknown as { errorHandler?: unknown }).errorHandler) {
-      try {
+  private async handleError(error: unknown, reply: FastifyReply, route: Route, context?: RequestContext): Promise<FastifyReply> {
+    try {
+      // Error handling personalizado si existe
+      if ((route.config as unknown as { errorHandler?: unknown }).errorHandler) {
         const errorHandler = (route.config as unknown as { errorHandler: unknown }).errorHandler;
-        // Ejecutar error handler personalizado
-        // Nota: Esto requeriría más implementación para ser completamente funcional
-      } catch {
-        // Error handler falló, usar manejo por defecto
+        if (context && typeof errorHandler === 'function') {
+          const response = await (errorHandler as any)(context, error);
+          return reply.status(response.status).send(response.body);
+        }
       }
-    }
 
-    // Error handling por defecto
-    const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
-    return reply.status(500).send({ error: errorMessage });
+      // Usar ErrorHandler de SyntroJS si está disponible
+      try {
+        const { ErrorHandler } = await import('../application/ErrorHandler');
+        if (context) {
+          const response = await ErrorHandler.handle(error as Error, context);
+          
+          // Aplicar headers si existen
+          if (response.headers) {
+            for (const [key, value] of Object.entries(response.headers)) {
+              reply.header(key, value as string);
+            }
+          }
+          
+          return reply.status(response.status).send(response.body);
+        }
+      } catch {
+        // ErrorHandler no disponible, usar manejo básico
+      }
+
+      // Error handling básico como fallback
+      const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
+      return reply.status(500).send({ error: errorMessage });
+    } catch {
+      // Fallback final
+      const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
+      return reply.status(500).send({ error: errorMessage });
+    }
   }
 
   async listen(fastify: FastifyInstance, port: number, host = '::'): Promise<string> {

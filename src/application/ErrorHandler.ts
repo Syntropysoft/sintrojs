@@ -8,6 +8,7 @@
 
 import { HTTPException, ValidationException } from '../domain/HTTPException';
 import type { ExceptionHandler, RequestContext, RouteResponse } from '../domain/types';
+import { z } from 'zod';
 
 /**
  * Error handler implementation
@@ -166,6 +167,68 @@ class ErrorHandlerImpl {
         body: {
           detail: validationError.detail,
           errors: validationError.errors,
+          path: context.path,
+        },
+      };
+    });
+
+    // ZodError handler (422) - Convert ZodError to ValidationException format
+    this.register(z.ZodError, (context, error) => {
+      const zodError = error as z.ZodError;
+
+      return {
+        status: 422,
+        body: {
+          detail: 'Validation Error',
+          errors: zodError.errors.map(err => ({
+            field: err.path.join('.'),
+            ...err
+          })),
+          path: context.path,
+        },
+      };
+    });
+
+    // JWTError handler (401) - Convert JWTError to HTTPException format
+    this.register(Error, (context, error) => {
+      const err = error as Error;
+      
+      // Check if it's a JWT error
+      if (err.message.includes('JWT token is required') || err.message.includes('INVALID_TOKEN')) {
+        return {
+          status: 401,
+          headers: {
+            'WWW-Authenticate': 'Bearer'
+          },
+          body: {
+            detail: 'Authentication required',
+            message: err.message,
+            path: context.path,
+          },
+        };
+      }
+      
+      // Check if it's a security error (missing credentials)
+      if (err.message.includes('Cannot destructure property') && err.message.includes('credentials')) {
+        return {
+          status: 401,
+          headers: {
+            'WWW-Authenticate': 'Basic'
+          },
+          body: {
+            detail: 'Authentication required',
+            message: 'Missing authentication credentials',
+            path: context.path,
+          },
+        };
+      }
+      
+      // Default error handling
+      return {
+        status: 500,
+        body: {
+          detail: 'Internal Server Error',
+          message: err.message,
           path: context.path,
         },
       };
