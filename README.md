@@ -1,153 +1,39 @@
 # SyntroJS 🚀
 
-> **🔥 DUAL RUNTIME: FastAPI for Node.js AND Bun - Same Code, Maximum Performance**
-> **⚡ 3.8x Faster with Bun | 🚀 89.3% of Fastify with Node.js**
-> The only framework that makes writing high-quality tests as easy as creating endpoints.
-
-## 🎉 **WORLD'S FIRST DUAL RUNTIME FRAMEWORK** 🎉
-
-### **🔥 THE REVOLUTION: Same Code, Two Runtimes, Maximum Performance**
-
-```bash
-# Same code runs on BOTH runtimes!
-node app.js    # 🚀 SyntroJS-Node (89.3% of Fastify)
-bun app.js     # ⚡ SyntroJS-Bun (6x faster than Fastify)
-```
-
-**🎯 ZERO CODE CHANGES** - **🚀 MAXIMUM PERFORMANCE** - **⚡ AUTO-OPTIMIZATION**
-
----
-
-## ⚠️ ALPHA VERSION - PROOF OF CONCEPT
-
-**🚨 IMPORTANT: This is an ALPHA version and proof of concept. Do not use in production!**
-
-- ✅ **Core functionality works** - Basic API creation, validation, and testing
-- ⚠️ **API may change** - Breaking changes expected in future versions
-- ⚠️ **Not production-ready** - Missing features, optimizations, and stability improvements
-- 🔬 **Experimental** - Testing new patterns and approaches to API development
-
-**Current Status:** Early development phase - feedback and contributions welcome!
-
----
+> **FastAPI for Node.js & Bun** - Same Code, Maximum Performance  
+> ⚡ **3.8x faster with Bun** | 🚀 **89.3% of Fastify with Node.js**
 
 [![npm version](https://img.shields.io/npm/v/syntrojs.svg)](https://www.npmjs.com/package/syntrojs)
 [![🚀 DUAL RUNTIME](https://img.shields.io/badge/🚀-DUAL%20RUNTIME-red.svg)](https://github.com/Syntropysoft/sintrojs)
 [![⚡ Bun Performance](https://img.shields.io/badge/⚡-3.8x%20Faster%20than%20Fastify-green.svg)](https://github.com/Syntropysoft/sintrojs)
 [![🚀 Node.js Performance](https://img.shields.io/badge/🚀-89.3%25%20of%20Fastify-blue.svg)](https://github.com/Syntropysoft/sintrojs)
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
-[![Coverage](https://img.shields.io/badge/coverage-80.26%25-brightgreen)](./coverage)
-[![Mutation Score](https://img.shields.io/badge/mutation-85.25%25-brightgreen)](./reports/mutation)
+[![Coverage](https://img.shields.io/badge/coverage-80.54%25-brightgreen)](./coverage)
 [![Tests](https://img.shields.io/badge/tests-552%20passing-brightgreen)](./tests)
 
 ---
 
 ## 🎯 What is SyntroJS?
 
-**SyntroJS is the WORLD'S FIRST dual runtime framework** for building APIs, heavily inspired by **FastAPI (Python)**. It brings the simplicity and elegance of FastAPI to **BOTH Node.js AND Bun** ecosystems with the power of TypeScript, enhanced with our Trust Engineering philosophy.
+**SyntroJS is the world's first dual-runtime framework** that brings FastAPI's simplicity to both Node.js and Bun. Write once, run anywhere with maximum performance.
 
-### **🔥 THE REVOLUTION:**
-- **Same code** runs on Node.js AND Bun
-- **Auto-detection** and runtime optimization
-- **Zero code changes** required
-- **Maximum performance** on both runtimes
-
-## 🔬 Current Development Status
-
-### What Works (ALPHA)
-- ✅ **Core API functionality** - GET, POST, PUT, DELETE, PATCH routes
-- ✅ **Request/Response validation** - Zod schema validation
-- ✅ **Type safety** - Full TypeScript support
-- ✅ **Automatic documentation** - Swagger UI and ReDoc
-- ✅ **Error handling** - Custom exception handling
-- ✅ **Testing framework** - TinyTest with SmartMutator
-- ✅ **Security plugins** - JWT, API Key, HTTP Basic, OAuth2
-- ✅ **Performance plugins** - Compression, CORS, Helmet, Rate Limiting
-- ✅ **Dual Runtime Support** - Same code runs on Node.js AND Bun
-- ✅ **Auto-detection** - Automatically detects and optimizes for runtime
-- ✅ **High Performance** - 89.3% of Fastify (Node.js) / 3.8x faster than Fastify (Bun)
-
-### What's Missing (Roadmap)
-- ✅ **Middleware system** - Custom middleware support (NEW!)
-- ⚠️ **Database integration** - ORM/ODM adapters
-- ✅ **WebSocket support** - Real-time communication (NEW!)
-- ⚠️ **GraphQL support** - GraphQL endpoint generation
-- ⚠️ **Production optimizations** - Performance tuning
-- ⚠️ **Deployment guides** - Docker, Kubernetes, etc.
-- ⚠️ **Advanced features** - Background tasks, caching, etc.
-
-### The Problem
-
-Building robust APIs in Node.js requires too much boilerplate:
-
-- ❌ **Express** is too basic (no validation, no docs, no types)
-- ❌ **NestJS** is too complex (opinionated DI, steep learning curve)
-- ❌ **Fastify** is fast but requires manual configuration
-- ❌ **No true "FastAPI for Node.js" exists**
-
-### The Solution: SyntroJS
-
-```typescript
-import { SyntroJS, HTTPException } from 'syntrojs';
-import { z } from 'zod';
-
-const app = new SyntroJS();
-
-app.get('/users/:id', {
-  params: z.object({ id: z.coerce.number() }),
-  response: z.object({ id: z.number(), name: z.string() }),
-  handler: async ({ params }) => {
-    const user = await db.users.find(params.id);
-    if (!user) throw new HTTPException(404, 'User not found');
-    return user;
-  },
-});
-
-await app.listen(3000);
-// 🚀 Server: http://localhost:3000
-// 📚 Docs: http://localhost:3000/docs
+### **🔥 The Revolution:**
+```bash
+# Same code runs on BOTH runtimes!
+node app.js    # 🚀 SyntroJS-Node (89.3% of Fastify)
+bun app.js     # ⚡ SyntroJS-Bun (3.8x faster than Fastify)
 ```
 
-**Result:**
-- ✅ Automatic validation (Zod)
-- ✅ Complete type-safety (TypeScript)
-- ✅ Automatic docs (Swagger UI + ReDoc)
-- ✅ High performance (Fastify)
-- ✅ Zero boilerplate
-- ✅ Verifiable code quality with SmartMutator (Trust Engineering)
+**Zero code changes** - **Maximum performance** - **Auto-optimization**
 
-## ⚡ Performance Benchmarks
+---
 
-SyntroJS delivers **exceptional performance** with **dual runtime support**:
+## ⚠️ ALPHA VERSION
 
-### 🏆 Performance Ranking (Dual Runtime)
-1. **🥇 SyntroJS-Bun**: 8,000+ req/sec average (**3.8x faster than Fastify**)
-2. **🥈 Fastify**: 5,200 req/sec average
-3. **🥉 SyntroJS-Node**: 4,500 req/sec average (**89.3% of Fastify**)
-4. **Express**: 2,469 req/sec average
+**🚨 This is an ALPHA version and proof of concept. Do not use in production!**
 
-### 📊 Key Performance Metrics
-- **SyntroJS-Bun vs Fastify**: 380% performance (3.8x faster)
-- **SyntroJS-Node vs Fastify**: 89.3% performance (only 11% overhead)
-- **SyntroJS-Bun vs Express**: 1,240% faster (12.4x performance)
-- **SyntroJS-Node vs Express**: 325% faster (3.25x performance)
-
-### 🎯 Performance Analysis
-- ✅ **SyntroJS-Bun**: Maximum performance with Bun runtime
-- ✅ **SyntroJS-Node**: Excellent performance with full ecosystem compatibility
-- ✅ **Auto-optimization**: Framework adapts to runtime automatically
-- ✅ **Zero code changes**: Same API, different performance
-- ✅ **Production ready**: Both runtimes suitable for production
-
-### 🚀 Runtime Comparison
-
-| Runtime | Performance | Ecosystem | Stability | Use Case |
-|---------|-------------|-----------|-----------|----------|
-| **SyntroJS-Bun** | 3.8x faster than Fastify | Growing | New | Maximum performance |
-| **SyntroJS-Node** | 89.3% of Fastify | Complete | Battle-tested | Production stability |
-
-**Note**: SyntroJS-Bun achieves 3.8x Fastify performance by leveraging Bun's JavaScriptCore engine and native optimizations. SyntroJS-Node maintains excellent performance while ensuring full compatibility with the Node.js ecosystem.
+- ✅ **Core functionality works** - Basic API creation, validation, and testing
+- ⚠️ **API may change** - Breaking changes expected in future versions
+- ⚠️ **Not production-ready** - Missing features, optimizations, and stability improvements
 
 ---
 
@@ -161,71 +47,23 @@ npm install syntrojs zod
 pnpm add syntrojs zod
 ```
 
-### 2. Create Your First API (4 Lines!)
-
-Create `app.js`:
+### 2. Your First API (4 Lines!)
 
 ```javascript
-/**
- * Ultra Simple API Example - 4 Lines
- * 
- * The simplest possible SyntroJS API.
- */
-
 import { SyntroJS } from 'syntrojs';
 
-// Create API in 4 lines
-const app = new SyntroJS({ title: 'Simple API' });
+const app = new SyntroJS({ title: 'My API' });
 app.get('/hello', { handler: () => ({ message: 'Hello World!' }) });
-app.listen(8080).then((address) => {
-  console.log('\n🚀 Simple API');
-  console.log(`Server running at ${address}\n`);
-  console.log('📖 Interactive Documentation:');
-  console.log(`   Swagger UI: ${address}/docs`);
-  console.log(`   ReDoc:      ${address}/redoc\n`);
-  console.log('🔗 Available Endpoints:');
-  console.log(`   GET    ${address}/hello\n`);
-  console.log('💡 Try this example:');
-  console.log(`   curl ${address}/hello\n`);
-});
+await app.listen(3000);
 ```
 
-### 3. Run Your API
-
-```bash
-node app.js
-```
-
-### 4. Test Your API
-
-```bash
-curl http://localhost:8080/hello
-# Response: {"message":"Hello World!"}
-```
-
-**That's it!** 🎉 You now have a working API with:
+**That's it!** 🎉 You now have:
 - ✅ Automatic validation
-- ✅ Type safety
-- ✅ Interactive docs at [http://localhost:8080/docs](http://localhost:8080/docs)
-- ✅ High performance (89.3% of Fastify)
+- ✅ Type safety  
+- ✅ Interactive docs at [http://localhost:3000/docs](http://localhost:3000/docs)
+- ✅ High performance
 
-**What you'll see when you run the server:**
-```
-🚀 Simple API
-Server running at http://localhost:8080
-
-📖 Interactive Documentation:
-   Swagger UI: http://localhost:8080/docs
-   ReDoc:      http://localhost:8080/redoc
-
-🔗 Available Endpoints:
-   GET    http://localhost:8080/hello
-
-💡 Try this example:
-   curl http://localhost:8080/hello
-```
-
-### 5. Optional: Add Validation
+### 3. Add Validation
 
 ```javascript
 import { SyntroJS } from 'syntrojs';
@@ -241,67 +79,170 @@ app.post('/users', {
   handler: ({ body }) => ({ id: 1, ...body }),
 });
 
-await app.listen(8080);
+await app.listen(3000);
 ```
 
-### 6. Optional: Simple Testing
-
-Create `test.js` to test the same API:
+### 4. Test Your API
 
 ```javascript
 import { TinyTest } from 'syntrojs/testing';
 
 const test = new TinyTest();
-
-// Test the exact same API from app.js
-test.get('/hello', {
-  handler: () => ({ message: 'Hello World!' }),
+test.post('/users', {
+  body: z.object({ name: z.string(), email: z.string().email() }),
+  handler: ({ body }) => ({ id: 1, ...body }),
 });
 
-// Run the test
-const result = await test.expectSuccess('GET', '/hello', {
-  expected: { message: 'Hello World!' }
+const result = await test.expectSuccess('POST', '/users', {
+  body: { name: 'John', email: 'john@example.com' }
 });
 
 console.log('✅ Test passed:', result);
-
 await test.close();
 ```
 
-### 7. Optional: Advanced Testing
+### 5. Simple Testing Examples
 
-```bash
-# Install testing dependencies (optional)
-npm install --save-dev @stryker-mutator/core @stryker-mutator/typescript-checker @stryker-mutator/vitest-runner
-```
-
+**Basic API Testing:**
 ```javascript
-import { SmartMutatorWrapper } from 'syntrojs/testing';
+import { TinyTest } from 'syntrojs/testing';
+import { z } from 'zod';
 
-// Automatically handles missing dependencies
-const result = await SmartMutatorWrapper.run({ mode: 'smart' });
-if (result) {
-  console.log(`Mutation score: ${result.mutationScore}%`);
-}
+// Test a simple GET endpoint
+test('GET /hello returns greeting', async () => {
+  const api = new TinyTest();
+  
+  api.get('/hello', {
+    handler: () => ({ message: 'Hello World!' }),
+  });
+  
+  const { status, data } = await api.expectSuccess('GET', '/hello');
+  
+  expect(status).toBe(200);
+  expect(data.message).toBe('Hello World!');
+  
+  await api.close();
+});
+
+// Test validation errors
+test('POST /users validates email', async () => {
+  const api = new TinyTest();
+  
+  api.post('/users', {
+    body: z.object({
+      name: z.string().min(1),
+      email: z.string().email(),
+    }),
+    handler: ({ body }) => ({ id: 1, ...body }),
+  });
+  
+  // Test invalid email
+  const { status, data } = await api.expectError('POST', '/users', 422, {
+    body: { name: 'John', email: 'invalid-email' },
+  });
+  
+  expect(status).toBe(422);
+  expect(data).toHaveProperty('detail');
+  
+  await api.close();
+});
+
+// Test boundary conditions (kills mutants!)
+test('POST /users validates age boundaries', async () => {
+  const api = new TinyTest();
+  
+  api.post('/users', {
+    body: z.object({
+      name: z.string(),
+      age: z.number().min(18).max(120),
+    }),
+    handler: ({ body }) => ({ id: 1, ...body }),
+  });
+  
+  // Test exact boundaries
+  await api.testBoundaries('POST', '/users', [
+    { input: { name: 'Minor', age: 17 }, expected: { success: false, status: 422 } },
+    { input: { name: 'Adult', age: 18 }, expected: { success: true } },
+    { input: { name: 'Old', age: 121 }, expected: { success: false, status: 422 } },
+    { input: { name: 'Valid', age: 120 }, expected: { success: true } },
+  ]);
+  
+  await api.close();
+});
 ```
 
-See [Optional Dependencies](./docs/OPTIONAL_DEPENDENCIES.md) for details.
+**Testing with Dependencies:**
+```javascript
+test('GET /users uses database service', async () => {
+  const api = new TinyTest();
+  
+  // Mock database
+  const mockDb = {
+    users: new Map([[1, { id: 1, name: 'John' }]]),
+    findById: (id) => mockDb.users.get(id),
+  };
+  
+  api.get('/users/:id', {
+    params: z.object({ id: z.coerce.number() }),
+    dependencies: {
+      db: inject(() => mockDb, { scope: 'singleton' }),
+    },
+    handler: ({ params, dependencies }) => {
+      const user = dependencies.db.findById(params.id);
+      if (!user) throw new HTTPException(404, 'User not found');
+      return user;
+    },
+  });
+  
+  const { status, data } = await api.expectSuccess('GET', '/users/1');
+  
+  expect(status).toBe(200);
+  expect(data.name).toBe('John');
+  
+  await api.close();
+});
+```
 
-## 🚀 Dual Runtime Support - Same Code, Maximum Performance
+---
 
-SyntroJS supports **both Node.js and Bun** with the same codebase. Just run your code with different runtimes and get automatic performance optimization!
+## ✨ Key Features
 
-### **The Magic: Auto-Detection**
+### 🎯 **Dual Runtime Support**
+- **Same code** runs on Node.js AND Bun
+- **Auto-detection** and runtime optimization
+- **Zero code changes** required
+- **Maximum performance** on both runtimes
+
+### 🔥 **FastAPI-like Developer Experience**
+- **Automatic validation** with Zod schemas
+- **Type inference** - Full TypeScript type safety
+- **Interactive docs** - Swagger UI + ReDoc out of the box
+- **Error handling** - FastAPI-style HTTPException
+
+### 🧪 **Testing Made Simple**
+- **TinyTest** - Write tests as easily as creating endpoints
+- **Boundary testing** - `testBoundaries()` built-in
+- **Contract testing** - `testContract()` built-in
+- **SmartMutator** - Mutation testing in seconds (not hours)
+
+### 🚀 **Advanced Features**
+- **Middleware System** - Functional middleware with global/route-specific support
+- **WebSocket Support** - Real-time communication with room management
+- **Dependency Injection** - Simple, functional DI with singleton and request scopes
+- **Background Tasks** - Non-blocking task execution
+- **Security** - JWT, OAuth2, API Key, HTTP Basic authentication
+- **Plugins** - CORS, Helmet, Compression, Rate Limiting
+
+---
+
+## 🔥 Dual Runtime - Same Code, Maximum Performance
+
+SyntroJS automatically detects your runtime and optimizes accordingly:
 
 ```javascript
 import { SyntroJS } from 'syntrojs';
 
-// Same code for both runtimes!
 const app = new SyntroJS({ title: 'My API' });
-
-app.get('/hello', { 
-  handler: () => ({ message: 'Hello World!' }) 
-});
 
 app.get('/runtime', {
   handler: () => ({
@@ -310,24 +251,23 @@ app.get('/runtime', {
   })
 });
 
-// Auto-detects runtime and optimizes accordingly
-await app.listen(8080);
+await app.listen(3000);
 ```
 
 ### **Run with Node.js:**
 ```bash
 node app.js
-# Output: 🚀 SyntroJS-NODE
-#         🔥 Runtime: Node.js (V8)
-#         🚀 Fast Performance: 89.3% of Fastify
+# 🚀 SyntroJS-NODE
+# 🔥 Runtime: Node.js (V8)
+# 🚀 Performance: 89.3% of Fastify
 ```
 
 ### **Run with Bun:**
 ```bash
 bun app.js
-# Output: 🚀 SyntroJS-BUN  
-#         🔥 Runtime: Bun (JavaScriptCore)
-#         ⚡ Ultra-fast Performance: 3.8x faster than Fastify
+# 🚀 SyntroJS-BUN  
+# 🔥 Runtime: Bun (JavaScriptCore)
+# ⚡ Performance: 3.8x faster than Fastify
 ```
 
 ### **Performance Comparison:**
@@ -337,196 +277,86 @@ bun app.js
 | **Node.js** | 89.3% of Fastify | Production stability, full ecosystem |
 | **Bun** | 3.8x faster than Fastify | Maximum performance, modern development |
 
-### **Why This Matters:**
+---
 
-- **✅ Zero Code Changes** - Same API, different performance
-- **✅ Auto-Optimization** - Framework adapts to runtime
-- **✅ Future-Proof** - Ready for next-generation runtimes
-- **✅ Best of Both Worlds** - Stability + Performance
+## 📚 Examples
 
-### **Installation:**
+### Basic CRUD API
 
-```bash
-# For Node.js (default)
-npm install syntrojs zod
-
-# For Bun (optional)
-curl -fsSL https://bun.sh/install | bash
-bun install syntrojs zod
-```
-
-### Fluent API & Advanced Pagination
-
-SyntroJS now supports a **fluent API** with method chaining and advanced pagination:
-
-```typescript
-import { SyntroJS } from 'syntrojs';
+```javascript
+import { SyntroJS, HTTPException } from 'syntrojs';
 import { z } from 'zod';
 
-// Method Chaining
-const api = new SyntroJS()
-  .title('My Enterprise API')
-  .version('2.0.0')
-  .description('API with advanced pagination')
-  .logging(true)
-  
-  .get('/users', {
-    query: z.object({
-      page: z.coerce.number().min(1).optional(),
-      limit: z.coerce.number().min(1).max(100).optional(),
-      sortBy: z.enum(['id', 'name', 'email', 'createdAt']).optional(),
-      sortOrder: z.enum(['asc', 'desc']).optional(),
-      search: z.string().optional()
-    }),
-    response: z.object({
-      users: z.array(z.object({
-        id: z.number(),
-        name: z.string(),
-        email: z.string(),
-        createdAt: z.string()
-      })),
-      pagination: z.object({
-        page: z.number(),
-        limit: z.number(),
-        total: z.number(),
-        pages: z.number(),
-        sortBy: z.string(),
-        sortOrder: z.string()
-      })
-    }),
-    handler: ({ query }) => {
-      const page = query.page ?? 1;
-      const limit = query.limit ?? 10;
-      const sortBy = query.sortBy ?? 'id';
-      const sortOrder = query.sortOrder ?? 'asc';
-      
-      // Your pagination logic here
-      return {
-        users: [], // Paginated data
-        pagination: { page, limit, total: 1000, pages: 100, sortBy, sortOrder }
-      };
-    }
-  })
-  
-  .listen(3000);
-```
+const app = new SyntroJS({ title: 'Users API' });
 
-**Object-based Routes:**
-
-```typescript
-const api = new SyntroJS({
-  routes: {
-    '/products': {
-      get: {
-        query: z.object({
-          page: z.coerce.number().min(1).optional(),
-          limit: z.coerce.number().min(1).max(1000).optional(),
-          sortBy: z.enum(['id', 'name', 'price']).optional(),
-          sortOrder: z.enum(['asc', 'desc']).optional()
-        }),
-        handler: ({ query }) => {
-          // Handle 10,000+ records efficiently
-          const page = query.page ?? 1;
-          const limit = query.limit ?? 20;
-          
-          return {
-            products: [], // Paginated data
-            pagination: { page, limit, total: 10000, pages: 500 }
-          };
-        }
-      },
-      post: {
-        body: z.object({ name: z.string(), price: z.number() }),
-        handler: ({ body }) => ({ id: 1, ...body })
-      }
-    }
-  }
+// User schema
+const UserSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  email: z.string().email(),
+  age: z.number().min(18),
 });
 
-// Configure metadata using chaining
-api
-  .title('Products API')
-  .version('1.0.0')
-  .description('Efficient handling of large data volumes')
-  .listen(3000);
-```
+// In-memory database
+const users = new Map();
+let nextId = 1;
 
-**Real-world Use Cases:**
-- 📊 **10,000 records** in pages of 100: `?page=1&limit=100`
-- 📊 **10,000 records** in pages of 1,000: `?page=1&limit=1000`
-- 🔄 **Sorting** by date: `?sortBy=createdAt&sortOrder=desc`
-- 🔍 **Search** with pagination: `?search=admin&page=1&limit=20`
-
-### Security Example
-
-```typescript
-import { SyntroJS, OAuth2PasswordBearer, signJWT, verifyJWT, inject } from 'syntrojs';
-import { z } from 'zod';
-
-const app = new SyntroJS();
-const oauth2 = new OAuth2PasswordBearer('/token');
-
-// Token endpoint
-app.post('/token', {
-  handler: () => {
-    const token = signJWT(
-      { sub: 'user123', role: 'admin' },
-      { secret: 'your-secret-key', expiresIn: '1h' }
-    );
-    return { access_token: token, token_type: 'bearer' };
+// GET /users - List all users
+app.get('/users', {
+  query: z.object({
+    page: z.coerce.number().default(1),
+    limit: z.coerce.number().default(10),
+  }),
+  response: z.object({
+    users: z.array(UserSchema),
+    pagination: z.object({
+      page: z.number(),
+      limit: z.number(),
+      total: z.number(),
+    }),
+  }),
+  handler: ({ query }) => {
+    const page = query.page;
+    const limit = query.limit;
+    const allUsers = Array.from(users.values());
+    
+    return {
+      users: allUsers.slice((page - 1) * limit, page * limit),
+      pagination: { page, limit, total: allUsers.length },
+    };
   },
 });
 
-// Protected endpoint
-app.get('/users/me', {
-  dependencies: {
-    token: inject(async (request) => oauth2.validate(request)),
+// POST /users - Create user
+app.post('/users', {
+  body: UserSchema.omit({ id: true }),
+  response: UserSchema,
+  status: 201,
+  handler: ({ body }) => {
+    const user = { id: nextId++, ...body };
+    users.set(user.id, user);
+    return user;
   },
-  handler: ({ dependencies }) => {
-    const payload = verifyJWT(dependencies.token, { secret: 'your-secret-key' });
-    return { user: payload.sub, role: payload.role };
+});
+
+// GET /users/:id - Get user by ID
+app.get('/users/:id', {
+  params: z.object({ id: z.coerce.number() }),
+  response: UserSchema,
+  handler: ({ params }) => {
+    const user = users.get(params.id);
+    if (!user) throw new HTTPException(404, 'User not found');
+    return user;
   },
 });
 
 await app.listen(3000);
 ```
 
-### Plugins Example
+### Middleware System
 
-```typescript
-import { SyntroJS, registerCors, registerHelmet, registerRateLimit } from 'syntrojs';
-
-const app = new SyntroJS();
-
-// Enable CORS
-await registerCors(app.getRawFastify(), {
-  origin: '*',
-  credentials: true,
-});
-
-// Security headers
-await registerHelmet(app.getRawFastify());
-
-// Rate limiting (100 req/min)
-await registerRateLimit(app.getRawFastify(), {
-  max: 100,
-  timeWindow: '1 minute',
-});
-
-// Your routes...
-app.get('/hello', {
-  handler: () => ({ message: 'Protected API with CORS, Security, and Rate Limiting!' }),
-});
-
-await app.listen(3000);
-```
-
-### Middleware System (NEW!)
-
-SyntroJS now includes a powerful, functional middleware system that feels like a conversation with your code:
-
-```typescript
-import { SyntroJS } from 'syntrojs';
+```javascript
+import { SyntroJS, HTTPException } from 'syntrojs';
 
 const app = new SyntroJS({ title: 'Middleware API' });
 
@@ -560,18 +390,9 @@ app.get('/private', {
 await app.listen(3000);
 ```
 
-**Middleware Features:**
-- ✅ **Functional approach** - Pure functions, no `next()` calls
-- ✅ **Global or route-specific** - Apply where you need them
-- ✅ **Immutable** - Middleware operations return new instances
-- ✅ **Type-safe** - Full TypeScript support
-- ✅ **Priority-based** - Control execution order
+### WebSocket Support
 
-### WebSocket Support (NEW!)
-
-Real-time communication made simple and conversational:
-
-```typescript
+```javascript
 import { SyntroJS } from 'syntrojs';
 
 const app = new SyntroJS({ title: 'WebSocket API' });
@@ -584,7 +405,7 @@ app.ws('/chat', (ws, context) => {
   ws.on('message', (data) => {
     console.log(`💬 Message: ${data.message}`);
     
-    // Broadcast to all clients in the room
+    // Broadcast to all clients
     ws.broadcast('chat', 'message', {
       user: data.user,
       message: data.message,
@@ -618,139 +439,95 @@ app.ws('/rooms/:roomId', (ws, context) => {
 await app.listen(3000);
 ```
 
-**WebSocket Features:**
-- ✅ **Event-based** - `ws.on('message')`, `ws.on('disconnect')`
-- ✅ **Room management** - `ws.join()`, `ws.leave()`, `ws.to()`
-- ✅ **Broadcasting** - Send to all or specific rooms
-- ✅ **Type-safe** - Full TypeScript support
-- ✅ **Simple API** - Feels like a conversation with your code
+### Dependency Injection
 
----
+```javascript
+import { SyntroJS, inject } from 'syntrojs';
 
-## ✨ Features
+const app = new SyntroJS({ title: 'DI API' });
 
-### Core Features
-- ✅ **Automatic Validation** - Powered by Zod schemas
-- ✅ **Type Inference** - Full TypeScript type safety
-- ✅ **OpenAPI Generation** - Automatic OpenAPI 3.1 spec
-- ✅ **Interactive Docs** - Swagger UI + ReDoc out of the box
-- ✅ **Error Handling** - FastAPI-style HTTPException
-- ✅ **High Performance** - Built on Fastify
-- ✅ **Zero Config** - Sensible defaults, configure only what you need
+// Database service (singleton)
+const getDb = () => ({
+  users: new Map(),
+  findById: (id) => this.users.get(id),
+  create: (user) => this.users.set(user.id, user),
+});
 
-### 🎯 The Differentiator: TinyTest + SmartMutator
-- ⭐ **TinyTest Wrapper** - Write tests as easily as creating endpoints
-- ⭐ **Boundary Testing** - `testBoundaries()` built-in
-- ⭐ **Contract Testing** - `testContract()` built-in
-- ⭐ **SmartMutator** - Mutation testing in seconds (not hours)
-- ⭐ **Public Quality Reports** - Mutation score in every release
+// Logger service (request-scoped)
+const getLogger = (context) => ({
+  info: (msg) => console.log(`[${context.correlationId}] ${msg}`),
+  error: (msg) => console.error(`[${context.correlationId}] ERROR: ${msg}`),
+});
 
-> **SmartMutator:** Stryker-compatible mutation testing optimized for SyntroJS.  
-> Same results as vanilla Stryker, **100x faster**.  
-> 📖 [Read the full technical details](./SMART_MUTATOR.md)
+app.get('/users/:id', {
+  dependencies: {
+    db: inject(getDb, { scope: 'singleton' }),
+    logger: inject(getLogger),
+  },
+  handler: ({ params, dependencies }) => {
+    dependencies.logger.info(`Fetching user ${params.id}`);
+    const user = dependencies.db.findById(params.id);
+    if (!user) throw new HTTPException(404, 'User not found');
+    return user;
+  },
+});
 
-### Advanced Features (v0.2.0)
-- 🔥 **Dependency Injection** - Simple, functional DI with singleton and request scopes
-- 🔥 **Background Tasks** - Non-blocking task execution (I/O only)
-- 🔥 **Fluent API** - Method chaining and object-based route definitions
-- 🔥 **Advanced Pagination** - Configurable pagination with sorting and filtering
-- 🔥 **Middleware System** - Functional middleware with global/route-specific support (NEW!)
-- 🔥 **WebSocket Support** - Real-time communication with room management (NEW!)
-- 🔥 **Security & Authentication**:
-  - `OAuth2PasswordBearer` - Complete OAuth2 flow
-  - `HTTPBearer` - Generic Bearer token authentication
-  - `HTTPBasic` - HTTP Basic authentication
-  - `APIKeyHeader`, `APIKeyCookie`, `APIKeyQuery` - Flexible API key authentication
-  - JWT utilities (`signJWT`, `verifyJWT`, `decodeJWT`)
-- 🔥 **Production Plugins**:
-  - `registerCors` - Cross-Origin Resource Sharing
-  - `registerHelmet` - Security headers (CSP, HSTS, etc.)
-  - `registerCompression` - Gzip/Brotli compression
-  - `registerRateLimit` - Request rate limiting
-
-### Fluent Plugins API
-
-SyntroJS now includes a fluent API for configuring essential plugins:
-
-```typescript
-// Development setup - one line
-const app = new SyntroJS({ title: 'My API' })
-  .withDevelopmentDefaults()
-  .listen(3000);
-
-// Production setup with custom configuration
-const app = new SyntroJS({ title: 'My API' })
-  .withProductionDefaults()
-  .withCors({ origin: ['https://myapp.com'] })
-  .listen(3000);
-
-// Custom configuration
-const app = new SyntroJS({ title: 'My API' })
-  .withCors({ origin: '*' })
-  .withSecurity()
-  .withCompression()
-  .withRateLimit({ max: 100, timeWindow: '1 minute' })
-  .withOpenAPI()
-  .withLogging()
-  .listen(3000);
+await app.listen(3000);
 ```
 
-**Available Methods:**
-- `.withCors(options?)` - Cross-Origin Resource Sharing
-- `.withSecurity(options?)` - Security headers (Helmet)
-- `.withCompression(options?)` - Response compression
-- `.withRateLimit(options?)` - Rate limiting
-- `.withDevelopmentDefaults()` - Development-friendly defaults
-- `.withProductionDefaults()` - Production-ready defaults
+### Background Tasks
 
----
+```javascript
+import { SyntroJS } from 'syntrojs';
 
-## 📖 Documentation
+const app = new SyntroJS({ title: 'Background Tasks API' });
 
-- **[Getting Started](./docs/getting-started.md)** - Complete guide for beginners
-- **[ROADMAP](./ROADMAP.md)** - Full implementation plan
-- **[TODO](./TODO.md)** - Current development status
-- **[API Reference](./docs/api-reference.md)** - Complete API documentation
-- **[Examples](./examples/)** - Code examples
-  - **[Quick Start](./examples/quick-start/)** - 4-line API example
-  - **[Dual Runtime](./examples/dual-runtime/)** - Node.js + Bun comparison
+app.post('/users', {
+  handler: ({ body, background }) => {
+    const user = createUser(body);
 
----
+    // Non-blocking: send welcome email
+    background.addTask(
+      async () => {
+        await sendEmail(user.email, 'Welcome!');
+      },
+      { name: 'send-welcome-email' }
+    );
 
-## 🏗️ Architecture
+    return user; // Response sent immediately!
+  },
+});
 
-SyntroJS follows **Domain-Driven Design (DDD)** and **SOLID** principles:
-
-```typescript
-src/
-├── domain/           # Pure entities (Route, HTTPException, Context)
-├── application/      # Business logic (RouteRegistry, SchemaValidator)
-├── infrastructure/   # External adapters (Fastify, Zod)
-├── plugins/          # Optional plugins (CORS, Helmet, etc.)
-├── security/         # Security utilities (OAuth2, JWT)
-├── testing/          # Testing utilities (TinyTest)
-└── core/             # Public API (SyntroJS class)
+await app.listen(3000);
 ```
 
 ---
 
-## 🧪 Testing: Our Real Differentiator
+## ⚡ Performance Benchmarks
 
-### The Problem Nobody Is Solving
+SyntroJS delivers **exceptional performance** with **dual runtime support**:
 
-```typescript
-✅ Tests passing: 150/150
-✅ Coverage: 95%
-❌ Bug in production
-```
+### 🏆 Performance Ranking
 
-**Why?** Because coverage doesn't measure test QUALITY, only lines executed.
+1. **🥇 SyntroJS-Bun**: 8,000+ req/sec average (**3.8x faster than Fastify**)
+2. **🥈 Fastify**: 5,200 req/sec average
+3. **🥉 SyntroJS-Node**: 4,500 req/sec average (**89.3% of Fastify**)
+4. **Express**: 2,469 req/sec average
 
-### TinyTest + Mutation Testing: The Solution
+### 📊 Key Performance Metrics
+
+- **SyntroJS-Bun vs Fastify**: 380% performance (3.8x faster)
+- **SyntroJS-Node vs Fastify**: 89.3% performance (only 11% overhead)
+- **SyntroJS-Bun vs Express**: 1,240% faster (12.4x performance)
+- **SyntroJS-Node vs Express**: 325% faster (3.25x performance)
+
+---
+
+## 🧪 Testing: Our Superpower
 
 **SyntroJS makes writing HIGH-QUALITY tests as easy as creating endpoints:**
 
-```typescript
+```javascript
 import { TinyTest } from 'syntrojs/testing';
 import { z } from 'zod';
 
@@ -777,7 +554,7 @@ test('POST /users validates age boundary', async () => {
 // When Stryker mutates .min(18) → .min(17), this test CATCHES it ✅
 ```
 
-**What makes this unique:**
+### **What makes this unique:**
 
 | Feature | Other Frameworks | SyntroJS |
 |---------|-----------------|---------|
@@ -787,19 +564,11 @@ test('POST /users validates age boundary', async () => {
 | **Mutation testing** | Optional, complex setup (30-60 min) | `SmartMutator` (8-30 sec) |
 | **Quality reports** | None | Public mutation score |
 
-**The SmartMutator advantage:**
-- ⚡ **100x faster** than vanilla Stryker (30 min → 8 sec)
-- ✅ **Same results** - 100% compatible with Stryker
-- 🔄 **Watch mode** - Real-time feedback
-- 📖 [Full technical details](./SMART_MUTATOR.md)
-
-**Result:** SyntroJS is the only framework that makes mutation testing usable in daily development.
-
 ---
 
-## 🆚 Comparisons
+## 🆚 vs. Other Frameworks
 
-### vs. All Frameworks (The Real Differentiator)
+### **The Real Differentiator**
 
 | Feature | NestJS | Fastify | Express | FastAPI | **SyntroJS** |
 |---------|--------|---------|---------|---------|-------------|
@@ -810,83 +579,58 @@ test('POST /users validates age boundary', async () => {
 | **Type Safety** | ✅ Strong | ⚠️ Manual | ❌ Weak | 🟡 Python | ✅ **TypeScript** |
 | **Testing DX** | ⚠️ Standard | ⚠️ Manual | ⚠️ Manual | ⚠️ pytest | ✅ **TinyTest** |
 | **Mutation Testing** | ❌ No | ❌ No | ❌ No | ❌ No | ✅ **SmartMutator (8s)** |
-| **Quality Reports** | ❌ No | ❌ No | ❌ No | ❌ No | ✅ **Public** |
+| **Dual Runtime** | ❌ No | ❌ No | ❌ No | ❌ No | ✅ **Node.js + Bun** |
 
 **The gap we fill:** We're the only framework where writing high-quality tests is as easy as creating endpoints.
 
 ---
 
-### Detailed Comparisons
+## 🏗️ Architecture
 
-#### vs. FastAPI (Python)
+SyntroJS follows **Domain-Driven Design (DDD)** and **SOLID** principles:
 
-| Feature | FastAPI | SyntroJS |
-|---------|---------|---------|
-| Syntax | ✅ Simple | ✅ Simple |
-| Validation | ✅ Pydantic | ✅ Zod |
-| Docs | ✅ Automatic | ✅ Automatic |
-| Type-safety | 🟡 Python hints | ✅ TypeScript (superior) |
-| Performance | 🟡 Uvicorn | ✅ Fastify (faster) |
-| **Testing** | ⚠️ pytest (manual) | ✅ **TinyTest (trivial)** |
-| **Mutation Testing** | ❌ mutpy (unused) | ✅ **SmartMutator (8s)** |
+```
+src/
+├── domain/           # Pure entities (Route, HTTPException, Context)
+├── application/      # Business logic (RouteRegistry, SchemaValidator)
+├── infrastructure/  # External adapters (Fastify, Zod)
+├── plugins/          # Optional plugins (CORS, Helmet, etc.)
+├── security/         # Security utilities (OAuth2, JWT)
+├── testing/          # Testing utilities (TinyTest)
+└── core/             # Public API (SyntroJS class)
+```
 
-#### vs. NestJS
+### **Design Principles**
 
-| Feature | NestJS | SyntroJS |
-|---------|--------|---------|
-| Simplicity | ⚠️ Complex | ✅ Simple |
-| Boilerplate | ❌ A lot | ✅ Minimal |
-| Learning curve | ⚠️ Steep | ✅ Easy |
-| Docs | ⚠️ Manual decorators | ✅ Automatic |
-| **Testing** | ⚠️ Jest (standard) | ✅ **TinyTest (advanced)** |
-| **Quality Guarantee** | ❌ No | ✅ **Public mutation score** |
-
----
-
-## 🎨 Design Principles
-
-1.  **Simplicity First** - If FastAPI can do it simply, so can we
-2.  **Type-Safety** - TypeScript strict mode, always
-3.  **SOLID** - Single Responsibility in every class/function
-4.  **DDD** - Clear separation of layers
-5.  **Guard Clauses** - Fail fast, early returns
-6.  **Functional** - Immutability, pure functions, composition
-7.  **Performance** - No overhead, public benchmarks
-8.  **Quality First** - TinyTest + Mutation Testing built-in (>90% coverage, >85% mutation score)
+1. **Simplicity First** - If FastAPI can do it simply, so can we
+2. **Type-Safety** - TypeScript strict mode, always
+3. **SOLID** - Single Responsibility in every class/function
+4. **DDD** - Clear separation of layers
+5. **Guard Clauses** - Fail fast, early returns
+6. **Functional** - Immutability, pure functions, composition
+7. **Performance** - No overhead, public benchmarks
+8. **Quality First** - TinyTest + Mutation Testing built-in
 
 ---
 
 ## 🗺️ Roadmap
 
-### v0.1.0 - MVP ✅
-- [x] Project setup
-- [x] Core framework (routing, validation)
-- [x] OpenAPI generation
-- [x] Swagger UI + ReDoc
-- [x] HTTPException handling
-- [x] Tests >90% coverage
-
-### v0.2.0 - Advanced Features ✅ (Current)
-- [x] Dependency Injection (singleton + request scopes)
-- [x] Background Tasks (in-process, non-blocking)
-- [x] Security modules (OAuth2, JWT, HTTPBasic, HTTPBearer, APIKey)
-- [x] Plugins (CORS, Helmet, Compression, Rate Limiting)
-- [x] TinyTest wrapper (expectSuccess, testBoundaries, testContract)
-- [x] Middleware System (functional, immutable, priority-based) ✅ NEW!
-- [x] WebSocket Support (event-based, room management) ✅ NEW!
-- [ ] SmartMutator (optimized mutation testing - in development)
-- [x] Tests >98% coverage
+### v0.3.0 - Architectural Evolution ✅ (Current)
+- ✅ **Factory Pattern** - Complete type safety implementation
+- ✅ **Middleware System** - Functional middleware with conversational API
+- ✅ **WebSocket Support** - Real-time communication with room management
+- ✅ **SOLID/DDD/Functional** - Applied throughout entire codebase
+- ✅ **Dead Code Elimination** - Removed 8 unused files
+- ✅ **All Tests Passing** - 552 tests, 80.54% coverage
 
 ### v1.0.0 - Production Ready (Next)
-- [ ] File uploads
-- [x] WebSockets ✅ (Already implemented!)
-- [ ] Static files serving
-- [ ] Performance benchmarks
-- [ ] Complete documentation
-- [ ] Migration guides
-- [ ] CLI tools
-
-See [ROADMAP.md](./ROADMAP.md) for the complete plan.
+- [ ] **Database integration** - ORM/ODM adapters
+- [ ] **GraphQL support** - GraphQL endpoint generation
+- [ ] **File uploads** - Multipart form handling
+- [ ] **Static files** - Serving static assets
+- [ ] **CLI tools** - Code generation and scaffolding
+- [ ] **Complete documentation** - Comprehensive guides
+- [ ] **Migration guides** - From Express/Fastify/NestJS
 
 ---
 
@@ -894,67 +638,19 @@ See [ROADMAP.md](./ROADMAP.md) for the complete plan.
 
 SyntroJS isn't just "well-tested". We prove it with public quality reports.
 
-### Our Commitments
+### **Our Commitments**
 
-```markdown
-[![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)](./coverage)
-[![Mutation Score](https://img.shields.io/badge/mutation-87%25-brightgreen)](./reports/mutation)
-[![Tests](https://img.shields.io/badge/tests-554%20passing-brightgreen)](./tests)
-[![Vulnerabilities](https://img.shields.io/badge/vulnerabilities-0-brightgreen)](./security)
-```
+1. ✅ **80.54% Test Coverage** - Unit + Integration + E2E tests (552 tests)
+2. 🔄 **>85% Mutation Score target** - Tests that truly validate logic
+3. ✅ **0 Known Vulnerabilities** - Automated security audits
+4. ✅ **Public Quality Reports** - Mutation testing reports in every release
 
-1.  ✅ **80.26% Test Coverage** - Unit + Integration + E2E tests (552 tests)
-2.  🔄 **>85% Mutation Score target** - Tests that truly validate logic, not just coverage (in development)
-3.  ✅ **0 Known Vulnerabilities** - Automated security audits
-4.  ✅ **Public Quality Reports** - Mutation testing reports in every release
-
-**Current Metrics (v0.2.0):**
-- 📊 Statements: 80.26%
-- 📊 Branches: 84.53%
-- 📊 Functions: 74.63%
+**Current Metrics (v0.3.0):**
+- 📊 Statements: 80.54%
+- 📊 Branches: 83.62%
+- 📊 Functions: 73.37%
 - 🧪 552 tests passing
-- 🧬 **>85% mutation score (525 mutants killed) (in development)**
-
-### Why This Matters
-
-**The problem with most frameworks:**
-- They report coverage (easy to fake)
-- Tests pass (doesn't mean tests are good)
-- No way to verify quality
-
-**SyntroJS's solution:**
-- Mutation testing kills weak tests
-- Public reports = transparency
-- >85% mutation score = high confidence
-
-**This makes SyntroJS the framework for teams that need production-ready APIs from day one.**
-
----
-
-## 🚨 ALPHA Disclaimer
-
-**This is an experimental proof of concept. Please be aware:**
-
-### ⚠️ Not Production Ready
-- **Breaking changes expected** - API may change significantly
-- **Missing features** - Many production features are not yet implemented
-- **Performance not optimized** - Not yet tuned for production workloads
-- **Limited testing** - While we have good test coverage, real-world usage is limited
-
-### 🔬 Experimental Features
-- **Trust Engineering** - New approach to API testing and quality assurance
-- **SmartMutator** - Experimental mutation testing integration
-- **TinyTest** - Custom testing framework (may change significantly)
-
-### 🤝 We Need Your Feedback
-This is a proof of concept to validate ideas. Your feedback is crucial:
-
-- **Try it out** - Test the core functionality
-- **Report issues** - Help us identify problems
-- **Suggest features** - What would make this useful for you?
-- **Share ideas** - How can we improve the developer experience?
-
-**Goal:** Build a truly production-ready FastAPI for Node.js based on real user feedback.
+- 🧬 **>85% mutation score target (in development)**
 
 ---
 
@@ -962,7 +658,7 @@ This is a proof of concept to validate ideas. Your feedback is crucial:
 
 We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
-### Development Setup
+### **Development Setup**
 
 ```bash
 # Clone repo
@@ -1012,4 +708,3 @@ SyntroJS is heavily inspired by:
 **Made with ❤️ by [SyntropySoft](https://syntropysoft.com) - developers who value quality over vanity metrics.**
 
 > "SyntroJS: FastAPI for Node.js. The only framework that guarantees your tests actually work." 🚀
-
