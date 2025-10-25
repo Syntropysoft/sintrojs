@@ -13,12 +13,14 @@ import { OpenAPIGenerator } from '../application/OpenAPIGenerator';
 import type { OpenAPIConfig } from '../application/OpenAPIGenerator';
 import { RouteRegistry } from '../application/RouteRegistry';
 import { Route } from '../domain/Route';
-import type { ExceptionHandler, HttpMethod, RouteConfig } from '../domain/types';
+import type { ExceptionHandler, HttpMethod, RouteConfig, Middleware, MiddlewareConfig, WebSocketHandler } from '../domain/types';
 import { BunAdapter } from '../infrastructure/BunAdapter';
 import { FastifyAdapter } from '../infrastructure/FastifyAdapter';
 import { FluentAdapter } from '../infrastructure/FluentAdapter';
 import { RuntimeOptimizer } from '../infrastructure/RuntimeOptimizer';
 import { UltraFastAdapter } from '../infrastructure/UltraFastAdapter';
+import { MiddlewareRegistry } from '../application/MiddlewareRegistry';
+import { WebSocketRegistry } from '../application/WebSocketRegistry';
 import { UltraFastifyAdapter } from '../infrastructure/UltraFastifyAdapter';
 import { UltraMinimalAdapter } from '../infrastructure/UltraMinimalAdapter';
 
@@ -78,6 +80,7 @@ export interface SyntroJSConfig {
     cors?: boolean;
     helmet?: boolean;
     rateLimit?: boolean;
+    middleware?: boolean;
   };
 
   /** Runtime to use: 'auto', 'node', or 'bun' */
@@ -87,6 +90,12 @@ export interface SyntroJSConfig {
 /**
  * SyntroJS main class
  * Facade that orchestrates all framework layers
+ * 
+ * Principles Applied:
+ * - SOLID: Single Responsibility, Open/Closed, Dependency Inversion
+ * - DDD: Domain Services, Value Objects, Aggregates
+ * - Functional: Pure functions, Immutability, Composition
+ * - Guard Clauses: Early validation, Fail Fast
  */
 export class SyntroJS {
   private readonly config: SyntroJSConfig;
@@ -100,64 +109,129 @@ export class SyntroJS {
     | typeof FluentAdapter;
   private readonly runtime: 'node' | 'bun';
   private readonly optimizer: RuntimeOptimizer;
+  private middlewareRegistry: MiddlewareRegistry;
+  private websocketRegistry: WebSocketRegistry;
   private isStarted = false;
 
   constructor(config: SyntroJSConfig = {}) {
-    this.config = {
+    // Guard clause: validate config
+    const validatedConfig = this.validateConfig(config);
+    
+    // Initialize immutable configuration
+    this.config = Object.freeze({
       runtime: 'auto',
-      ...config,
-    };
+      ...validatedConfig,
+    });
 
-    // Initialize runtime optimizer
+    // Initialize domain services (DDD)
     this.optimizer = new RuntimeOptimizer();
+    this.middlewareRegistry = new MiddlewareRegistry();
+    this.websocketRegistry = new WebSocketRegistry();
 
-    // Auto-detect runtime
+    // Auto-detect runtime (pure function)
     this.runtime = this.detectRuntime();
 
-    // Choose adapter based on runtime and config
+    // Choose adapter based on runtime and config (pure function)
     this.adapter = this.selectOptimalAdapter();
 
-    // Create Fastify instance via adapter
-    if (this.adapter === FluentAdapter) {
-      // FluentAdapter needs special handling
-      const fluentAdapter = new FluentAdapter();
-      if (config.fluentConfig) {
-        // Apply fluent configuration
-        if (config.fluentConfig.logger !== undefined) fluentAdapter.withLogger(config.fluentConfig.logger);
-        if (config.fluentConfig.validation !== undefined) fluentAdapter.withValidation(config.fluentConfig.validation);
-        if (config.fluentConfig.errorHandling !== undefined) fluentAdapter.withErrorHandling(config.fluentConfig.errorHandling);
-        if (config.fluentConfig.dependencyInjection !== undefined) fluentAdapter.withDependencyInjection(config.fluentConfig.dependencyInjection);
-        if (config.fluentConfig.backgroundTasks !== undefined) fluentAdapter.withBackgroundTasks(config.fluentConfig.backgroundTasks);
-        if (config.fluentConfig.openAPI !== undefined) fluentAdapter.withOpenAPI(config.fluentConfig.openAPI);
-        if (config.fluentConfig.compression !== undefined) fluentAdapter.withCompression(config.fluentConfig.compression);
-        if (config.fluentConfig.cors !== undefined) fluentAdapter.withCors(config.fluentConfig.cors);
-        if (config.fluentConfig.helmet !== undefined) fluentAdapter.withHelmet(config.fluentConfig.helmet);
-        if (config.fluentConfig.rateLimit !== undefined) fluentAdapter.withRateLimit(config.fluentConfig.rateLimit);
-      } else {
-        // Use standard preset
-        fluentAdapter.standard();
-      }
-      this.fastify = fluentAdapter.create();
-    } else {
-      // Other adapters use the standard create method
-      if (this.adapter === FluentAdapter) {
-        this.fastify = this.adapter.create() as FastifyInstance;
-      } else {
-        this.fastify = this.adapter.create() as FastifyInstance;
-      }
-    }
+    // Create Fastify instance via adapter (composition)
+    this.fastify = this.createFastifyInstance();
 
     // Register OpenAPI endpoint
     this.registerOpenAPIEndpoint();
 
     // Register routes from config if provided
-    if (config.routes) {
-      this.registerRoutesFromConfig(config.routes);
+    if (this.config.routes) {
+      this.registerRoutesFromConfig(this.config.routes);
     }
   }
 
   /**
-   * Auto-detect runtime (Bun or Node.js)
+   * Guard clause: Validate configuration
+   * 
+   * @param config - Configuration to validate
+   * @returns Validated configuration
+   * @throws Error if configuration is invalid
+   */
+  private validateConfig(config: SyntroJSConfig): SyntroJSConfig {
+    // Guard clause: config must be an object
+    if (!config || typeof config !== 'object') {
+      throw new Error('Configuration must be a valid object');
+    }
+
+    // Guard clause: validate runtime if provided
+    if (config.runtime && !['auto', 'node', 'bun'].includes(config.runtime)) {
+      throw new Error('Runtime must be "auto", "node", or "bun"');
+    }
+
+    // Guard clause: validate fluentConfig if provided
+    if (config.fluentConfig && typeof config.fluentConfig !== 'object') {
+      throw new Error('fluentConfig must be a valid object');
+    }
+
+    // Return validated config (immutable)
+    return Object.freeze({ ...config });
+  }
+
+  /**
+   * Create Fastify instance using composition pattern
+   * 
+   * @returns Configured Fastify instance
+   */
+  private createFastifyInstance(): FastifyInstance {
+    if (this.adapter === FluentAdapter) {
+      return this.createFluentAdapter();
+    }
+    
+    return this.adapter.create() as FastifyInstance;
+  }
+
+  /**
+   * Create FluentAdapter with configuration
+   * 
+   * @returns Configured FluentAdapter instance
+   */
+  private createFluentAdapter(): FastifyInstance {
+    const fluentAdapter = new FluentAdapter();
+    
+    // Apply fluent configuration using functional composition
+    const configuredAdapter = this.applyFluentConfig(fluentAdapter);
+    
+    // Configure middleware registry
+    configuredAdapter.withMiddlewareRegistry(this.middlewareRegistry);
+    
+    return configuredAdapter.create();
+  }
+
+  /**
+   * Apply fluent configuration using functional composition
+   * 
+   * @param adapter - FluentAdapter instance
+   * @returns Configured adapter
+   */
+  private applyFluentConfig(adapter: FluentAdapter): FluentAdapter {
+    const fluentConfig = this.config.fluentConfig;
+    
+    if (!fluentConfig) {
+      return adapter.standard();
+    }
+
+    // Apply configuration using functional composition
+    return Object.entries(fluentConfig).reduce((acc, [key, value]) => {
+      if (value !== undefined) {
+        const methodName = `with${key.charAt(0).toUpperCase()}${key.slice(1)}` as keyof FluentAdapter;
+        if (typeof acc[methodName] === 'function') {
+          return (acc[methodName] as (value: boolean) => FluentAdapter)(value);
+        }
+      }
+      return acc;
+    }, adapter);
+  }
+
+  /**
+   * Auto-detect runtime (Bun or Node.js) - Pure function
+   * 
+   * @returns Detected runtime
    */
   private detectRuntime(): 'node' | 'bun' {
     // If runtime is explicitly set, use it
@@ -559,6 +633,65 @@ export class SyntroJS {
         this.registerRoute(httpMethod, path, config);
       }
     }
+  }
+
+  /**
+   * Add middleware - simple functional API
+   * Principio: Inmutabilidad funcional - actualiza referencia interna
+   */
+  use(middleware: Middleware): this;
+  use(middleware: Middleware, config: MiddlewareConfig): this;
+  use(path: string, middleware: Middleware): this;
+  use(path: string, middleware: Middleware, config: MiddlewareConfig): this;
+  use(
+    middlewareOrPath: Middleware | string,
+    middlewareOrConfig?: Middleware | MiddlewareConfig,
+    config?: MiddlewareConfig,
+  ): this {
+    // Guard Clause: Validar parámetros
+    if (!middlewareOrPath) {
+      throw new Error('Middleware or path is required');
+    }
+
+    // Actualizar referencia interna con nueva instancia inmutable
+    this.middlewareRegistry = this.middlewareRegistry.add(
+      middlewareOrPath as any,
+      middlewareOrConfig as any,
+      config as any,
+    );
+    return this;
+  }
+
+  /**
+   * Get middleware registry (for internal use)
+   */
+  getMiddlewareRegistry(): MiddlewareRegistry {
+    return this.middlewareRegistry;
+  }
+
+  /**
+   * Add WebSocket handler - simple functional API
+   * Principio: Inmutabilidad funcional - actualiza referencia interna
+   */
+  ws(path: string, handler: WebSocketHandler): this {
+    // Guard Clause: Validar parámetros
+    if (!path || typeof path !== 'string') {
+      throw new Error('Path is required and must be a valid string');
+    }
+    if (!handler || typeof handler !== 'function') {
+      throw new Error('Handler is required and must be a valid function');
+    }
+
+    // Actualizar referencia interna con nueva instancia inmutable
+    this.websocketRegistry = this.websocketRegistry.add(path, handler);
+    return this;
+  }
+
+  /**
+   * Get websocket registry (for internal use)
+   */
+  getWebSocketRegistry(): WebSocketRegistry {
+    return this.websocketRegistry;
   }
 }
 

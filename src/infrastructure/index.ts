@@ -12,7 +12,6 @@ export * from './FastifyAdapter';
 export * from './UltraFastAdapter';
 export * from './UltraMinimalAdapter';
 export * from './UltraFastifyAdapter';
-export * from './SmartAdapter';
 export * from './ZodAdapter';
 export * from './BunAdapter';
 export * from './RuntimeOptimizer';

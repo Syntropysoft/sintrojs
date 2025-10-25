@@ -1,6 +1,6 @@
 # SyntroJS Performance Optimization Strategy
 
-## 🎯 Goal: 6x Faster than Fastify (Inspired by ElysiaJS)
+## 🎯 Goal: 6x Faster than Fastify (Inspired by )
 
 ### 📊 Current Performance
 - SyntroJS vs Fastify: 89.3% (11% overhead)
@@ -116,7 +116,7 @@ const app = new SyntroJS()
 
 ## 📝 Notes
 
-- **Inspiration**: ElysiaJS performance techniques
+- **Inspiration**:  performance techniques
 - **Goal**: Become the fastest Node.js framework
 - **Strategy**: Evolution, not revolution
 - **Timeline**: 24 months to $5K+/mes revenue

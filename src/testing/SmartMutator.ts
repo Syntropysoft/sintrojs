@@ -193,13 +193,3 @@ export class SmartMutator {
     };
   }
 }
-
-/**
- * Exported singleton (Module Pattern)
- */
-export const SmartMutatorSingleton = SmartMutator;
-
-/**
- * Factory for testing
- */
-export const createSmartMutator = (): typeof SmartMutator => SmartMutator;

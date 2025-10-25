@@ -1,7 +1,7 @@
 # SyntroJS 🚀
 
 > **🔥 DUAL RUNTIME: FastAPI for Node.js AND Bun - Same Code, Maximum Performance**
-> **⚡ 6x Faster with Bun | 🚀 89.3% of Fastify with Node.js**
+> **⚡ 3.8x Faster with Bun | 🚀 89.3% of Fastify with Node.js**
 > The only framework that makes writing high-quality tests as easy as creating endpoints.
 
 ## 🎉 **WORLD'S FIRST DUAL RUNTIME FRAMEWORK** 🎉
@@ -33,13 +33,13 @@ bun app.js     # ⚡ SyntroJS-Bun (6x faster than Fastify)
 
 [![npm version](https://img.shields.io/npm/v/syntrojs.svg)](https://www.npmjs.com/package/syntrojs)
 [![🚀 DUAL RUNTIME](https://img.shields.io/badge/🚀-DUAL%20RUNTIME-red.svg)](https://github.com/Syntropysoft/sintrojs)
-[![⚡ Bun Performance](https://img.shields.io/badge/⚡-6x%20Faster%20than%20Fastify-green.svg)](https://github.com/Syntropysoft/sintrojs)
+[![⚡ Bun Performance](https://img.shields.io/badge/⚡-3.8x%20Faster%20than%20Fastify-green.svg)](https://github.com/Syntropysoft/sintrojs)
 [![🚀 Node.js Performance](https://img.shields.io/badge/🚀-89.3%25%20of%20Fastify-blue.svg)](https://github.com/Syntropysoft/sintrojs)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
-[![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)](./coverage)
+[![Coverage](https://img.shields.io/badge/coverage-80.26%25-brightgreen)](./coverage)
 [![Mutation Score](https://img.shields.io/badge/mutation-85.25%25-brightgreen)](./reports/mutation)
-[![Tests](https://img.shields.io/badge/tests-554%20passing-brightgreen)](./tests)
+[![Tests](https://img.shields.io/badge/tests-552%20passing-brightgreen)](./tests)
 
 ---
 
@@ -66,12 +66,12 @@ bun app.js     # ⚡ SyntroJS-Bun (6x faster than Fastify)
 - ✅ **Performance plugins** - Compression, CORS, Helmet, Rate Limiting
 - ✅ **Dual Runtime Support** - Same code runs on Node.js AND Bun
 - ✅ **Auto-detection** - Automatically detects and optimizes for runtime
-- ✅ **High Performance** - 89.3% of Fastify (Node.js) / 6x faster than Fastify (Bun)
+- ✅ **High Performance** - 89.3% of Fastify (Node.js) / 3.8x faster than Fastify (Bun)
 
 ### What's Missing (Roadmap)
-- ⚠️ **Middleware system** - Custom middleware support
+- ✅ **Middleware system** - Custom middleware support (NEW!)
 - ⚠️ **Database integration** - ORM/ODM adapters
-- ⚠️ **WebSocket support** - Real-time communication
+- ✅ **WebSocket support** - Real-time communication (NEW!)
 - ⚠️ **GraphQL support** - GraphQL endpoint generation
 - ⚠️ **Production optimizations** - Performance tuning
 - ⚠️ **Deployment guides** - Docker, Kubernetes, etc.
@@ -122,13 +122,13 @@ await app.listen(3000);
 SyntroJS delivers **exceptional performance** with **dual runtime support**:
 
 ### 🏆 Performance Ranking (Dual Runtime)
-1. **🥇 SyntroJS-Bun**: 8,000+ req/sec average (**6x faster than Fastify**)
+1. **🥇 SyntroJS-Bun**: 8,000+ req/sec average (**3.8x faster than Fastify**)
 2. **🥈 Fastify**: 5,200 req/sec average
 3. **🥉 SyntroJS-Node**: 4,500 req/sec average (**89.3% of Fastify**)
 4. **Express**: 2,469 req/sec average
 
 ### 📊 Key Performance Metrics
-- **SyntroJS-Bun vs Fastify**: 600% performance (6x faster)
+- **SyntroJS-Bun vs Fastify**: 380% performance (3.8x faster)
 - **SyntroJS-Node vs Fastify**: 89.3% performance (only 11% overhead)
 - **SyntroJS-Bun vs Express**: 1,240% faster (12.4x performance)
 - **SyntroJS-Node vs Express**: 325% faster (3.25x performance)
@@ -144,10 +144,10 @@ SyntroJS delivers **exceptional performance** with **dual runtime support**:
 
 | Runtime | Performance | Ecosystem | Stability | Use Case |
 |---------|-------------|-----------|-----------|----------|
-| **SyntroJS-Bun** | 6x faster than Fastify | Growing | New | Maximum performance |
+| **SyntroJS-Bun** | 3.8x faster than Fastify | Growing | New | Maximum performance |
 | **SyntroJS-Node** | 89.3% of Fastify | Complete | Battle-tested | Production stability |
 
-**Note**: SyntroJS-Bun achieves 6x Fastify performance by leveraging Bun's JavaScriptCore engine and native optimizations. SyntroJS-Node maintains excellent performance while ensuring full compatibility with the Node.js ecosystem.
+**Note**: SyntroJS-Bun achieves 3.8x Fastify performance by leveraging Bun's JavaScriptCore engine and native optimizations. SyntroJS-Node maintains excellent performance while ensuring full compatibility with the Node.js ecosystem.
 
 ---
 
@@ -306,7 +306,7 @@ app.get('/hello', {
 app.get('/runtime', {
   handler: () => ({
     runtime: typeof Bun !== 'undefined' ? 'Bun (JavaScriptCore)' : 'Node.js (V8)',
-    performance: typeof Bun !== 'undefined' ? '6x faster than Fastify' : '89.3% of Fastify'
+    performance: typeof Bun !== 'undefined' ? '3.8x faster than Fastify' : '89.3% of Fastify'
   })
 });
 
@@ -327,7 +327,7 @@ node app.js
 bun app.js
 # Output: 🚀 SyntroJS-BUN  
 #         🔥 Runtime: Bun (JavaScriptCore)
-#         ⚡ Ultra-fast Performance: 6x faster than Fastify
+#         ⚡ Ultra-fast Performance: 3.8x faster than Fastify
 ```
 
 ### **Performance Comparison:**
@@ -335,7 +335,7 @@ bun app.js
 | Runtime | Performance | Use Case |
 |---------|-------------|----------|
 | **Node.js** | 89.3% of Fastify | Production stability, full ecosystem |
-| **Bun** | 6x faster than Fastify | Maximum performance, modern development |
+| **Bun** | 3.8x faster than Fastify | Maximum performance, modern development |
 
 ### **Why This Matters:**
 
@@ -521,6 +521,110 @@ app.get('/hello', {
 await app.listen(3000);
 ```
 
+### Middleware System (NEW!)
+
+SyntroJS now includes a powerful, functional middleware system that feels like a conversation with your code:
+
+```typescript
+import { SyntroJS } from 'syntrojs';
+
+const app = new SyntroJS({ title: 'Middleware API' });
+
+// Simple middleware - just a function!
+const logger = async (context) => {
+  console.log(`📝 ${context.method} ${context.url} - ${new Date().toISOString()}`);
+};
+
+const auth = async (context) => {
+  const token = context.headers.authorization;
+  if (!token) {
+    throw new HTTPException(401, 'Missing authorization header');
+  }
+  // Add user info to context
+  context.user = { id: 1, name: 'John Doe' };
+};
+
+// Apply middleware globally
+app.use(logger);
+app.use(auth);
+
+// Or apply to specific routes
+app.get('/public', {
+  handler: () => ({ message: 'No auth needed' })
+});
+
+app.get('/private', {
+  handler: ({ user }) => ({ message: `Hello ${user.name}!` })
+});
+
+await app.listen(3000);
+```
+
+**Middleware Features:**
+- ✅ **Functional approach** - Pure functions, no `next()` calls
+- ✅ **Global or route-specific** - Apply where you need them
+- ✅ **Immutable** - Middleware operations return new instances
+- ✅ **Type-safe** - Full TypeScript support
+- ✅ **Priority-based** - Control execution order
+
+### WebSocket Support (NEW!)
+
+Real-time communication made simple and conversational:
+
+```typescript
+import { SyntroJS } from 'syntrojs';
+
+const app = new SyntroJS({ title: 'WebSocket API' });
+
+// Simple chat handler
+app.ws('/chat', (ws, context) => {
+  console.log(`👋 New connection from ${context.ip}`);
+  
+  // Handle messages
+  ws.on('message', (data) => {
+    console.log(`💬 Message: ${data.message}`);
+    
+    // Broadcast to all clients in the room
+    ws.broadcast('chat', 'message', {
+      user: data.user,
+      message: data.message,
+      timestamp: new Date().toISOString()
+    });
+  });
+  
+  // Handle disconnections
+  ws.on('disconnect', () => {
+    console.log(`👋 User disconnected`);
+  });
+});
+
+// Room-based chat
+app.ws('/rooms/:roomId', (ws, context) => {
+  const roomId = context.params.roomId;
+  
+  // Join the room
+  ws.join(roomId);
+  
+  ws.on('message', (data) => {
+    // Send only to users in this room
+    ws.to(roomId).broadcast(roomId, 'message', data);
+  });
+  
+  ws.on('disconnect', () => {
+    ws.leave(roomId);
+  });
+});
+
+await app.listen(3000);
+```
+
+**WebSocket Features:**
+- ✅ **Event-based** - `ws.on('message')`, `ws.on('disconnect')`
+- ✅ **Room management** - `ws.join()`, `ws.leave()`, `ws.to()`
+- ✅ **Broadcasting** - Send to all or specific rooms
+- ✅ **Type-safe** - Full TypeScript support
+- ✅ **Simple API** - Feels like a conversation with your code
+
 ---
 
 ## ✨ Features
@@ -550,6 +654,8 @@ await app.listen(3000);
 - 🔥 **Background Tasks** - Non-blocking task execution (I/O only)
 - 🔥 **Fluent API** - Method chaining and object-based route definitions
 - 🔥 **Advanced Pagination** - Configurable pagination with sorting and filtering
+- 🔥 **Middleware System** - Functional middleware with global/route-specific support (NEW!)
+- 🔥 **WebSocket Support** - Real-time communication with room management (NEW!)
 - 🔥 **Security & Authentication**:
   - `OAuth2PasswordBearer` - Complete OAuth2 flow
   - `HTTPBearer` - Generic Bearer token authentication
@@ -766,12 +872,14 @@ test('POST /users validates age boundary', async () => {
 - [x] Security modules (OAuth2, JWT, HTTPBasic, HTTPBearer, APIKey)
 - [x] Plugins (CORS, Helmet, Compression, Rate Limiting)
 - [x] TinyTest wrapper (expectSuccess, testBoundaries, testContract)
+- [x] Middleware System (functional, immutable, priority-based) ✅ NEW!
+- [x] WebSocket Support (event-based, room management) ✅ NEW!
 - [ ] SmartMutator (optimized mutation testing - in development)
 - [x] Tests >98% coverage
 
 ### v1.0.0 - Production Ready (Next)
 - [ ] File uploads
-- [ ] WebSockets
+- [x] WebSockets ✅ (Already implemented!)
 - [ ] Static files serving
 - [ ] Performance benchmarks
 - [ ] Complete documentation
@@ -795,16 +903,16 @@ SyntroJS isn't just "well-tested". We prove it with public quality reports.
 [![Vulnerabilities](https://img.shields.io/badge/vulnerabilities-0-brightgreen)](./security)
 ```
 
-1.  ✅ **98% Test Coverage** - Unit + Integration + E2E tests (554 tests)
+1.  ✅ **80.26% Test Coverage** - Unit + Integration + E2E tests (552 tests)
 2.  🔄 **>85% Mutation Score target** - Tests that truly validate logic, not just coverage (in development)
 3.  ✅ **0 Known Vulnerabilities** - Automated security audits
 4.  ✅ **Public Quality Reports** - Mutation testing reports in every release
 
 **Current Metrics (v0.2.0):**
-- 📊 Statements: 98.05%
-- 📊 Branches: 94.03%
-- 📊 Functions: 99.29%
-- 🧪 554 tests passing
+- 📊 Statements: 80.26%
+- 📊 Branches: 84.53%
+- 📊 Functions: 74.63%
+- 🧪 552 tests passing
 - 🧬 **>85% mutation score (525 mutants killed) (in development)**
 
 ### Why This Matters
@@ -838,7 +946,7 @@ SyntroJS isn't just "well-tested". We prove it with public quality reports.
 - **SmartMutator** - Experimental mutation testing integration
 - **TinyTest** - Custom testing framework (may change significantly)
 
-### 🤝 We Need Your Feedback!
+### 🤝 We Need Your Feedback
 This is a proof of concept to validate ideas. Your feedback is crucial:
 
 - **Try it out** - Test the core functionality

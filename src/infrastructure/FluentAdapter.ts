@@ -1,13 +1,18 @@
 /**
  * FluentAdapter - Tree Shaking Fluent para SyntroJS
  * 
+ * Responsibility: Dynamic feature configuration with fluent API
+ * Pattern: Builder Pattern + Fluent Interface
+ * Principles: SOLID, DDD, Functional Programming, Guard Clauses
+ * 
  * Permite configurar dinámicamente qué funcionalidades incluir/excluir
- * usando un API fluido similar a ElysiaJS
+ * usando un API fluido similar a 
  */
 
 import Fastify, { type FastifyInstance, type FastifyRequest, type FastifyReply } from 'fastify';
 import type { Route } from '../domain/Route';
-import type { HttpMethod, RequestContext } from '../domain/types';
+import type { HttpMethod, RequestContext, Middleware } from '../domain/types';
+import type { MiddlewareRegistry } from '../application/MiddlewareRegistry';
 
 export interface FluentAdapterConfig {
   logger?: boolean;
@@ -20,23 +25,29 @@ export interface FluentAdapterConfig {
   cors?: boolean;
   helmet?: boolean;
   rateLimit?: boolean;
+  middleware?: boolean; // Nuevo: soporte para middleware
 }
 
 export class FluentAdapter {
-  private config: FluentAdapterConfig = {
-    logger: false,
-    validation: true,
-    errorHandling: true,
-    dependencyInjection: true, // Habilitado por defecto
-    backgroundTasks: true, // Habilitado por defecto
-    openAPI: true,
-    compression: false,
-    cors: false,
-    helmet: false,
-    rateLimit: false,
-  };
+  private readonly config: FluentAdapterConfig;
+  private middlewareRegistry?: MiddlewareRegistry;
 
-  constructor() {}
+  constructor() {
+    // Initialize immutable default configuration
+    this.config = Object.freeze({
+      logger: false,
+      validation: true,
+      errorHandling: true,
+      dependencyInjection: true,
+      backgroundTasks: true,
+      openAPI: true,
+      compression: false,
+      cors: false,
+      helmet: false,
+      rateLimit: false,
+      middleware: true,
+    });
+  }
 
   // Métodos estáticos para compatibilidad con otros adapters
   static create(config?: Record<string, unknown>): FastifyInstance {
@@ -61,58 +72,122 @@ export class FluentAdapter {
     await fastify.close();
   }
 
-  // Fluent API para configurar funcionalidades
+  // Fluent API para configurar funcionalidades - Functional Programming
   withLogger(enabled = true): this {
-    this.config.logger = enabled;
-    return this;
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('Logger enabled must be a boolean');
+    }
+    
+    // Create new instance with updated config (immutability)
+    return this.createWithConfig({ logger: enabled });
   }
 
   withValidation(enabled = true): this {
-    this.config.validation = enabled;
-    return this;
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('Validation enabled must be a boolean');
+    }
+    
+    return this.createWithConfig({ validation: enabled });
   }
 
   withErrorHandling(enabled = true): this {
-    this.config.errorHandling = enabled;
-    return this;
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('Error handling enabled must be a boolean');
+    }
+    
+    return this.createWithConfig({ errorHandling: enabled });
   }
 
   withDependencyInjection(enabled = true): this {
-    this.config.dependencyInjection = enabled;
-    return this;
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('Dependency injection enabled must be a boolean');
+    }
+    
+    return this.createWithConfig({ dependencyInjection: enabled });
   }
 
   withBackgroundTasks(enabled = true): this {
-    this.config.backgroundTasks = enabled;
-    return this;
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('Background tasks enabled must be a boolean');
+    }
+    
+    return this.createWithConfig({ backgroundTasks: enabled });
   }
 
   withOpenAPI(enabled = true): this {
-    this.config.openAPI = enabled;
-    return this;
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('OpenAPI enabled must be a boolean');
+    }
+    
+    return this.createWithConfig({ openAPI: enabled });
   }
 
   withCompression(enabled = true): this {
-    this.config.compression = enabled;
-    return this;
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('Compression enabled must be a boolean');
+    }
+    
+    return this.createWithConfig({ compression: enabled });
   }
 
   withCors(enabled = true): this {
-    this.config.cors = enabled;
-    return this;
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('CORS enabled must be a boolean');
+    }
+    
+    return this.createWithConfig({ cors: enabled });
   }
 
   withHelmet(enabled = true): this {
-    this.config.helmet = enabled;
-    return this;
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('Helmet enabled must be a boolean');
+    }
+    
+    return this.createWithConfig({ helmet: enabled });
   }
 
   withRateLimit(enabled = true): this {
-    this.config.rateLimit = enabled;
-    return this;
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('Rate limit enabled must be a boolean');
+    }
+    
+    return this.createWithConfig({ rateLimit: enabled });
   }
 
-  // Presets comunes
+  withMiddleware(enabled = true): this {
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('Middleware enabled must be a boolean');
+    }
+    
+    return this.createWithConfig({ middleware: enabled });
+  }
+
+  /**
+   * Create new instance with updated configuration (Functional Programming)
+   * 
+   * @param updates - Configuration updates
+   * @returns New FluentAdapter instance
+   */
+  private createWithConfig(updates: Partial<FluentAdapterConfig>): this {
+    const newConfig = Object.freeze({ ...this.config, ...updates });
+    const newInstance = Object.create(Object.getPrototypeOf(this));
+    newInstance.config = newConfig;
+    newInstance.middlewareRegistry = this.middlewareRegistry;
+    return newInstance;
+  }
+
+  // Presets comunes - Functional Composition
   minimal(): this {
     return this
       .withLogger(false)
@@ -202,6 +277,15 @@ export class FluentAdapter {
     }
   }
 
+  /**
+   * Configure middleware registry
+   */
+  withMiddlewareRegistry(registry: MiddlewareRegistry): this {
+    this.middlewareRegistry = registry;
+    return this;
+  }
+
+
   // Registrar ruta con funcionalidades dinámicas
   async registerRoute(fastify: FastifyInstance, route: Route): Promise<void> {
     if (!fastify || !route) return;
@@ -233,6 +317,14 @@ export class FluentAdapter {
           },
         },
       };
+
+      // Ejecutar middleware si está habilitado
+      if (this.config.middleware && this.middlewareRegistry) {
+        const middlewares = this.middlewareRegistry.getMiddlewares(route.path, route.method);
+        if (middlewares.length > 0) {
+          await this.middlewareRegistry.executeMiddlewares(middlewares, context);
+        }
+      }
 
       try {
 

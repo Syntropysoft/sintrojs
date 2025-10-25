@@ -149,9 +149,65 @@ export type ExceptionHandler<E extends Error = Error> = (
 ) => RouteResponse | Promise<RouteResponse>;
 
 /**
- * Middleware function type
+ * Simple middleware function - pure function
  */
-export type Middleware = (context: RequestContext, next: () => Promise<void>) => Promise<void>;
+export type Middleware = (context: RequestContext) => Promise<void> | void;
+
+/**
+ * Simple middleware configuration
+ */
+export interface MiddlewareConfig {
+  /** Path pattern to match (e.g., '/api', '/users') */
+  path?: string;
+  /** HTTP method to match */
+  method?: HttpMethod;
+  /** Execution priority (lower = earlier) */
+  priority?: number;
+}
+
+/**
+ * Registered middleware entry
+ */
+export interface MiddlewareEntry {
+  middleware: Middleware;
+  config: MiddlewareConfig;
+  id: string;
+}
+
+/**
+ * WebSocket connection interface
+ */
+export interface WebSocketConnection {
+  /** Send message to client */
+  send(data: string | object): void;
+  
+  /** Send message to specific room */
+  to(room: string): WebSocketConnection;
+  
+  /** Broadcast to room */
+  broadcast(room: string, event: string, data: any): void;
+  
+  /** Join a room */
+  join(room: string): void;
+  
+  /** Leave a room */
+  leave(room: string): void;
+  
+  /** Event listeners */
+  on(event: 'message', handler: (data: any) => void): void;
+  on(event: 'disconnect', handler: () => void): void;
+  
+  /** Close connection */
+  close(): void;
+}
+
+/**
+ * WebSocket handler function
+ */
+export type WebSocketHandler = (
+  ws: WebSocketConnection,
+  context: RequestContext
+) => Promise<void> | void;
 
 /**
  * Lifecycle hook types
