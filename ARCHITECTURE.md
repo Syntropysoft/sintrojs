@@ -41,7 +41,7 @@ src/
 │   └── JWT.ts                # JWT utilities
 │
 ├── testing/                   # Testing utilities
-│   ├── SyntroJSTest.ts       # Test wrapper
+│   ├── TinyTest.ts           # Test wrapper
 │   └── SmartMutator.ts       # Mutation testing
 │
 └── core/

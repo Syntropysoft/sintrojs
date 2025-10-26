@@ -515,7 +515,7 @@ function createUser(data) {
 
 ---
 
-### The Solution: Mutation Testing + Testing Framework
+### The Solution: Mutation Testing + TinyTest
 
 **Mutation Testing detects useless tests:**
 
@@ -525,10 +525,10 @@ function createUser(data) {
    // Mutant: .min(17)  ← If test still passes, the test is useless
    ```
 
-2. **Our testing framework makes writing GOOD tests easy:**
+2. **TinyTest makes writing GOOD tests easy:**
    ```typescript
    test('user creation validates age', async () => {
-     const api = new SyntroJSTest();
+     const api = new TinyTest();
      
      api.post('/users', {
        body: z.object({ name: z.string(), age: z.number().min(18) }),
@@ -547,7 +547,7 @@ function createUser(data) {
 
 ---
 
-### Why Our Testing Framework Is Our Real Differentiator
+### Why TinyTest Is Our Real Differentiator
 
 **Mutation Testing exists in all languages:**
 - Python: mutpy, cosmic-ray
@@ -564,7 +564,7 @@ function createUser(data) {
 
 **SyntroJS solves all these problems:**
 1. ✅ **Automatic setup:** Comes configured out-of-the-box
-2. ✅ **Quick to write tests:** Our testing framework eliminates boilerplate
+2. ✅ **Quick to write tests:** TinyTest eliminates boilerplate
 3. ✅ **Public reports:** Trust Engineering = total transparency
 4. ✅ **Part of the framework:** Not an addon, it's core
 
@@ -644,7 +644,7 @@ await api.testProperty('POST', '/users', {
 - Echo/Chi (Go): Standard testing (testing/httptest)
 
 **SyntroJS is the only one that:**
-1. Makes writing tests trivial
+1. Makes writing tests trivial (TinyTest)
 2. Validates that tests are useful (Mutation Testing)
 3. Publishes quality reports (Trust Engineering)
 4. Makes it all part of the framework, not optional
