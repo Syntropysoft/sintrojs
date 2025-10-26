@@ -396,7 +396,7 @@ app.post('/upload', {
 
 **Both runtimes:**
 - ✅ Vitest works
-- ✅ SyntroJS `TinyTest` works
+- ✅ SyntroJS test framework works
 
 **Watch mode:**
 - Bun: Native watch (faster)

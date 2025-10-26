@@ -454,8 +454,8 @@ return { status: 201 }  →  [
 ### Phase 3: Test Mapping
 
 ```typescript
-// TinyTest registers which tests cover which routes
-class TinyTestImpl {
+// SyntroJS Test Framework registers which tests cover which routes
+class SyntroJSTestImpl {
   test(name: string, fn: () => Promise<void>) {
     // Intercept api.get(), api.post(), etc. calls
     const coveredRoutes = this.detectCoveredRoutes(fn);
@@ -623,11 +623,11 @@ function someHelper(data: string) {
 
 **Mitigation:** Use Stryker full mode for occasional complete audit.
 
-### 3. Requires TinyTest for Test Mapping
+### 3. Requires SyntroJS Test Framework for Test Mapping
 
-To map tests to routes, you need to use TinyTest.
+To map tests to routes, you need to use our testing framework.
 
-**Without TinyTest:**
+**Without our test framework:**
 ```typescript
 // Standard tests (Vitest)
 test('POST /users', async () => {
@@ -639,10 +639,10 @@ test('POST /users', async () => {
 // Result: Runs all tests (slower)
 ```
 
-**With TinyTest:**
+**With our test framework:**
 ```typescript
 test('POST /users', async () => {
-  const api = new TinyTest();
+  const api = new SyntroJSTest();
   api.post('/users', { body: UserSchema, handler });
   
   await api.expectSuccess('POST', '/users', data);
@@ -693,8 +693,8 @@ test('POST /users', async () => {
 
 ### SyntroJS
 - [SyntroJS Documentation](./README.md)
-- [TinyTest Documentation](./TESTING.md)
-- [Architecture](./ROADMAP.md)
+- [Testing Documentation](./TESTING.md)
+- [Architecture](./ARCHITECTURE.md)
 
 ---
 

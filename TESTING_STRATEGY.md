@@ -35,16 +35,16 @@ tests/
     └── stryker.config.js
 ```
 
-### TinyTest - Testing Wrapper
+### SyntroJS Test Framework - Testing Wrapper
 
 ```typescript
-import { TinyTest } from 'syntrojs/testing';
+import { SyntroJSTest } from 'syntrojs/testing';
 
 describe('Users API', () => {
-  let api: TinyTest;
+  let api: SyntroJSTest;
   
   beforeEach(() => {
-    api = new TinyTest();
+    api = new SyntroJSTest();
   });
   
   afterEach(() => api.close());
