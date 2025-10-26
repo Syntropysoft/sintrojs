@@ -1,59 +1,59 @@
-# SmartMutator: Mutation Testing en Segundos
+# SmartMutator: Mutation Testing in Seconds
 
-> **Stryker optimizado para SyntroJS. Mismo resultado, 100x más rápido.**
+> **Stryker optimized for SyntroJS. Same results, 100x faster.**
 
 ---
 
-## 🎯 El Problema
+## 🎯 The Problem
 
-### Mutation Testing Es Crítico, Pero Nadie Lo Usa
+### Mutation Testing Is Critical, But No One Uses It
 
-**El problema universal:**
+**The universal problem:**
 ```typescript
 ✅ Tests passing: 150/150
 ✅ Coverage: 95%
-❌ Bug en producción
+❌ Bug in production
 ```
 
-**La solución:** Mutation Testing (Stryker, mutpy, PIT, etc.)
-- Cambia el código (mutantes)
-- Ejecuta los tests
-- Si los tests siguen pasando → test inútil
+**The solution:** Mutation Testing (Stryker, mutpy, PIT, etc.)
+- Changes code (mutants)
+- Runs tests
+- If tests still pass → useless test
 
-**El problema de la solución:**
+**The problem with the solution:**
 ```bash
-# Mutation testing tradicional (Stryker):
+# Traditional mutation testing (Stryker):
 npx stryker run
 
-⏱️  Tiempo: 30-60 minutos (o más)
-💸 Costo: Demasiado caro para desarrollo diario
-📊 Resultado: Solo se usa en CI/CD, no en desarrollo local
+⏱️  Time: 30-60 minutes (or more)
+💸 Cost: Too expensive for daily development
+📊 Result: Only used in CI/CD, not in local development
 ```
 
 ---
 
-## 💡 La Solución: SmartMutator
+## 💡 The Solution: SmartMutator
 
-### De 30 Minutos a 8 Segundos
+### From 30 Minutes to 8 Seconds
 
-**SmartMutator NO es un mutation testing diferente.**  
-**Es Stryker, pero optimizado inteligentemente para SyntroJS.**
+**SmartMutator is NOT a different mutation testing tool.**  
+**It's Stryker, but intelligently optimized for SyntroJS.**
 
 ```bash
-# SmartMutator (optimizado)
+# SmartMutator (optimized)
 pnpm test:mutate
 
-⏱️  Tiempo: 8-30 segundos
-💸 Costo: Usable en desarrollo diario
-📊 Resultado: Feedback en tiempo real
-✅ Compatibilidad: 100% con Stryker (mismo resultado)
+⏱️  Time: 8-30 seconds
+💸 Cost: Usable in daily development
+📊 Result: Real-time feedback
+✅ Compatibility: 100% with Stryker (same result)
 ```
 
 ---
 
-## 🏗️ Arquitectura
+## 🏗️ Architecture
 
-### SmartMutator = Stryker + Optimizaciones Inteligentes
+### SmartMutator = Stryker + Smart Optimizations
 
 ```typescript
 import { StrykerCore } from '@stryker-mutator/core';
@@ -62,13 +62,13 @@ class SmartMutatorImpl {
   private stryker: StrykerCore;
   
   constructor() {
-    // Stryker hace el mutation testing REAL
+    // Stryker does the REAL mutation testing
     this.stryker = new StrykerCore();
   }
   
   /**
-   * Modo rápido: Optimización inteligente
-   * Usa conocimiento de SyntroJS para acelerar Stryker
+   * Fast mode: Smart optimization
+   * Uses SyntroJS knowledge to speed up Stryker
    */
   async runSmart(options?: MutationOptions): Promise<MutationReport> {
     const config = this.buildOptimizedConfig(options);
@@ -76,8 +76,8 @@ class SmartMutatorImpl {
   }
   
   /**
-   * Modo completo: Stryker vanilla (para auditoría)
-   * Mismo resultado, sin optimizaciones
+   * Full mode: Vanilla Stryker (for audit)
+   * Same result, no optimizations
    */
   async runFull(options?: MutationOptions): Promise<MutationReport> {
     const config = this.buildFullConfig(options);
@@ -85,22 +85,22 @@ class SmartMutatorImpl {
   }
   
   /**
-   * Nuestra "magia": Análisis de SyntroJS
+   * Our "magic": SyntroJS analysis
    */
   private buildOptimizedConfig(options?: MutationOptions): StrykerConfig {
     const analysis = this.analyzeRoutes();
     
     return {
-      // Solo mutar archivos críticos (no infraestructura)
+      // Only mutate critical files (not infrastructure)
       mutate: analysis.criticalFiles,
       
-      // Solo ejecutar tests relevantes (no toda la suite)
+      // Only run relevant tests (not entire suite)
       testRunner: 'vitest',
       testRunnerOptions: {
         testFilter: analysis.relevantTests,
       },
       
-      // Paralelización inteligente
+      // Smart parallelization
       concurrency: analysis.optimalWorkers,
     };
   }
@@ -109,56 +109,56 @@ class SmartMutatorImpl {
 
 ---
 
-## ⚡ Optimizaciones Clave
+## ⚡ Key Optimizations
 
-### 1. Mutación Dirigida (Smart Mutation)
+### 1. Targeted Mutation (Smart Mutation)
 
-**Stryker tradicional:**
-- Muta TODO el código (infraestructura, config, imports, etc.)
-- Genera 1000+ mutantes innecesarios
+**Traditional Stryker:**
+- Mutates EVERYTHING (infrastructure, config, imports, etc.)
+- Generates 1000+ unnecessary mutants
 
 **SmartMutator:**
-- Solo muta código crítico (schemas, handlers, lógica)
-- Genera 100-200 mutantes relevantes
+- Only mutates critical code (schemas, handlers, logic)
+- Generates 100-200 relevant mutants
 
 ```typescript
-// Ejemplo: SyntroJS conoce su estructura
+// Example: SyntroJS knows its structure
 app.post('/users', {
   body: z.object({
-    name: z.string().min(3),    // ✅ Mutar: .min(2), .min(4)
-    age: z.number().min(18),    // ✅ Mutar: .min(17), .min(19)
-    email: z.string().email(),  // ✅ Mutar: .string() (sin email)
+    name: z.string().min(3),    // ✅ Mutate: .min(2), .min(4)
+    age: z.number().min(18),    // ✅ Mutate: .min(17), .min(19)
+    email: z.string().email(),  // ✅ Mutate: .string() (no email)
   }),
   handler: ({ body }) => {
-    if (body.age < 21) {        // ✅ Mutar: < 20, < 22, <= 21
+    if (body.age < 21) {        // ✅ Mutate: < 20, < 22, <= 21
       return { canDrink: false };
     }
     return createUser(body);
   },
 });
 
-// ❌ NO mutar:
+// ❌ DO NOT mutate:
 // - Imports (import { z } from 'zod')
 // - Config (await app.listen(3000))
-// - Infraestructura (Fastify internals)
+// - Infrastructure (Fastify internals)
 ```
 
-**Resultado:** 90% de mutantes innecesarios eliminados.
+**Result:** 90% of unnecessary mutants eliminated.
 
 ---
 
-### 2. Test Mapping Inteligente
+### 2. Smart Test Mapping
 
-**Stryker tradicional:**
-- Por cada mutante, ejecuta TODA la suite de tests
-- 150 tests × 100 mutantes = 15,000 ejecuciones de tests
+**Traditional Stryker:**
+- For each mutant, runs ENTIRE test suite
+- 150 tests × 100 mutants = 15,000 test executions
 
 **SmartMutator:**
-- SyntroJS registra qué tests cubren qué rutas
-- Solo ejecuta tests relevantes por mutante
+- SyntroJS registers which tests cover which routes
+- Only runs relevant tests per mutant
 
 ```typescript
-// SyntroJS mantiene un registro interno:
+// SyntroJS maintains an internal registry:
 const testRegistry = {
   'POST /users': [
     'tests/e2e/users.test.ts::POST /users creates user',
@@ -169,156 +169,156 @@ const testRegistry = {
   ],
 };
 
-// Cuando se muta POST /users:
-// Stryker: Ejecuta 150 tests ❌
-// SmartMutator: Ejecuta 2 tests ✅
+// When POST /users is mutated:
+// Stryker: Runs 150 tests ❌
+// SmartMutator: Runs 2 tests ✅
 
-// Resultado: 75x menos ejecuciones de tests
+// Result: 75x fewer test executions
 ```
 
-**Resultado:** De 150 tests por mutante → 2-3 tests por mutante.
+**Result:** From 150 tests per mutant → 2-3 tests per mutant.
 
 ---
 
-### 3. Paralelización Inteligente
+### 3. Smart Parallelization
 
-**Stryker tradicional:**
-- Paraleliza mutantes sin coordinación
-- Puede saturar CPU o desperdiciar cores
+**Traditional Stryker:**
+- Parallelizes mutants without coordination
+- Can saturate CPU or waste cores
 
 **SmartMutator:**
-- Agrupa mutantes por "blast radius"
-- Balancea carga de trabajo
+- Groups mutants by "blast radius"
+- Balances workload
 
 ```typescript
-// Grupos de mutantes:
+// Mutant groups:
 
-// Grupo 1: Mutantes independientes (ejecutar en paralelo)
+// Group 1: Independent mutants (run in parallel)
 [
   { route: 'POST /users', tests: 2 },     // Worker 1
   { route: 'GET /products', tests: 3 },   // Worker 2
   { route: 'DELETE /orders', tests: 1 },  // Worker 3
 ]
 
-// Grupo 2: Mutantes en código compartido (ejecutar secuencial)
+// Group 2: Mutants in shared code (run sequentially)
 [
-  { file: 'ErrorHandler', tests: 150 },   // Afecta todo, ejecutar solo
+  { file: 'ErrorHandler', tests: 150 },   // Affects everything, run alone
 ]
 ```
 
-**Resultado:** Mejor uso de CPU, menos overhead.
+**Result:** Better CPU usage, less overhead.
 
 ---
 
-### 4. Mutación Incremental
+### 4. Incremental Mutation
 
-**Stryker tradicional:**
-- Muta TODO el proyecto en cada ejecución
-- No considera qué cambió
+**Traditional Stryker:**
+- Mutates ENTIRE project on each run
+- Doesn't consider what changed
 
 **SmartMutator:**
-- Solo genera mutantes en código que cambió
+- Only generates mutants in code that changed
 
 ```bash
-# Developer cambia una ruta:
+# Developer changes one route:
 git diff --name-only HEAD~1 HEAD
 # src/routes/users.ts
 
 # SmartMutator:
 pnpm test:mutate --incremental
 
-# Solo muta src/routes/users.ts (10 mutantes)
-# NO muta todo el proyecto (500 mutantes)
+# Only mutates src/routes/users.ts (10 mutants)
+# Does NOT mutate entire project (500 mutants)
 ```
 
-**Resultado:** De 500 mutantes → 10 mutantes (cambio típico).
+**Result:** From 500 mutants → 10 mutants (typical change).
 
 ---
 
-## 📊 Comparativa de Performance
+## 📊 Performance Comparison
 
-### Caso Real: API con 20 rutas, 150 tests
+### Real Case: API with 20 routes, 150 tests
 
-| Método | Mutantes Generados | Tests Ejecutados | Tiempo | Uso en Dev |
-|--------|-------------------|------------------|--------|------------|
-| **Stryker (vanilla)** | 1,247 | 187,050 | 43 min | ❌ No (solo CI/CD) |
-| **SmartMutator (optimizado)** | 142 | 284 | 12 seg | ✅ Sí (diario) |
-| **Reducción** | 88% | 99.8% | **99.5%** | - |
+| Method | Mutants Generated | Tests Executed | Time | Dev Usage |
+|--------|-------------------|----------------|------|-----------|
+| **Stryker (vanilla)** | 1,247 | 187,050 | 43 min | ❌ No (CI/CD only) |
+| **SmartMutator (optimized)** | 142 | 284 | 12 sec | ✅ Yes (daily) |
+| **Reduction** | 88% | 99.8% | **99.5%** | - |
 
-### Caso Incremental: Cambio en 1 ruta
+### Incremental Case: Change in 1 route
 
-| Método | Mutantes Generados | Tests Ejecutados | Tiempo | Uso en Dev |
-|--------|-------------------|------------------|--------|------------|
+| Method | Mutants Generated | Tests Executed | Time | Dev Usage |
+|--------|-------------------|----------------|------|-----------|
 | **Stryker (vanilla)** | 1,247 | 187,050 | 43 min | ❌ No |
-| **SmartMutator (incremental)** | 8 | 16 | **3.2 seg** | ✅ Sí (hot reload) |
-| **Reducción** | 99.4% | 99.99% | **99.9%** | - |
+| **SmartMutator (incremental)** | 8 | 16 | **3.2 sec** | ✅ Yes (hot reload) |
+| **Reduction** | 99.4% | 99.99% | **99.9%** | - |
 
 ---
 
-## 🔬 Validación de Resultados
+## 🔬 Result Validation
 
-### Los Resultados Son Auditables
+### Results Are Auditable
 
-**Crítico:** SmartMutator NO infla los números. Es 100% compatible con Stryker.
+**Critical:** SmartMutator does NOT inflate numbers. It's 100% compatible with Stryker.
 
 ```bash
-# Opción A: SmartMutator (rápido)
+# Option A: SmartMutator (fast)
 pnpm test:mutate
 # 🧬 Mutation Testing (Smart Mode)
 # 📊 Mutation score: 87% (123/141 mutants killed)
 # ⏱️  Time: 12.3s
 
-# Opción B: Stryker vanilla (auditoría completa)
+# Option B: Vanilla Stryker (full audit)
 npx stryker run --config stryker-full.conf.js
 # 📊 Mutation score: 87% (123/141 mutants killed)
 # ⏱️  Time: 43min 18s
 
-# ✅ Mismo resultado, diferente tiempo
+# ✅ Same result, different time
 ```
 
-**Por qué esto importa:**
-1. **No vendor lock-in:** Stryker sigue funcionando
-2. **Auditable:** Cualquiera puede verificar con Stryker vanilla
-3. **Trust Engineering:** Los reportes son reales, no marketing
+**Why this matters:**
+1. **No vendor lock-in:** Stryker still works
+2. **Auditable:** Anyone can verify with vanilla Stryker
+3. **Trust Engineering:** Reports are real, not marketing
 
 ---
 
-## 🚀 Uso en Desarrollo
+## 🚀 Development Usage
 
-### Modo Smart (Recomendado)
+### Smart Mode (Recommended)
 
 ```bash
-# Ejecutar mutation testing optimizado
+# Run optimized mutation testing
 pnpm test:mutate
 
-# Modo incremental (solo archivos cambiados)
+# Incremental mode (only changed files)
 pnpm test:mutate --incremental
 
-# Watch mode (feedback en tiempo real)
+# Watch mode (real-time feedback)
 pnpm test:mutate --watch
 ```
 
-### Modo Full (Auditoría)
+### Full Mode (Audit)
 
 ```bash
-# Ejecutar Stryker vanilla (sin optimizaciones)
+# Run vanilla Stryker (no optimizations)
 pnpm test:mutate --full
 
-# Equivalente a:
+# Equivalent to:
 npx stryker run
 ```
 
 ---
 
-## 📈 Integración en Workflow
+## 📈 Workflow Integration
 
-### Desarrollo Local
+### Local Development
 
 ```bash
-# Terminal 1: Servidor en watch mode
+# Terminal 1: Server in watch mode
 pnpm dev
 
-# Terminal 2: Mutation testing en watch mode
+# Terminal 2: Mutation testing in watch mode
 pnpm test:mutate --watch
 
 # Output:
@@ -345,20 +345,20 @@ jobs:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
       
-      # Tests normales
+      # Normal tests
       - run: pnpm test
       
-      # Mutation testing (incremental para PRs)
+      # Mutation testing (incremental for PRs)
       - name: Mutation Testing (Incremental)
         if: github.event_name == 'pull_request'
         run: pnpm test:mutate --incremental
       
-      # Mutation testing (full para main)
+      # Mutation testing (full for main)
       - name: Mutation Testing (Full)
         if: github.ref == 'refs/heads/main'
         run: pnpm test:mutate
       
-      # Publicar reportes
+      # Publish reports
       - uses: actions/upload-artifact@v3
         with:
           name: mutation-report
@@ -367,75 +367,75 @@ jobs:
 
 ---
 
-## 🛠️ Configuración
+## 🛠️ Configuration
 
-### Zero Config (Recomendado)
+### Zero Config (Recommended)
 
-SmartMutator funciona out-of-the-box con SyntroJS:
+SmartMutator works out-of-the-box with SyntroJS:
 
 ```typescript
-// No requiere configuración
+// No configuration needed
 import { SyntroJS } from 'syntrojs';
 
 const app = new SyntroJS();
-// SmartMutator ya está configurado ✅
+// SmartMutator is already configured ✅
 ```
 
-### Configuración Avanzada
+### Advanced Configuration
 
 ```typescript
 // syntrojs.config.ts
 export default {
   mutation: {
     mode: 'smart',           // 'smart' | 'full'
-    incremental: true,       // Solo archivos cambiados
-    threshold: 85,           // Mínimo mutation score
+    incremental: true,       // Only changed files
+    threshold: 85,           // Minimum mutation score
     ignorePatterns: [
-      '**/generated/**',     // Ignorar código generado
-      '**/*.config.ts',      // Ignorar configuraciones
+      '**/generated/**',     // Ignore generated code
+      '**/*.config.ts',      // Ignore configurations
     ],
-    concurrency: 4,          // Workers paralelos
-    timeout: 5000,           // Timeout por test (ms)
+    concurrency: 4,          // Parallel workers
+    timeout: 5000,           // Per-test timeout (ms)
   },
 };
 ```
 
 ---
 
-## 🔍 Cómo Funciona Internamente
+## 🔍 How It Works Internally
 
-### Fase 1: Análisis de Rutas
+### Phase 1: Route Analysis
 
 ```typescript
-// SmartMutator inspecciona el RouteRegistry
+// SmartMutator inspects the RouteRegistry
 const routes = RouteRegistry.getAll();
 
 for (const route of routes) {
-  // Analiza schemas de Zod
+  // Analyze Zod schemas
   if (route.body) {
     this.extractZodConstraints(route.body);
-    // Encuentra: .min(18), .email(), etc.
+    // Finds: .min(18), .email(), etc.
   }
   
-  // Analiza lógica del handler (AST)
+  // Analyze handler logic (AST)
   this.parseHandler(route.handler);
-  // Encuentra: if (age < 21), return 201, etc.
+  // Finds: if (age < 21), return 201, etc.
 }
 ```
 
-### Fase 2: Generación de Mutantes
+### Phase 2: Mutant Generation
 
 ```typescript
-// Solo en lugares críticos:
+// Only in critical places:
 
-// 1. Validaciones de Zod
+// 1. Zod validations
 z.number().min(18)  →  [
   z.number().min(17),  // Boundary mutant
   z.number().min(19),  // Boundary mutant
   z.number(),          // Remove constraint
 ]
 
-// 2. Condicionales en handlers
+// 2. Conditionals in handlers
 if (age < 21)  →  [
   if (age <= 21),      // Boundary mutant
   if (age < 20),       // Off-by-one mutant
@@ -451,51 +451,51 @@ return { status: 201 }  →  [
 ]
 ```
 
-### Fase 3: Mapeo de Tests
+### Phase 3: Test Mapping
 
 ```typescript
-// TinyTest registra qué tests cubren qué rutas
+// TinyTest registers which tests cover which routes
 class TinyTestImpl {
   test(name: string, fn: () => Promise<void>) {
-    // Intercepta las llamadas a api.get(), api.post(), etc.
+    // Intercept api.get(), api.post(), etc. calls
     const coveredRoutes = this.detectCoveredRoutes(fn);
     
-    // Registra el mapeo
+    // Register the mapping
     this.testRegistry.register(name, coveredRoutes);
   }
 }
 
-// Resultado:
+// Result:
 {
   'tests/users.test.ts::POST /users validates age': ['POST /users'],
   'tests/users.test.ts::GET /users/:id returns user': ['GET /users/:id'],
 }
 ```
 
-### Fase 4: Ejecución Optimizada
+### Phase 4: Optimized Execution
 
 ```typescript
 for (const mutant of mutants) {
-  // Solo ejecutar tests relevantes
+  // Only run relevant tests
   const relevantTests = this.testRegistry.getTestsFor(mutant.route);
   
-  // Ejecutar en paralelo si son independientes
+  // Run in parallel if independent
   await this.runTests(relevantTests, { parallel: true });
 }
 ```
 
 ---
 
-## 🎯 Casos de Uso
+## 🎯 Use Cases
 
-### Caso 1: Desarrollo de Nueva Feature
+### Case 1: New Feature Development
 
 ```bash
-# Developer crea nueva ruta
+# Developer creates new route
 git status
-# modified: src/routes/products.ts (nuevo endpoint)
+# modified: src/routes/products.ts (new endpoint)
 
-# Ejecuta mutation testing
+# Run mutation testing
 pnpm test:mutate --incremental
 
 # Output:
@@ -518,13 +518,13 @@ Suggestions:
   - Add boundary test: stock === 1 should fail
 ```
 
-### Caso 2: Refactoring Seguro
+### Case 2: Safe Refactoring
 
 ```bash
-# Developer refactoriza lógica de validación
+# Developer refactors validation logic
 git diff src/services/validator.ts
 
-# Ejecuta mutation testing
+# Run mutation testing
 pnpm test:mutate --incremental
 
 # Output:
@@ -541,11 +541,11 @@ Results:
 ⏱️  Time: 8.1s
 ```
 
-### Caso 3: PR Review (CI/CD)
+### Case 3: PR Review (CI/CD)
 
 ```yaml
-# GitHub Actions ejecuta mutation testing incremental
-# Solo en archivos del PR
+# GitHub Actions runs incremental mutation testing
+# Only on PR files
 
 🧬 Smart Mutation Testing (PR #123)
 📝 Changed files: 3
@@ -568,78 +568,78 @@ Comment posted to PR with details.
 
 ---
 
-## 🔄 Comparación con Otras Soluciones
+## 🔄 Comparison with Other Solutions
 
 ### vs. Stryker (Vanilla)
 
-| Característica | Stryker | SmartMutator |
-|----------------|---------|--------------|
-| **Engine** | Stryker | Stryker (mismo) |
-| **Resultado** | Standard | Mismo resultado |
-| **Tiempo** | 30-60 min | 8-30 seg |
+| Feature | Stryker | SmartMutator |
+|---------|---------|-------------|
+| **Engine** | Stryker | Stryker (same) |
+| **Result** | Standard | Same result |
+| **Time** | 30-60 min | 8-30 sec |
 | **Setup** | Manual | Zero config |
-| **Incremental** | No | Sí |
-| **Watch mode** | No | Sí |
-| **Uso en Dev** | ❌ No | ✅ Sí |
+| **Incremental** | No | Yes |
+| **Watch mode** | No | Yes |
+| **Dev Usage** | ❌ No | ✅ Yes |
 
-### vs. Mutation Testing en Otros Lenguajes
+### vs. Mutation Testing in Other Languages
 
-| Lenguaje | Herramienta | Tiempo Típico | DX |
-|----------|-------------|---------------|-----|
-| Python | mutpy | 20-40 min | ⚠️ Setup complejo |
+| Language | Tool | Typical Time | DX |
+|----------|------|---------------|-----|
+| Python | mutpy | 20-40 min | ⚠️ Complex setup |
 | Go | go-mutesting | 15-30 min | ⚠️ Experimental |
-| Rust | cargo-mutants | 10-25 min | ⚠️ Reciente |
-| Java | PIT | 30-60 min | ⚠️ Setup complejo |
-| **TypeScript** | **SmartMutator** | **8-30 seg** | **✅ Zero config** |
+| Rust | cargo-mutants | 10-25 min | ⚠️ Recent |
+| Java | PIT | 30-60 min | ⚠️ Complex setup |
+| **TypeScript** | **SmartMutator** | **8-30 sec** | **✅ Zero config** |
 
 ---
 
-## 🚧 Limitaciones Conocidas
+## 🚧 Known Limitations
 
-### 1. Solo Funciona con SyntroJS
+### 1. Only Works with SyntroJS
 
-SmartMutator requiere que el código use SyntroJS para funcionar.
+SmartMutator requires code to use SyntroJS to work.
 
-**Por qué:** Las optimizaciones dependen de conocer la estructura de rutas, schemas y handlers de SyntroJS.
+**Why:** Optimizations depend on knowing the structure of routes, schemas and handlers of SyntroJS.
 
-**Alternativa:** Usar Stryker vanilla con cualquier framework.
+**Alternative:** Use vanilla Stryker with any framework.
 
-### 2. No Optimiza Código No-SyntroJS
+### 2. Doesn't Optimize Non-SyntroJS Code
 
-Si tienes código fuera de rutas (utils, helpers), SmartMutator no lo optimiza.
+If you have code outside routes (utils, helpers), SmartMutator doesn't optimize it.
 
 ```typescript
-// ✅ Optimizado (parte de ruta)
+// ✅ Optimized (part of route)
 app.post('/users', {
   body: UserSchema,
   handler: ({ body }) => createUser(body),
 });
 
-// ❌ NO optimizado (fuera de SyntroJS)
+// ❌ NOT optimized (outside SyntroJS)
 function someHelper(data: string) {
   return data.toUpperCase();
 }
 ```
 
-**Mitigación:** Usa Stryker full mode para auditoría completa ocasional.
+**Mitigation:** Use Stryker full mode for occasional complete audit.
 
-### 3. Requiere TinyTest para Test Mapping
+### 3. Requires TinyTest for Test Mapping
 
-Para mapear tests a rutas, necesitas usar TinyTest.
+To map tests to routes, you need to use TinyTest.
 
-**Sin TinyTest:**
+**Without TinyTest:**
 ```typescript
-// Tests estándar (Vitest)
+// Standard tests (Vitest)
 test('POST /users', async () => {
   const res = await fetch('/users', { method: 'POST', body: data });
   expect(res.status).toBe(201);
 });
 
-// SmartMutator no puede mapear este test a la ruta
-// Resultado: Ejecuta todos los tests (más lento)
+// SmartMutator can't map this test to the route
+// Result: Runs all tests (slower)
 ```
 
-**Con TinyTest:**
+**With TinyTest:**
 ```typescript
 test('POST /users', async () => {
   const api = new TinyTest();
@@ -648,46 +648,46 @@ test('POST /users', async () => {
   await api.expectSuccess('POST', '/users', data);
 });
 
-// SmartMutator mapea automáticamente
-// Resultado: Solo ejecuta este test (rápido)
+// SmartMutator maps automatically
+// Result: Only runs this test (fast)
 ```
 
 ---
 
 ## 🔮 Roadmap
 
-### Fase 1: MVP (v0.3.0)
-- ✅ SmartMutator básico
-- ✅ Mutación dirigida (Zod schemas)
-- ✅ Test mapping simple
-- ✅ Comparativa con Stryker vanilla
+### Phase 1: MVP (v0.3.0)
+- ✅ Basic SmartMutator
+- ✅ Targeted mutation (Zod schemas)
+- ✅ Simple test mapping
+- ✅ Comparison with vanilla Stryker
 
-### Fase 2: Optimización (v0.4.0)
-- ✅ Mutación incremental
-- ✅ Paralelización inteligente
-- ✅ CLI con opciones avanzadas
-- ✅ Reportes detallados
+### Phase 2: Optimization (v0.4.0)
+- ✅ Incremental mutation
+- ✅ Smart parallelization
+- ✅ CLI with advanced options
+- ✅ Detailed reports
 
-### Fase 3: Hot Reload (v1.0.0)
-- ⏳ Watch mode integrado
-- ⏳ Feedback en tiempo real
-- ⏳ Dashboard visual
-- ⏳ Integración con VSCode
+### Phase 3: Hot Reload (v1.0.0)
+- ⏳ Integrated watch mode
+- ⏳ Real-time feedback
+- ⏳ Visual dashboard
+- ⏳ VSCode integration
 
-### Fase 4: AI-Assisted (v2.0.0)
-- 🔮 Sugerencias de tests basadas en mutantes
-- 🔮 Auto-fix de tests débiles
-- 🔮 Predicción de mutantes críticos
+### Phase 4: AI-Assisted (v2.0.0)
+- 🔮 Test suggestions based on mutants
+- 🔮 Auto-fix weak tests
+- 🔮 Predict critical mutants
 
 ---
 
-## 📚 Referencias
+## 📚 References
 
-### Mutation Testing (Conceptos)
+### Mutation Testing (Concepts)
 - [Mutation Testing Introduction](https://stryker-mutator.io/docs/)
 - [Why Mutation Testing?](https://pedrorijo.com/blog/mutation-testing/)
 
-### Stryker (Herramienta)
+### Stryker (Tool)
 - [Stryker Documentation](https://stryker-mutator.io/)
 - [Stryker GitHub](https://github.com/stryker-mutator/stryker-js)
 
@@ -700,30 +700,29 @@ test('POST /users', async () => {
 
 ## 🤝 Contributing
 
-SmartMutator es parte del core de SyntroJS. Si querés contribuir:
+SmartMutator is part of SyntroJS core. If you want to contribute:
 
-1. **Reportar issues** - Si encontrás mutantes que deberían matarse pero sobreviven
-2. **Optimizaciones** - Si tenés ideas para hacer mutation testing más rápido
-3. **Documentación** - Si encontrás casos de uso que no están cubiertos
+1. **Report issues** - If you find mutants that should be killed but survive
+2. **Optimizations** - If you have ideas to make mutation testing faster
+3. **Documentation** - If you find use cases that aren't covered
 
-Ver [CONTRIBUTING.md](./CONTRIBUTING.md) para más detalles.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.
 
 ---
 
-## 💎 El Valor Real
+## 💎 The Real Value
 
-**SmartMutator no es solo "Stryker más rápido".**
+**SmartMutator is not just "faster Stryker".**
 
-**Es mutation testing que realmente se usa en desarrollo diario.**
+**It's mutation testing that actually gets used in daily development.**
 
-- De auditoría cara en CI/CD → Feedback instantáneo en desarrollo
-- De 30-60 minutos → 8-30 segundos
-- De "solo grandes equipos" → Cualquier developer
-- De "optional nice-to-have" → Standard en SyntroJS
+- From expensive CI/CD audit → Instant feedback in development
+- From 30-60 minutes → 8-30 seconds
+- From "only big teams" → Any developer
+- From "optional nice-to-have" → Standard in SyntroJS
 
-**Resultado:** Calidad de código verificable, sin compromiso en productividad.
+**Result:** Verifiable code quality, without compromising productivity.
 
 ---
 
 **"Making mutation testing usable. Finally."** 🚀
-

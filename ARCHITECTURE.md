@@ -1,31 +1,33 @@
-# 🏗️ Arquitectura y Principios de Diseño
+# 🏗️ Architecture and Design Principles
 
-### Estructura de Capas (DDD + SOLID)
+### Layer Structure (DDD + SOLID)
 
 ```
 src/
-├── domain/                    # Entidades y lógica de negocio pura
-│   ├── Route.ts              # Entity: Ruta
-│   ├── HTTPException.ts      # Entity: Excepciones HTTP
+├── domain/                    # Pure business logic entities
+│   ├── Route.ts              # Entity: Route
+│   ├── HTTPException.ts      # Entity: HTTP Exceptions
 │   ├── Context.ts            # Value Object: Request context
 │   ├── Response.ts           # Value Object: Response
-│   └── types.ts              # Types del dominio
+│   └── types.ts              # Domain types
 │
-├── application/               # Casos de uso / Servicios
-│   ├── RouteRegistry.ts      # Service: Registro de rutas (singleton)
-│   ├── SchemaValidator.ts    # Service: Validación con Zod (singleton)
-│   ├── OpenAPIGenerator.ts   # Service: Genera OpenAPI spec (singleton)
-│   ├── ErrorHandler.ts       # Service: Manejo de errores (singleton)
-│   ├── DependencyInjector.ts # Service: DI simple (singleton)
+├── application/               # Use cases / Services
+│   ├── RouteRegistry.ts      # Service: Route registration (singleton)
+│   ├── SchemaValidator.ts    # Service: Validation with Zod (singleton)
+│   ├── OpenAPIGenerator.ts   # Service: Generates OpenAPI spec (singleton)
+│   ├── ErrorHandler.ts       # Service: Error handling (singleton)
+│   ├── DependencyInjector.ts # Service: Simple DI (singleton)
 │   └── BackgroundTasks.ts    # Service: Background tasks (singleton)
 │
-├── infrastructure/            # Adaptadores externos
-│   ├── FastifyAdapter.ts     # Adapter: Integración con Fastify
-│   ├── ZodAdapter.ts         # Adapter: Integración con Zod
+├── infrastructure/            # External adapters
+│   ├── FastifyAdapter.ts     # Adapter: Fastify integration
+│   ├── BunAdapter.ts         # Adapter: Bun runtime integration
+│   ├── FluentAdapter.ts      # Adapter: Generic HTTP server
+│   ├── ZodAdapter.ts         # Adapter: Zod integration
 │   ├── OpenAPIAdapter.ts     # Adapter: OpenAPI 3.1 spec
 │   └── WebSocketAdapter.ts   # Adapter: WebSockets
 │
-├── plugins/                   # Plugins opcionales
+├── plugins/                   # Optional plugins
 │   ├── cors.ts               # CORS middleware
 │   ├── compression.ts        # Compression
 │   ├── helmet.ts             # Security headers
@@ -39,41 +41,42 @@ src/
 │   └── JWT.ts                # JWT utilities
 │
 ├── testing/                   # Testing utilities
-│   └── TinyTest.ts           # Test wrapper
+│   ├── TinyTest.ts           # Test wrapper
+│   └── SmartMutator.ts       # Mutation testing
 │
 └── core/
-    └── TinyApi.ts            # Facade: API pública (singleton)
+    └── SyntroJS.ts            # Facade: Public API (singleton)
 ```
 
-### Principios de Diseño
+### Design Principles
 
 1. **SOLID**
-   - Single Responsibility: Cada clase/función hace UNA cosa
+   - Single Responsibility: Each class/function does ONE thing
    - Open/Closed: Extensible via plugins
-   - Liskov Substitution: Interfaces claras
-   - Interface Segregation: Interfaces pequeñas y específicas
-   - Dependency Inversion: Depender de abstracciones
+   - Liskov Substitution: Clear interfaces
+   - Interface Segregation: Small, specific interfaces
+   - Dependency Inversion: Depend on abstractions
 
 2. **DDD (Domain-Driven Design)**
-   - Separación clara de capas
-   - Domain entities sin dependencias externas
-   - Application services orquestan lógica
-   - Infrastructure adapta tecnologías externas
+   - Clear layer separation
+   - Domain entities without external dependencies
+   - Application services orchestrate logic
+   - Infrastructure adapts external technologies
 
 3. **Guard Clauses**
    - Fail fast
    - Early returns
-   - Validación al inicio de funciones
+   - Validation at function start
 
-4. **Programación Funcional**
+4. **Functional Programming**
    - Immutability
-   - Pure functions donde sea posible
-   - Composición de funciones
-   - No side effects ocultos
+   - Pure functions where possible
+   - Function composition
+   - No hidden side effects
 
 5. **Singletons (Module Pattern)**
    ```typescript
-   // Cada service es un singleton exportado
+   // Each service is an exported singleton
    class SchemaValidatorImpl {
      validate(schema, data) { /* ... */ }
    }
