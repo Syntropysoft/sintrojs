@@ -1,143 +1,143 @@
-# TinyApi - Filosofía y Principios Fundamentales
+# SyntroJS - Philosophy and Fundamental Principles
 
-> "Construir el framework que el ecosistema necesitaba, pero nadie había creado."
-
----
-
-## 🎯 Nuestra Visión
-
-Crear el framework más simple y poderoso para construir APIs en Node.js, encontrando el punto óptimo entre **velocidad extrema** y **estructura sólida**, sin sacrificar la experiencia del desarrollador ni la preparación para producción.
+> "Building the framework the ecosystem needed, but no one had created."
 
 ---
 
-## 🧭 El Problema que Resolvemos
+## 🎯 Our Vision
 
-El ecosistema de frameworks para APIs en Node.js presenta un dilema:
+Create the simplest and most powerful framework for building APIs in Node.js, finding the optimal point between **extreme speed** and **solid structure**, without sacrificing developer experience or production readiness.
 
-### El Espectro del Compromiso
+---
+
+## 🧭 The Problem We Solve
+
+The Node.js framework ecosystem presents a dilemma:
+
+### The Compromise Spectrum
 
 ```
-[Minimalista]  ←――――――――――――――→  [Estructurado]
-   Rápido                           Complejo
-   Sin guía                         Mucho boilerplate
-   Máxima libertad                  Curva de aprendizaje alta
+[Minimalist]  ←――――――――――――――→  [Structured]
+   Fast                           Complex
+   No guidance                    Lots of boilerplate
+   Maximum freedom                 High learning curve
 ```
 
-**El Gap:** Buscamos ofrecer una combinación que actualmente es difícil de encontrar:
-- Alta velocidad de ejecución
-- Arquitectura clara y guiada
-- Mínimo código repetitivo
-- Type-safety total
-- Preparación para producción desde día 1
+**The Gap:** We seek to offer a combination that is currently hard to find:
+- High execution speed
+- Clear and guided architecture
+- Minimum repetitive code
+- Total type-safety
+- Production readiness from day 1
 
-**TinyApi es nuestra propuesta para llenar ese gap.**
-
----
-
-## 🏛️ Pilares Fundamentales
-
-### 1. **Simplicidad como Principio, No como Limitación**
-
-La simplicidad no significa "features limitadas". Significa:
-- API intuitiva que no requiere documentación extensa para empezar
-- Configuración mínima para casos comunes
-- Complejidad disponible solo cuando se necesita
-- Defaults sensatos que funcionan para el 80% de los casos
-
-**Filosofía:** Si no podés explicarlo en 5 líneas de código, no es suficientemente simple.
+**SyntroJS is our proposal to fill that gap.**
 
 ---
 
-### 2. **Type-Safety Total: Compile-Time + Runtime**
+## 🏛️ Fundamental Pillars
 
-La seguridad de tipos no es opcional. Es fundamental para:
-- Prevenir errores en producción
-- Mejorar la refactorización
-- Generar documentación automática
-- Aumentar la confianza del desarrollador
+### 1. **Simplicity as Principle, Not Limitation**
 
-**Principio:** Un solo esquema define tipos (compile-time), validación (runtime) y documentación (OpenAPI).
+Simplicity doesn't mean "limited features". It means:
+- Intuitive API that doesn't require extensive documentation to get started
+- Minimal configuration for common cases
+- Complexity available only when needed
+- Sensible defaults that work for 80% of cases
 
-**No duplicación:**
+**Philosophy:** If you can't explain it in 5 lines of code, it's not simple enough.
+
+---
+
+### 2. **Total Type-Safety: Compile-Time + Runtime**
+
+Type safety is not optional. It's fundamental for:
+- Preventing errors in production
+- Improving refactoring
+- Generating automatic documentation
+- Increasing developer confidence
+
+**Principle:** A single schema defines types (compile-time), validation (runtime) and documentation (OpenAPI).
+
+**No duplication:**
 ```
-❌ Definir: Tipo + Validador + Documentación
-✅ Definir: Esquema → (Tipo, Validador, Docs)
+❌ Define: Type + Validator + Documentation
+✅ Define: Schema → (Type, Validator, Docs)
 ```
 
 ---
 
-### 3. **Performance No Negociable**
+### 3. **Non-Negotiable Performance**
 
-La velocidad no es una característica opcional. Es un requisito fundamental.
+Speed is not an optional feature. It's a fundamental requirement.
 
-**Compromisos que NO hacemos:**
-- No sacrificamos velocidad por conveniencia
-- No agregamos overhead innecesario
-- No usamos abstracciones costosas sin justificación
+**Commitments we DON'T make:**
+- Don't sacrifice speed for convenience
+- Don't add unnecessary overhead
+- Don't use expensive abstractions without justification
 
-**Compromisos que SÍ hacemos:**
-- Usar el motor HTTP más rápido disponible
-- Medir y publicar benchmarks constantemente
-- Optimizar el path crítico de cada request
+**Commitments we DO make:**
+- Use the fastest available HTTP engine
+- Constantly measure and publish benchmarks
+- Optimize the critical path of each request
 
-**Filosofía:** Si es más lento que una implementación manual bien hecha, no lo incluimos.
-
----
-
-### 4. **Arquitectura Opinionada, Implementación Flexible**
-
-Proveemos estructura sin imponer rigidez.
-
-**Opiniones fuertes:**
-- Separación clara de capas (Dominio, Aplicación, Infraestructura)
-- Principios SOLID en el diseño
-- Guard clauses y fail-fast
-- Immutability donde sea posible
-
-**Flexibilidad donde importa:**
-- Funcional o OOP: el desarrollador elige
-- Inyección de dependencias simple, no contenedores complejos
-- Plugins opcionales, no framework monolítico
-
-**Filosofía:** Guiar sin encerrar. Estructurar sin sobrecargar.
+**Philosophy:** If it's slower than a well-made manual implementation, we don't include it.
 
 ---
 
-### 5. **Developer Experience (DX) como Métrica de Éxito**
+### 4. **Opinionated Architecture, Flexible Implementation**
 
-El framework se juzga por la productividad que genera.
+We provide structure without imposing rigidity.
 
-**Indicadores de DX excelente:**
-- Time to first API: < 2 minutos
-- Documentación generada automáticamente
-- Error messages claros y accionables
-- Testing tan fácil como escribir la API
-- Hot reload sin configuración
+**Strong opinions:**
+- Clear layer separation (Domain, Application, Infrastructure)
+- SOLID principles in design
+- Guard clauses and fail-fast
+- Immutability where possible
 
-**Filosofía:** Si el desarrollador tiene que buscar en Stack Overflow, podemos mejorar.
+**Flexibility where it matters:**
+- Functional or OOP: the developer chooses
+- Simple dependency injection, not complex containers
+- Optional plugins, not monolithic framework
+
+**Philosophy:** Guide without locking. Structure without overloading.
 
 ---
 
-### 6. **NO Reinventar la Rueda: El Test de la Mandíbula**
+### 5. **Developer Experience (DX) as Success Metric**
 
-El ecosistema Node.js ya tiene soluciones excelentes para muchos problemas. No competimos con ellas, las potenciamos.
+The framework is judged by the productivity it generates.
 
-**Criterio de NO Implementación:**
-- ❌ ORMs (Prisma, TypeORM, Drizzle ya son excelentes)
-- ❌ HTTP Clients (fetch/axios funcionan perfectamente)
-- ❌ Validation libraries (Zod/Yup/Joi ya existen)
-- ❌ Cualquier cosa que requiera mantener código complejo que otros ya mantienen
+**Indicators of excellent DX:**
+- Time to first API: < 2 minutes
+- Automatically generated documentation
+- Clear and actionable error messages
+- Testing as easy as writing the API
+- Hot reload without configuration
 
-**Criterio de SÍ Implementación - "Trivializar lo Complejo":**
+**Philosophy:** If the developer has to search Stack Overflow, we can improve.
 
-Solo implementamos algo si cumple:
-> **Arquitectura enterprise compleja → Código trivial**
+---
 
-No se trata de ocultar complejidad, sino de hacerla **fácil de usar correctamente**.
+### 6. **DON'T Reinvent the Wheel: The Jaw Drop Test**
 
-**Ejemplo 1: Database (Prisma)**
+The Node.js ecosystem already has excellent solutions for many problems. We don't compete with them, we enhance them.
+
+**Criteria for NOT implementing:**
+- ❌ ORMs (Prisma, TypeORM, Drizzle are already excellent)
+- ❌ HTTP Clients (fetch/axios work perfectly)
+- ❌ Validation libraries (Zod/Yup/Joi already exist)
+- ❌ Anything that requires maintaining complex code that others already maintain
+
+**Criteria for YES implementation - "Trivialize the Complex":**
+
+We only implement something if it meets:
+> **Complex enterprise architecture → Trivial code**
+
+It's not about hiding complexity, but making it **easy to use correctly**.
+
+**Example 1: Database (Prisma)**
 ```typescript
-// ❌ Express + Prisma (código típico: 30+ líneas)
+// ❌ Express + Prisma (typical code: 30+ lines)
 app.post('/users', async (req, res) => {
   try {
     const parsed = userSchema.safeParse(req.body);
@@ -156,7 +156,7 @@ app.post('/users', async (req, res) => {
 ```
 
 ```typescript
-// ✅ TinyApi (mismo resultado: 7 líneas)
+// ✅ SyntroJS (same result: 7 lines)
 app.post('/users', {
   body: UserSchema,
   status: 201,
@@ -166,9 +166,9 @@ app.post('/users', {
 });
 ```
 
-**Ejemplo 2: Message Queues (RabbitMQ, NATS, Kafka)**
+**Example 2: Message Queues (RabbitMQ, NATS, Kafka)**
 ```typescript
-// ❌ Express + RabbitMQ (código típico: 200+ líneas)
+// ❌ Express + RabbitMQ (typical code: 200+ lines)
 import amqp from 'amqplib';
 
 let connection, channel;
@@ -200,7 +200,7 @@ process.on('SIGTERM', async () => {
 ```
 
 ```typescript
-// ✅ TinyApi (mismo resultado: 30 líneas, DI maneja lifecycle)
+// ✅ SyntroJS (same result: 30 lines, DI handles lifecycle)
 import amqp from 'amqplib';
 
 const getRabbitMQ = async () => {
@@ -210,7 +210,7 @@ const getRabbitMQ = async () => {
   
   return {
     channel,
-    cleanup: async () => {  // 🎯 DI ejecuta cleanup automáticamente
+    cleanup: async () => {  // 🎯 DI executes cleanup automatically
       await channel.close();
       await connection.close();
     },
@@ -221,7 +221,7 @@ app.post('/users', {
   body: UserSchema,
   dependencies: { 
     db: inject(getPrisma, { scope: 'singleton' }),
-    mq: inject(getRabbitMQ, { scope: 'singleton' })  // 🎯 Lifecycle automático
+    mq: inject(getRabbitMQ, { scope: 'singleton' })  // 🎯 Automatic lifecycle
   },
   handler: async ({ body, dependencies }) => {
     const user = await dependencies.db.user.create({ data: body });
@@ -236,64 +236,64 @@ app.post('/users', {
     return user;
   },
 });
-// 🎯 No cleanup manual, DI lo maneja
+// 🎯 No manual cleanup, DI handles it
 ```
 
-**Eso es "trivializar lo complejo".** NO creamos wrappers (RabbitMQ, NATS, Kafka tienen excelentes librerías). Solo eliminamos el boilerplate de lifecycle management usando DI.
+**That's "trivializing the complex".** We DON'T create wrappers (RabbitMQ, NATS, Kafka have excellent libraries). We only eliminate lifecycle management boilerplate using DI.
 
-**Meta:** Que integrar RabbitMQ, NATS, Kafka, AWS SQS sea trivial gracias al DI que maneja init/cleanup automáticamente, pero usando las librerías directamente.
+**Goal:** Making integrating RabbitMQ, NATS, Kafka, AWS SQS trivial thanks to DI that handles init/cleanup automatically, but using the libraries directly.
 
-**Estrategia Ultra-Minimalista:**
-1. **Glue code ONLY** (v0.2.2): Un solo documento (`docs/INTEGRATIONS.md`) con snippets de 5-10 líneas mostrando cómo conectar librerías con DI
-2. **Link a docs oficiales:** Prisma ya tiene excelente documentación, RabbitMQ también, Kafka también. No duplicamos.
-3. **Crear helpers solo si hay friction validado** (v0.4.x+): Iterar con usuarios reales primero
+**Ultra-Minimalist Strategy:**
+1. **Glue code ONLY** (v0.2.2): A single document (`docs/INTEGRATIONS.md`) with 5-10 line snippets showing how to connect libraries with DI
+2. **Link to official docs:** Prisma already has excellent documentation, RabbitMQ too, Kafka too. We don't duplicate.
+3. **Create helpers only if there's validated friction** (v0.4.x+): Iterate with real users first
 
-**Regla de Oro:** El developer ya sabe usar Prisma/RabbitMQ/Kafka. Solo necesita ver cómo conectarlo con TinyApi DI.
+**Golden Rule:** The developer already knows how to use Prisma/RabbitMQ/Kafka. They just need to see how to connect it with SyntroJS DI.
 
-**NO creamos:**
-- ❌ Tutoriales de Prisma (Prisma docs ya es excelente)
-- ❌ Tutoriales de RabbitMQ (amqplib docs ya existe)
-- ❌ Tutoriales de Kafka (kafkajs docs ya existe)
-- ❌ Ejemplos "enterprise-ready" complejos
+**We DON'T create:**
+- ❌ Prisma tutorials (Prisma docs is already excellent)
+- ❌ RabbitMQ tutorials (amqplib docs already exists)
+- ❌ Kafka tutorials (kafkajs docs already exists)
+- ❌ Complex "enterprise-ready" examples
 
-**SÍ creamos:**
-- ✅ Template genérico: "Así conectás CUALQUIER librería con DI"
-- ✅ Snippets mínimos (5-10 líneas) para librerías comunes
-- ✅ Links a documentación oficial
+**We DO create:**
+- ✅ Generic template: "This is how you connect ANY library with DI"
+- ✅ Minimal snippets (5-10 lines) for common libraries
+- ✅ Links to official documentation
 
-**Filosofía:** Respetamos el tiempo del developer. No duplicamos docs que ya existen. Solo mostramos el "glue code" necesario.
+**Philosophy:** We respect the developer's time. We don't duplicate docs that already exist. We only show the necessary "glue code".
 
 ---
 
-### 7. **Production-First, Desde v1.0**
+### 7. **Production-First, Since v1.0**
 
-No construimos un framework de "juguete". Construimos una herramienta de producción.
+We don't build a "toy" framework. We build a production tool.
 
-**Requisitos no negociables para v1.0:**
-- Mutation testing >85% (tests que realmente validan)
-- Coverage >90% (no métrica vanidosa)
-- Zero vulnerabilidades conocidas
+**Non-negotiable requirements for v1.0:**
+- Mutation testing >85% (tests that really validate)
+- Coverage >90% (not vanity metric)
+- Zero known vulnerabilities
 - Graceful shutdown
-- Observability built-in
-- Health checks estándar
+- Built-in observability
+- Standard health checks
 
-**Filosofía:** Confianza antes que features. Robustez antes que popularidad rápida.
+**Philosophy:** Trust before features. Robustness before quick popularity.
 
 ---
 
-### 8. **La Simplicidad es Difícil: Por Qué TypeScript**
+### 8. **Simplicity is Hard: Why TypeScript**
 
-La simplicidad no ocurre por accidente. Requiere diseño intencional y las herramientas correctas.
+Simplicity doesn't happen by accident. It requires intentional design and the right tools.
 
-**Por qué TypeScript es superior para este problema:**
-- Type inference: Menos anotaciones, más safety
-- Compile-time validation: Errores antes de runtime
-- IDE support: Autocompletado que "enseña" el framework
+**Why TypeScript is superior for this problem:**
+- Type inference: Fewer annotations, more safety
+- Compile-time validation: Errors before runtime
+- IDE support: Autocomplete that "teaches" the framework
 - Ecosystem maturity: npm, tooling, community
 
-**Por qué no Go/Rust para APIs (todavía):**
+**Why not Go/Rust for APIs (yet):**
 ```go
-// Go: Verbose, sin generics elegantes
+// Go: Verbose, without elegant generics
 func CreateUser(w http.ResponseWriter, r *http.Request) {
     var user User
     if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
@@ -302,230 +302,230 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
     if err := validate(user); err != nil {
         // More manual handling...
     }
-    // ...más boilerplate
+    // ...more boilerplate
 }
 ```
 
 ```typescript
-// TypeScript + TinyApi: Conciso, type-safe
+// TypeScript + SyntroJS: Concise, type-safe
 app.post('/users', {
   body: UserSchema,
-  handler: ({ body }) => createUser(body)  // Todo inferido
+  handler: ({ body }) => createUser(body)  // All inferred
 });
 ```
 
-**Validación Multi-Ecosistema:** Go y Rust brillan en otros dominios (systems, CLI, performance crítica). Para APIs con DX extraordinario, TypeScript es imbatible hoy.
+**Multi-Ecosystem Validation:** Go and Rust shine in other domains (systems, CLI, critical performance). For APIs with extraordinary DX, TypeScript is unbeatable today.
 
 ---
 
-## 🛡️ Trust Engineering: Transparencia Total
+## 🛡️ Trust Engineering: Total Transparency
 
-Creemos que la calidad del código debe ser **verificable públicamente**.
+We believe code quality must be **publicly verifiable**.
 
-### Compromisos de Transparencia:
+### Transparency Commitments:
 
-1. **Reportes Públicos de Calidad**
-   - Coverage reports en cada release
-   - Mutation testing results públicos
-   - Security audit results disponibles
+1. **Public Quality Reports**
+   - Coverage reports on each release
+   - Public mutation testing results
+   - Available security audit results
 
-2. **Benchmarks Honestos**
-   - Comparaciones justas con alternativas
-   - Metodología pública y reproducible
-   - Reconocimiento de trade-offs
+2. **Honest Benchmarks**
+   - Fair comparisons with alternatives
+   - Public and reproducible methodology
+   - Acknowledgment of trade-offs
 
-3. **Gestión de Riesgos Abierta**
-   - Dependencias críticas documentadas
-   - Planes de mitigación públicos
-   - Comunicación proactiva de breaking changes
+3. **Open Risk Management**
+   - Documented critical dependencies
+   - Public mitigation plans
+   - Proactive communication of breaking changes
 
-**Filosofía:** Buscamos ganar confianza con hechos verificables, no solo con promesas.
+**Philosophy:** We seek to earn trust with verifiable facts, not just promises.
 
 ---
 
-## 🧬 Principios de Diseño de API
+## 🧬 API Design Principles
 
-### El Principio de Mínima Sorpresa
+### The Principle of Least Surprise
 
 ```typescript
-// Si un desarrollador espera que esto funcione...
+// If a developer expects this to work...
 app.get('/users/:id', {
   params: Schema.object({ id: Schema.number() }),
   handler: ({ params }) => getUser(params.id)
 });
 
-// ...entonces debe funcionar, sin configuración adicional.
+// ...then it must work, without additional configuration.
 ```
 
-### El Principio de Escalabilidad Progresiva
+### The Principle of Progressive Scalability
 
 ```typescript
-// Día 1: Simple
+// Day 1: Simple
 app.get('/hello', {
   handler: () => ({ message: 'Hello' })
 });
 
-// Día 30: Complejo (cuando lo necesites)
+// Day 30: Complex (when needed)
 app.get('/users', {
   dependencies: { db, auth, cache },
   middleware: [rateLimit, validate],
   handler: async ({ dependencies, background }) => {
-    // Toda la complejidad disponible, sin cambiar paradigma
+    // All complexity available without changing paradigm
   }
 });
 ```
 
-### El Principio de Consistencia
+### The Principle of Consistency
 
-- Los conceptos se reutilizan, no se reinventan
-- Los patrones se repiten, no se multiplican
-- Las convenciones son universales, no contextuales
-
----
-
-## 🌊 Filosofía de Evolución
-
-### Cómo Decidimos Qué Agregar
-
-**Pregunta #1:** ¿Resuelve un problema real del 80% de usuarios?
-- Si no → No lo agregamos al core
-- Si sí → Continuar evaluación
-
-**Pregunta #2:** ¿Se puede implementar como plugin sin tocar el core?
-- Si sí → Hacerlo plugin
-- Si no → Continuar evaluación
-
-**Pregunta #3:** ¿Compromete algún pilar fundamental (simplicidad, performance, DX)?
-- Si sí → Rechazar o replantear
-- Si no → Proceder con implementación
-
-**Pregunta #4:** ¿Pasa mutation testing y tiene >90% coverage?
-- Si no → No mergear
-- Si sí → Aceptar
-
-### Cómo Manejamos Breaking Changes
-
-**Principio:** Las APIs públicas son contratos sagrados.
-
-**Proceso:**
-1. Deprecation notice en versión N
-2. Mantener backward compatibility en N+1, N+2
-3. Breaking change solo en major version (N+3)
-4. Migration guide detallada
-5. Automated migration tools cuando sea posible
+- Concepts are reused, not reinvented
+- Patterns are repeated, not multiplied
+- Conventions are universal, not contextual
 
 ---
 
-## 🎯 Posicionamiento Filosófico
+## 🌊 Evolution Philosophy
 
-### No Somos:
+### How We Decide What to Add
 
-❌ Un framework full-stack (hacemos APIs, punto)  
-❌ Una copia de herramientas de otros ecosistemas  
-❌ La solución para todos los problemas  
-❌ Un experimento académico
+**Question #1:** Does it solve a real problem for 80% of users?
+- If no → Don't add to core
+- If yes → Continue evaluation
 
-### Somos:
+**Question #2:** Can it be implemented as a plugin without touching the core?
+- If yes → Make it a plugin
+- If no → Continue evaluation
 
-✅ **El punto óptimo** entre velocidad bruta y estructura sólida  
-✅ **Type-safety nativo** desde el diseño, no como agregado  
-✅ **Production-ready** desde v1.0, no "eventualmente"  
-✅ **Transparentes** en calidad, trade-offs y limitaciones
+**Question #3:** Does it compromise any fundamental pillar (simplicity, performance, DX)?
+- If yes → Reject or rethink
+- If no → Proceed with implementation
+
+**Question #4:** Does it pass mutation testing and have >90% coverage?
+- If no → Don't merge
+- If yes → Accept
+
+### How We Handle Breaking Changes
+
+**Principio:** Public APIs are sacred contracts.
+
+**Process:**
+1. Deprecation notice in version N
+2. Maintain backward compatibility in N+1, N+2
+3. Breaking change only in major version (N+3)
+4. Detailed migration guide
+5. Automated migration tools when possible
 
 ---
 
-## 🌐 Validación Multi-Ecosistema
+## 🎯 Philosophical Positioning
 
-### Por Qué Elegimos TypeScript para Este Problema
+### We Are NOT:
 
-No construimos TinyApi "porque TypeScript está de moda". Lo construimos porque TypeScript ofrece ventajas arquitecturales inherentes para el problema específico de "FastAPI-like DX".
+❌ A full-stack framework (we make APIs, period)  
+❌ A copy of tools from other ecosystems  
+❌ The solution to all problems  
+❌ An academic experiment
 
-**Comparación con otros ecosistemas:**
+### We Are:
 
-| Decisión | Go (alternativa común) | TinyApi (TypeScript) |
+✅ **The optimal point** between raw speed and solid structure  
+✅ **Native type-safety** from design, not as an add-on  
+✅ **Production-ready** since v1.0, not "eventually"  
+✅ **Transparent** in quality, trade-offs and limitations
+
+---
+
+## 🌐 Multi-Ecosystem Validation
+
+### Why We Choose TypeScript for This Problem
+
+We don't build SyntroJS "because TypeScript is trending". We build it because TypeScript offers inherent architectural advantages for the specific problem of "FastAPI-like DX".
+
+**Comparison with other ecosystems:**
+
+| Decision | Go (common alternative) | SyntroJS (TypeScript) |
 |----------|------------------------|----------------------|
-| **Validación** | Struct tags (strings) sin verificación estática | Schemas como código nativo con inferencia de tipos |
-| **Build** | Requiere code generation (`go generate`) | Transparente, sin pasos extra |
-| **Docs** | Herramientas externas para OpenAPI | Integración nativa (Zod → JSON Schema) |
-| **Type System** | Type hints básicos | Inferencia avanzada + generics |
+| **Validation** | Struct tags (strings) without static verification | Schemas as native code with type inference |
+| **Build** | Requires code generation (`go generate`) | Transparent, no extra steps |
+| **Docs** | External tools for OpenAPI | Native integration (Zod → JSON Schema) |
+| **Type System** | Basic type hints | Advanced inference + generics |
 
-**Conclusión:** Para frameworks de alto DX, TypeScript + Zod resuelve NATIVAMENTE problemas que otros lenguajes intentan resolver con herramientas externas.
+**Conclusion:** For high-DX frameworks, TypeScript + Zod solves NATIVELY problems that other languages try to solve with external tools.
 
-**Esto no significa que TypeScript sea "mejor" en general.** Go destaca en infraestructura cloud-native y concurrencia extrema. Rust domina en sistemas de bajo nivel. Pero para APIs con alta DX y type-safety total, TypeScript tiene ventajas estructurales.
+**This doesn't mean TypeScript is "better" in general.** Go excels in cloud-native infrastructure and extreme concurrency. Rust dominates in low-level systems. But for APIs with high DX and total type-safety, TypeScript has structural advantages.
 
-### Lecciones de Otros Ecosistemas que Adoptamos
+### Lessons from Other Ecosystems We Adopt
 
-**De Go:**
-- Background Tasks deben ser deliberados (no goroutines/Promises sueltas)
-- Context propagation solo para request-scoped data
-- Performance de compilación importa
+**From Go:**
+- Background Tasks must be deliberate (not loose goroutines/Promises)
+- Context propagation only for request-scoped data
+- Compilation performance matters
 
-**De Rust:**
-- Type-safety extremo previene errores en producción
-- Fail-fast con validación en boundaries
-- Inmutabilidad como default
+**From Rust:**
+- Extreme type-safety prevents errors in production
+- Fail-fast with validation at boundaries
+- Immutability as default
 
-**De Python (FastAPI):**
-- Single source of truth para schemas
-- Docs automáticas desde código
-- DX como prioridad #1
+**From Python (FastAPI):**
+- Single source of truth for schemas
+- Automatic docs from code
+- DX as priority #1
 
-**Filosofía:** Estudiamos soluciones en múltiples ecosistemas, adoptamos lo mejor de cada uno, y descartamos lo que no encaja con nuestros pilares.
+**Philosophy:** We study solutions in multiple ecosystems, adopt the best from each, and discard what doesn't fit our pillars.
 
 ---
 
-## 🧪 Filosofía de Testing: Nuestro Diferenciador Real
+## 🧪 Testing Philosophy: Our Real Differentiator
 
-### Testing No Es Una Métrica, Es Una Cultura (Y Una Ventaja Competitiva)
+### Testing Is Not a Metric, It's a Culture (And a Competitive Advantage)
 
-**El problema que nadie está resolviendo:**
+**The problem no one is solving:**
 
-En TODOS los ecosistemas (Node.js, Python, Go, Rust, Java), el testing tiene un problema fundamental:
+In ALL ecosystems (Node.js, Python, Go, Rust, Java), testing has a fundamental problem:
 
 ```typescript
 ✅ Tests passing: 150/150
 ✅ Coverage: 95%
-❌ Código con bug crítico en producción
+❌ Code with critical bug in production
 ```
 
-**¿Por qué?** Porque **coverage no mide calidad de tests**, solo líneas ejecutadas.
+**Why?** Because **coverage doesn't measure test quality**, only lines executed.
 
 ---
 
-### El Problema del Coverage Superficial
+### The Problem of Superficial Coverage
 
-**Test inútil con 100% coverage:**
+**Useless test with 100% coverage:**
 ```typescript
 test('user creation', async () => {
   const result = await createUser({ name: 'Gaby', age: 30 });
-  expect(result).toBeDefined(); // ✅ Pasa, coverage = 100%
+  expect(result).toBeDefined(); // ✅ Passes, coverage = 100%
 });
 
-// Código en producción con bug:
+// Code in production with bug:
 function createUser(data) {
-  // ❌ BUG: No valida age > 18
-  return db.insert(data); // El test "pasa" igual
+  // ❌ BUG: Doesn't validate age > 18
+  return db.insert(data); // Test "passes" anyway
 }
 ```
 
-**Este test da falsa sensación de seguridad:**
-- Ejecuta todas las líneas ✅
-- El test pasa ✅
-- El bug llega a producción ❌
+**This test gives false sense of security:**
+- Executes all lines ✅
+- Test passes ✅
+- Bug reaches production ❌
 
 ---
 
-### La Solución: Mutation Testing + TinyTest
+### The Solution: Mutation Testing + TinyTest
 
-**Mutation Testing detecta tests inútiles:**
+**Mutation Testing detects useless tests:**
 
-1. **Stryker introduce un mutante** (cambia el código):
+1. **Stryker introduces a mutant** (changes the code):
    ```typescript
    // Original: .min(18)
-   // Mutante: .min(17)  ← Si el test sigue pasando, el test es inútil
+   // Mutant: .min(17)  ← If test still passes, the test is useless
    ```
 
-2. **TinyTest hace que escribir tests BUENOS sea fácil:**
+2. **TinyTest makes writing GOOD tests easy:**
    ```typescript
    test('user creation validates age', async () => {
      const api = new TinyTest();
@@ -535,190 +535,189 @@ function createUser(data) {
        handler: ({ body }) => createUser(body),
      });
      
-     // Boundary testing: valida el límite exacto
+     // Boundary testing: validates exact limit
      await api.testBoundaries('POST', '/users', [
-       { input: { age: 17 }, expected: { success: false } }, // ❌ Debe fallar
-       { input: { age: 18 }, expected: { success: true } },  // ✅ Debe pasar
+       { input: { age: 17 }, expected: { success: false } }, // ❌ Must fail
+       { input: { age: 18 }, expected: { success: true } },  // ✅ Must pass
      ]);
    });
-   // Cuando Stryker cambia .min(18) → .min(17), este test FALLA
-   // Mutante detectado ✅
+   // When Stryker changes .min(18) → .min(17), this test FAILS
+   // Mutant detected ✅
    ```
 
 ---
 
-### Por Qué TinyTest Es Nuestro Diferenciador Real
+### Why TinyTest Is Our Real Differentiator
 
-**Mutation Testing existe en todos los lenguajes:**
+**Mutation Testing exists in all languages:**
 - Python: mutpy, cosmic-ray
 - Go: go-mutesting, gremlins
 - Rust: cargo-mutants
-- Java: PIT (el más maduro)
+- Java: PIT (the most mature)
 - JavaScript: Stryker
 
-**Pero NADIE lo usa (<5% de proyectos) porque:**
-1. ❌ Setup complicado
-2. ❌ Lento (10-100x más que tests normales)
-3. ❌ Reportes difíciles de interpretar
-4. ❌ No integrado en el workflow
+**But NO ONE uses it (<5% of projects) because:**
+1. ❌ Complicated setup
+2. ❌ Slow (10-100x slower than normal tests)
+3. ❌ Hard to interpret reports
+4. ❌ Not integrated in workflow
 
-**TinyApi resuelve todos estos problemas:**
-1. ✅ **Setup automático:** Viene configurado out-of-the-box
-2. ✅ **Tests rápidos de escribir:** TinyTest elimina boilerplate
-3. ✅ **Reportes públicos:** Trust Engineering = transparencia total
-4. ✅ **Parte del framework:** No es un addon, es core
+**SyntroJS solves all these problems:**
+1. ✅ **Automatic setup:** Comes configured out-of-the-box
+2. ✅ **Quick to write tests:** TinyTest eliminates boilerplate
+3. ✅ **Public reports:** Trust Engineering = total transparency
+4. ✅ **Part of the framework:** Not an addon, it's core
 
 ---
 
-### Qué Rechazamos
+### What We Reject
 
-❌ **Coverage como vanity metric**
-- 100% coverage no garantiza calidad
-- Solo mide "líneas ejecutadas", no "lógica validada"
+❌ **Coverage as vanity metric**
+- 100% coverage doesn't guarantee quality
+- Only measures "lines executed", not "logic validated"
 
-❌ **Tests que solo verifican "que no crashea"**
+❌ **Tests that only verify "it doesn't crash"**
 ```typescript
-// Test inútil:
-expect(result).toBeDefined(); // ¿Y qué? ¿Qué valida esto?
+// Useless test:
+expect(result).toBeDefined(); // And? What does this validate?
 ```
 
-❌ **Mocks excesivos que no validan comportamiento real**
+❌ **Excessive mocks that don't validate real behavior**
 ```typescript
-// Test que mockea TODO:
+// Test that mocks EVERYTHING:
 const mockDb = { insert: vi.fn(() => ({ id: 1 })) };
-// No valida que la DB realmente funcione
+// Doesn't validate that DB really works
 ```
 
 ---
 
-### Qué Abrazamos
+### What We Embrace
 
-✅ **Mutation testing (tests que realmente validan lógica)**
-- Si el test no puede detectar un mutante, es inútil
-- >85% mutation score = tests robustos
+✅ **Mutation testing (tests that really validate logic)**
+- If test can't detect a mutant, it's useless
+- >85% mutation score = robust tests
 
-✅ **Boundary testing (validación de límites exactos)**
+✅ **Boundary testing (validation of exact limits)**
 ```typescript
 await api.testBoundaries('POST', '/users', [
-  { input: { age: 17 }, expected: { success: false } }, // Justo antes del límite
-  { input: { age: 18 }, expected: { success: true } },  // Justo en el límite
+  { input: { age: 17 }, expected: { success: false } }, // Just before limit
+  { input: { age: 18 }, expected: { success: true } },  // Just at limit
 ]);
 ```
 
-✅ **Contract testing (validación de interfaces)**
+✅ **Contract testing (validation of interfaces)**
 ```typescript
 await api.testContract('POST', '/users', {
   input: { name: 'Gaby', age: 30 },
-  responseSchema: UserResponseSchema, // Valida el contrato
+  responseSchema: UserResponseSchema, // Validates contract
 });
 ```
 
-✅ **Property-based testing (exploración de edge cases)**
+✅ **Property-based testing (exploration of edge cases)**
 ```typescript
 await api.testProperty('POST', '/users', {
   schema: UserSchema,
-  iterations: 100, // Genera 100 inputs aleatorios válidos
-  property: (response) => response.id > 0, // Invariante que debe cumplirse
+  iterations: 100, // Generates 100 random valid inputs
+  property: (response) => response.id > 0, // Invariant that must hold
 });
 ```
 
 ---
 
-### La Filosofía
+### The Philosophy
 
-> **"Si un test no puede fallar cuando el código está roto, no es un test útil."**
+> **"If a test can't fail when code is broken, it's not a useful test."**
 
-**Corolario:** Si Stryker muta tu código y el test sigue pasando, el test es inútil.
+**Corollary:** If Stryker mutates your code and the test still passes, the test is useless.
 
-**Nuestro compromiso:** Hacer que escribir tests BUENOS sea tan fácil como escribir tests malos.
-
----
-
-### Por Qué Esto Es Único
-
-**Ningún framework hace esto:**
-- NestJS: Testing estándar (Jest/Vitest)
-- Fastify: Testing manual
-- Express: Testing manual
-- FastAPI (Python): Testing estándar (pytest)
-- Echo/Chi (Go): Testing estándar (testing/httptest)
-
-**TinyApi es el único que:**
-1. Hace que escribir tests sea trivial (TinyTest)
-2. Valida que los tests sean útiles (Mutation Testing)
-3. Publica reportes de calidad (Trust Engineering)
-4. Lo hace todo parte del framework, no opcional
-
-**Esto nos convierte en el framework para equipos que valoran calidad verificable.**
+**Our commitment:** Make writing GOOD tests as easy as writing bad tests.
 
 ---
 
-## 🌍 Filosofía de Comunidad
+### Why This Is Unique
 
-### Construimos Con la Comunidad, No Para la Comunidad
+**No framework does this:**
+- NestJS: Standard testing (Jest/Vitest)
+- Fastify: Manual testing
+- Express: Manual testing
+- FastAPI (Python): Standard testing (pytest)
+- Echo/Chi (Go): Standard testing (testing/httptest)
 
-**Principios de gobernanza:**
-1. **Decisiones técnicas son públicas** - RFCs para features mayores
-2. **Contribuciones son bienvenidas** - Good first issues siempre disponibles
-3. **Meritocracia de ideas** - La mejor idea gana, sin importar quién la propone
-4. **Respeto absoluto** - Zero tolerance para toxicidad
+**SyntroJS is the only one that:**
+1. Makes writing tests trivial (TinyTest)
+2. Validates that tests are useful (Mutation Testing)
+3. Publishes quality reports (Trust Engineering)
+4. Makes it all part of the framework, not optional
 
-**Filosofía:** Creemos que el mejor código viene de la diversidad de perspectivas.
-
----
-
-## ⚠️ Advertencias Conscientes
-
-### Reconocemos Nuestras Limitaciones
-
-**No somos la mejor opción si:**
-- Necesitás un framework full-stack con ORM integrado
-- Preferís máxima flexibilidad sin opiniones arquitectónicas
-- Tu equipo ya domina otra herramienta y está satisfecho
-- Buscás la última moda tecnológica sin fundamentos sólidos
-
-**Podemos ser una buena opción si:**
-- Construís APIs puras de alto rendimiento
-- Valorás type-safety total sobre todo
-- Necesitás estructura sin complejidad innecesaria
-- Buscás preparación para producción desde día 1
-
-**Filosofía:** Ser excelente en nuestro nicho > ser mediocre en todo.
+**This makes us the framework for teams that value verifiable quality.**
 
 ---
 
-## 🔮 Visión a Largo Plazo
+## 🌍 Community Philosophy
 
-### ¿Qué Queremos Ser en 5 Años?
+### We Build WITH the Community, Not FOR the Community
 
-**No queremos:**
-- Ser el framework más popular (popularidad es vanidad)
-- Tener la mayor cantidad de features (features son deuda)
-- Dominar todos los casos de uso (especialización > generalización)
+**Governance principles:**
+1. **Technical decisions are public** - RFCs for major features
+2. **Contributions are welcome** - Good first issues always available
+3. **Meritocracy of ideas** - Best idea wins, regardless of who proposes it
+4. **Absolute respect** - Zero tolerance for toxicity
 
-**Sí aspiramos a:**
-- Ser un framework **confiable** para APIs de producción
-- Ofrecer una **excelente DX** en nuestro segmento
-- Ser una **opción sólida** cuando type-safety y performance importan
-- Mantener **coherencia** con nuestros pilares fundamentales
+**Philosophy:** We believe best code comes from diversity of perspectives.
 
 ---
 
-## 💎 El Mantra
+## ⚠️ Conscious Warnings
 
-> **"Tiny en código. Mighty en impacto."**
+### We Acknowledge Our Limitations
 
-Cada línea de código justificada.  
-Cada feature medida por su valor.  
-Cada decisión guiada por principios.
+**We're not the best option if:**
+- You need a full-stack framework with integrated ORM
+- You prefer maximum flexibility without architectural opinions
+- Your team already masters another tool and is satisfied
+- You seek the latest tech trend without solid foundations
 
-No solo construimos un framework.  
-Construimos una filosofía ejecutable.
+**We can be a good option if:**
+- You build pure high-performance APIs
+- You value total type-safety above all
+- You need structure without unnecessary complexity
+- You seek production readiness from day 1
+
+**Philosophy:** Being excellent in our niche > being mediocre at everything.
 
 ---
 
-**TinyApi: Nuestra visión de lo que un framework moderno puede ser.**
+## 🔮 Long-Term Vision
 
-_Última actualización: Octubre 2025_  
-_Este documento evoluciona con el proyecto, pero los principios permanecen._
+### What Do We Want to Be in 5 Years?
 
+**We don't want:**
+- To be the most popular framework (popularity is vanity)
+- To have the most features (features are debt)
+- To dominate all use cases (specialization > generalization)
+
+**We aspire to:**
+- Be a **reliable** framework for production APIs
+- Offer **excellent DX** in our segment
+- Be a **solid option** when type-safety and performance matter
+- Maintain **consistency** with our fundamental pillars
+
+---
+
+## 💎 The Mantra
+
+> **"Tiny in code. Mighty in impact."**
+
+Each line of code justified.  
+Each feature measured by its value.  
+Each decision guided by principles.
+
+We don't just build a framework.  
+We build an executable philosophy.
+
+---
+
+**SyntroJS: Our vision of what a modern framework can be.**
+
+_Last updated: October 2025_  
+_This document evolves with the project, but principles remain._

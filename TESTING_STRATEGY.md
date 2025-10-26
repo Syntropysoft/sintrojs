@@ -1,10 +1,10 @@
-# 🧪 Testing Strategy y Requisitos de Cobertura
+# 🧪 Testing Strategy and Coverage Requirements
 
-### Suite de Testing Completa
+### Complete Testing Suite
 
 ```
 tests/
-├── unit/                      # Tests unitarios (>90% coverage)
+├── unit/                      # Unit tests (>90% coverage)
 │   ├── domain/
 │   │   ├── Route.test.ts
 │   │   ├── HTTPException.test.ts
@@ -20,13 +20,13 @@ tests/
 │       ├── FastifyAdapter.test.ts
 │       └── ZodAdapter.test.ts
 │
-├── integration/               # Tests de integración
+├── integration/               # Integration tests
 │   ├── routing.test.ts
 │   ├── validation.test.ts
 │   ├── openapi.test.ts
 │   └── dependencies.test.ts
 │
-├── e2e/                       # Tests end-to-end
+├── e2e/                       # End-to-end tests
 │   ├── full-api.test.ts
 │   ├── error-handling.test.ts
 │   └── background-tasks.test.ts
@@ -38,7 +38,7 @@ tests/
 ### TinyTest - Testing Wrapper
 
 ```typescript
-import { TinyTest } from 'tinyapi/testing';
+import { TinyTest } from 'syntrojs/testing';
 
 describe('Users API', () => {
   let api: TinyTest;
@@ -80,5 +80,5 @@ describe('Users API', () => {
 
 - **Unit tests:** >90%
 - **Integration tests:** >85%
-- **E2E tests:** Critical paths cubiertos
+- **E2E tests:** Critical paths covered
 - **Mutation testing:** >85% mutation score
