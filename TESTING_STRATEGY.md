@@ -4,34 +4,55 @@
 
 ```
 tests/
-├── unit/                      # Unit tests (>90% coverage)
-│   ├── domain/
-│   │   ├── Route.test.ts
+├── universal/                 # Tests that work in all runtimes (DDD structure)
+│   ├── domain/                # Domain layer tests
 │   │   ├── HTTPException.test.ts
-│   │   └── Context.test.ts
+│   │   └── Route.test.ts
 │   │
-│   ├── application/
-│   │   ├── RouteRegistry.test.ts
-│   │   ├── SchemaValidator.test.ts
+│   ├── application/           # Application layer tests
+│   │   ├── BackgroundTasks.test.ts
+│   │   ├── DependencyInjector.test.ts
+│   │   ├── DocsRenderer.test.ts
+│   │   ├── ErrorHandler.test.ts
 │   │   ├── OpenAPIGenerator.test.ts
-│   │   └── DependencyInjector.test.ts
+│   │   ├── RouteRegistry.test.ts
+│   │   └── SchemaValidator.test.ts
 │   │
-│   └── infrastructure/
-│       ├── FastifyAdapter.test.ts
-│       └── ZodAdapter.test.ts
+│   ├── e2e/                  # End-to-end tests
+│   │   ├── background-tasks.test.ts
+│   │   ├── basic-api.test.ts
+│   │   ├── dependency-injection.test.ts
+│   │   ├── docs.test.ts
+│   │   ├── openapi.test.ts
+│   │   ├── plugins.test.ts
+│   │   ├── security.test.ts
+│   │   └── smart-mutator.test.ts
+│   │
+│   ├── middleware/           # Middleware tests
+│   │   └── middleware-system.test.ts
+│   │
+│   └── websocket/            # WebSocket tests
+│       └── websocket-system.test.ts
 │
-├── integration/               # Integration tests
-│   ├── routing.test.ts
-│   ├── validation.test.ts
-│   ├── openapi.test.ts
-│   └── dependencies.test.ts
+├── node/                     # Node.js specific tests
+│   ├── infrastructure/
+│   │   ├── FastifyAdapter.test.ts
+│   │   └── ZodAdapter.test.ts
+│   ├── security/
+│   │   ├── APIKey.test.ts
+│   │   ├── HTTPBasic.test.ts
+│   │   ├── HTTPBearer.test.ts
+│   │   ├── jwt.test.ts
+│   │   └── OAuth2PasswordBearer.test.ts
+│   └── testing/
+│       ├── SmartMutator.test.ts
+│       └── TinyTest.test.ts
 │
-├── e2e/                       # End-to-end tests
-│   ├── full-api.test.ts
-│   ├── error-handling.test.ts
-│   └── background-tasks.test.ts
+├── bun/                      # Bun specific tests
+│   ├── performance.test.ts
+│   └── runtime-detection.test.ts
 │
-└── mutation/                  # Mutation testing (Stryker)
+└── mutation/                 # Mutation testing (Stryker)
     └── stryker.config.js
 ```
 
@@ -75,6 +96,18 @@ describe('Users API', () => {
   });
 });
 ```
+
+### Directory Organization Principles
+
+**DDD-aligned structure:** Our test directory mirrors `src/` to facilitate:
+- Finding all tests for a specific domain/application layer
+- Understanding test coverage at a glance
+- Maintaining consistency with our architecture
+
+**File naming convention:**
+- `<component-name>.test.ts` - Standard test files
+- Tests are organized by domain/application/infrastructure layers
+- Runtime-specific tests are separated into `node/` and `bun/` folders
 
 ### Coverage Requirements
 
