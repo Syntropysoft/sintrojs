@@ -1,7 +1,9 @@
-# SyntroJS 🚀
-
-> **FastAPI for Node.js & Bun** - Same Code, Maximum Performance  
-> ⚡ **3.8x faster with Bun** | 🚀 **89.3% of Fastify with Node.js**
+<p align="center">
+  <img src="./assets/syntropySoft.png" alt="SyntroJS Logo" width="170"/>
+  <h1 align="center">SyntroJS 🚀</h1>
+  <p align="center"><b>FastAPI for Node.js & Bun</b></p>
+  <p align="center">⚡ <b>3.8x faster with Bun</b> | 🚀 <b>89.3% of Fastify with Node.js</b></p>
+</p>
 
 [![npm version](https://img.shields.io/npm/v/syntrojs.svg)](https://www.npmjs.com/package/syntrojs)
 [![🚀 DUAL RUNTIME](https://img.shields.io/badge/🚀-DUAL%20RUNTIME-red.svg)](https://github.com/Syntropysoft/sintrojs)
