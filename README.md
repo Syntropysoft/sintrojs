@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/syntropySoft.png" alt="SyntroJS Logo" width="170"/>
+  <img src="https://raw.githubusercontent.com/Syntropysoft/sintrojs/main/assets/syntropySoft.png" alt="SyntroJS Logo" width="170"/>
   <h1 align="center">SyntroJS 🚀</h1>
   <p align="center"><b>FastAPI for Node.js & Bun</b></p>
   <p align="center">⚡ <b>3.8x faster with Bun</b> | 🚀 <b>89.3% of Fastify with Node.js</b></p>
