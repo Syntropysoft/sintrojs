@@ -14,16 +14,16 @@ import {
 
 describe('Plugins E2E', () => {
   describe('Plugin Registration', () => {
-    test('should throw error if Fastify instance is not provided', async () => {
-      await expect(registerCors(null as any)).rejects.toThrow('Fastify instance is required');
+    test('should throw error if server instance is not provided', async () => {
+      await expect(registerCors(null as any)).rejects.toThrow('Server instance is required');
 
-      await expect(registerHelmet(null as any)).rejects.toThrow('Fastify instance is required');
+      await expect(registerHelmet(null as any)).rejects.toThrow('Server instance is required');
 
       await expect(registerCompression(null as any)).rejects.toThrow(
-        'Fastify instance is required',
+        'Server instance is required',
       );
 
-      await expect(registerRateLimit(null as any)).rejects.toThrow('Fastify instance is required');
+      await expect(registerRateLimit(null as any)).rejects.toThrow('Server instance is required');
     });
 
     test('should register plugins successfully when dependencies are installed', async () => {

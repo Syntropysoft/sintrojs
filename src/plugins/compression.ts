@@ -1,7 +1,7 @@
 /**
  * Compression Plugin - Wrapper for @fastify/compress
  *
- * Response compression for TinyApi (gzip, deflate, brotli)
+ * Response compression for SyntroJS (gzip, deflate, brotli)
  */
 
 import type { FastifyInstance } from 'fastify';

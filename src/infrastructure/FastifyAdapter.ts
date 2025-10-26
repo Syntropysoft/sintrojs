@@ -131,7 +131,29 @@ class FastifyAdapterImpl {
           await cleanup();
         }
 
-        // Send response
+        // Check if result is a RouteResponse object (has status, body, headers)
+        // This allows handlers to return { status, body, headers } for full control
+        if (result && typeof result === 'object' && 'status' in result && 'body' in result) {
+          const response = result as { status: number; body: unknown; headers?: Record<string, string> };
+          
+          // Set content type first if provided
+          if (response.headers && response.headers['Content-Type']) {
+            reply.type(response.headers['Content-Type']);
+          }
+          
+          // Set other headers if provided
+          if (response.headers) {
+            for (const [key, value] of Object.entries(response.headers)) {
+              if (key !== 'Content-Type') {
+                reply.header(key, value);
+              }
+            }
+          }
+          
+          return reply.status(response.status).send(response.body);
+        }
+
+        // Send response as-is (string, object, etc.)
         const statusCode = route.config.status ?? 200;
         return reply.status(statusCode).send(result);
       } catch (error) {

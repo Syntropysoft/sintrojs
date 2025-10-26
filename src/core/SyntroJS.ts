@@ -119,6 +119,7 @@ export class SyntroJS {
   private middlewareRegistry: MiddlewareRegistry;
   private websocketRegistry: WebSocketRegistry;
   private isStarted = false;
+  private openAPIEndpointsRegistered = false;
 
   constructor(config: SyntroJSConfig = {}) {
     // Guard clause: validate config
@@ -144,8 +145,8 @@ export class SyntroJS {
     // Create server instance via adapter (composition)
     this.server = this.createServerInstance();
 
-    // Register OpenAPI endpoint
-    this.registerOpenAPIEndpoint();
+    // Note: OpenAPI endpoints are registered via regular routes
+    // No special initialization needed - they use the standard route registration
 
     // Register routes from config if provided
     if (this.config.routes) {
@@ -451,7 +452,13 @@ export class SyntroJS {
       throw new Error('Server is already started');
     }
 
-    // Register all routes with Fastify
+    // Register OpenAPI endpoints only once
+    if (!this.openAPIEndpointsRegistered) {
+      this.registerOpenAPIEndpoints();
+      this.openAPIEndpointsRegistered = true;
+    }
+    
+    // Register all routes
     this.registerAllRoutes();
 
     // Start server via adapter
@@ -613,43 +620,53 @@ export class SyntroJS {
   }
 
   /**
-   * Registers OpenAPI and docs endpoints
+   * Registers OpenAPI and docs endpoints after server starts
    */
-  private registerOpenAPIEndpoint(): void {
-    // Register /openapi.json endpoint
-    this.registerRoute('GET', '/openapi.json', {
-      handler: async () => {
-        return this.getOpenAPISpec();
-      },
-    });
+  private async registerOpenAPIEndpoints(): Promise<void> {
+    // Register /openapi.json endpoint only if not already registered
+    if (!RouteRegistry.has('GET', '/openapi.json')) {
+      this.registerRoute('GET', '/openapi.json', {
+        handler: async () => {
+          return this.getOpenAPISpec();
+        },
+      });
+    }
 
-    // Register /docs endpoint (Swagger UI)
-    this.registerRoute('GET', '/docs', {
-      handler: async () => {
-        const html = DocsRenderer.renderSwaggerUI({
-          openApiUrl: '/openapi.json',
-          title: this.config.title,
-        });
-        // For Fastify, return HTML with proper content-type
-        // For Bun, we'll need to handle this in the adapter
-        return new Response(html, {
-          headers: { 'Content-Type': 'text/html' },
-        });
-      },
-    });
+    // Register /docs endpoint (Swagger UI) only if not already registered
+    if (!RouteRegistry.has('GET', '/docs')) {
+      this.registerRoute('GET', '/docs', {
+        handler: async () => {
+          const html = DocsRenderer.renderSwaggerUI({
+            openApiUrl: '/openapi.json',
+            title: this.config.title,
+          });
+          // Return object with headers to set content-type
+          return {
+            status: 200,
+            body: html,
+            headers: { 'Content-Type': 'text/html' },
+          };
+        },
+      });
+    }
 
-    // Register /redoc endpoint
-    this.registerRoute('GET', '/redoc', {
-      handler: async () => {
-        const html = DocsRenderer.renderReDoc({
-          openApiUrl: '/openapi.json',
-          title: this.config.title,
-        });
-        return new Response(html, {
-          headers: { 'Content-Type': 'text/html' },
-        });
-      },
-    });
+    // Register /redoc endpoint only if not already registered
+    if (!RouteRegistry.has('GET', '/redoc')) {
+      this.registerRoute('GET', '/redoc', {
+        handler: async () => {
+          const html = DocsRenderer.renderReDoc({
+            openApiUrl: '/openapi.json',
+            title: this.config.title,
+          });
+          // Return object with headers to set content-type
+          return {
+            status: 200,
+            body: html,
+            headers: { 'Content-Type': 'text/html' },
+          };
+        },
+      });
+    }
   }
 
   /**

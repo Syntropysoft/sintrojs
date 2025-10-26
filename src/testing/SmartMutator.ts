@@ -1,7 +1,7 @@
 /**
  * SmartMutator - Intelligent Mutation Testing
  *
- * Responsibility: Optimize Stryker configuration for TinyApi
+ * Responsibility: Optimize Stryker configuration for SyntroJS
  * Pattern: Analyzer + Config Generator
  * Principles: SOLID, Smart Optimization
  *
@@ -88,14 +88,14 @@ export interface SmartMutatorOptions {
   mode?: 'smart' | 'full';
   /**
    * Optional path to a Stryker configuration file.
-   * If not provided, a default configuration optimized for TinyApi will be used.
+   * If not provided, a default configuration optimized for SyntroJS will be used.
    * @default 'stryker.config.mjs'
    */
   strykerConfigFile?: string;
 }
 
 /**
- * SmartMutator class provides advanced mutation testing capabilities for the TinyApi framework.
+ * SmartMutator class provides advanced mutation testing capabilities for the SyntroJS framework.
  * It integrates with Stryker to perform mutation testing, offering both smart and full mutation modes.
  * The smart mode (TODO) aims to optimize the mutation testing process by focusing on relevant code changes.
  * The full mode provides comprehensive mutation coverage across the entire codebase.

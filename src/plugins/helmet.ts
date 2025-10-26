@@ -1,7 +1,7 @@
 /**
  * Helmet Plugin - Wrapper for @fastify/helmet
  *
- * Security headers configuration for TinyApi
+ * Security headers configuration for SyntroJS
  */
 
 import type { FastifyInstance } from 'fastify';

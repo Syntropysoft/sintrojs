@@ -1,5 +1,5 @@
 /**
- * TinyApi Plugins
+ * SyntroJS Plugins
  *
  * Optional plugins for common use cases
  * All plugins are wrappers around Fastify plugins

@@ -1,7 +1,7 @@
 /**
  * CORS Plugin - Wrapper for @fastify/cors
  *
- * Cross-Origin Resource Sharing configuration for TinyApi
+ * Cross-Origin Resource Sharing configuration for SyntroJS
  */
 
 import type { FastifyInstance } from 'fastify';

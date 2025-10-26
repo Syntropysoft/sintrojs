@@ -281,6 +281,24 @@ bun app.js
 
 ## 📚 Examples
 
+### 🎯 Comprehensive Examples Repository
+
+Looking for production-ready examples and benchmarks? Check out our **[Examples Repository](https://github.com/Syntropysoft/syntrojs-examples)**:
+
+```bash
+git clone https://github.com/Syntropysoft/syntrojs-examples.git
+cd syntrojs-examples
+```
+
+**What's inside:**
+- 🚀 **Complete microservices architecture** with Docker
+- 📊 **Performance benchmarks** ready to run
+- 🧪 **Testing examples** with TinyTest
+- 🔐 **Security implementations** (JWT, OAuth2, API Key)
+- 📡 **WebSocket examples** with room management
+- 🔄 **Background tasks** examples
+- 🛠️ **Dependency injection** patterns
+
 ### Basic CRUD API
 
 ```javascript
@@ -505,7 +523,9 @@ await app.listen(3000);
 
 ## ⚡ Performance Benchmarks
 
-SyntroJS delivers **exceptional performance** with **dual runtime support**:
+SyntroJS delivers **exceptional performance** with **dual runtime support**.
+
+**📊 Run benchmarks yourself:** Clone our [examples repository](https://github.com/Syntropysoft/syntrojs-examples) and run `pnpm benchmark`.
 
 ### 🏆 Performance Ranking
 

@@ -371,6 +371,32 @@ export class FluentAdapter {
           return reply.status(statusCode).send(validatedResult);
         }
 
+        // Check if result is a RouteResponse object (has status, body, headers)
+        if (result && typeof result === 'object' && 'status' in result && 'body' in result) {
+          const response = result as { status: number; body: unknown; headers?: Record<string, string> };
+          
+          // Set content type first if provided
+          if (response.headers && response.headers['Content-Type']) {
+            reply.type(response.headers['Content-Type']);
+          }
+          
+          // Set other headers if provided
+          if (response.headers) {
+            for (const [key, value] of Object.entries(response.headers)) {
+              if (key !== 'Content-Type') {
+                reply.header(key, value);
+              }
+            }
+          }
+
+          // Ejecutar cleanup después de enviar la respuesta
+          if (cleanupFn) {
+            setImmediate(() => cleanupFn!());
+          }
+
+          return reply.status(response.status).send(response.body);
+        }
+
         const statusCode = route.config.status ?? 200;
 
         // Ejecutar cleanup después de enviar la respuesta

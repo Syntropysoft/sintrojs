@@ -1,4 +1,16 @@
-import type { Server } from 'bun';
+// Bun types are only available when running in Bun runtime
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+interface BunServer {
+  stop(): void;
+}
+
+interface Bun {
+  serve(options: {
+    port: number;
+    hostname: string;
+    fetch(request: Request): Promise<Response>;
+  }): BunServer;
+}
 import type { Route } from '../domain/Route';
 import type { RequestContext } from '../domain/types';
 import { SchemaValidator } from '../application/SchemaValidator';
@@ -13,7 +25,7 @@ import { MiddlewareRegistry } from '../application/MiddlewareRegistry';
  */
 
 class BunAdapterImpl {
-  private server: Server | null = null;
+  private server: BunServer | null = null;
   private routes: Map<string, Route> = new Map();
   private isRunning = false;
   private middlewareRegistry?: MiddlewareRegistry;
@@ -74,12 +86,14 @@ class BunAdapterImpl {
     }
 
     // Create Bun native server
-    this.server = Bun.serve({
+    const self = this;
+    const bun = (globalThis as { Bun?: Bun }).Bun!;
+    this.server = bun.serve({
       port,
       hostname: host,
-      async fetch(request) {
-        return await this.handleRequest(request);
-      }.bind(this),
+      async fetch(request: Request): Promise<Response> {
+        return await self.handleRequest(request);
+      },
     });
 
     this.isRunning = true;
@@ -154,7 +168,7 @@ class BunAdapterImpl {
       });
     } catch (error) {
       // Handle errors
-      return this.handleError(error);
+      return await this.handleError(error);
     }
   }
 
@@ -228,8 +242,9 @@ class BunAdapterImpl {
    * @param error - Error to handle
    * @returns Error response
    */
-  private handleError(error: unknown): Response {
-    const httpException = ErrorHandler.handle(error, {} as any);
+  private async handleError(error: unknown): Promise<Response> {
+    const errorObj = error instanceof Error ? error : new Error(String(error));
+    const httpException = await ErrorHandler.handle(errorObj, {} as any);
 
     return new Response(JSON.stringify(httpException.body), {
       status: httpException.status,

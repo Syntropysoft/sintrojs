@@ -1,7 +1,7 @@
 /**
  * Rate Limiting Plugin - Wrapper for @fastify/rate-limit
  *
- * Request rate limiting for TinyApi
+ * Request rate limiting for SyntroJS
  */
 
 import type { FastifyInstance } from 'fastify';
