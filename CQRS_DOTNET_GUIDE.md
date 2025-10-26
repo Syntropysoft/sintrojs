@@ -1,5 +1,5 @@
-# SyntroJS for .NET - Guía de Implementación
-## Framework Minimalista para CQRS + SAGA + Event-Driven
+# SintroNet - Guía de Implementación
+## Framework Minimalista para CQRS + SAGA + Event-Driven en .NET
 
 > **Filosofía:** "Minimal en configuración. Máximo en potencia. La complejidad empresarial reducida a APIs declarativas."
 
@@ -10,18 +10,20 @@
 1. [Visión General](#visión-general)
 2. [El Problema que Resolvemos](#el-problema-que-resolvemos)
 3. [Solución: API Declarativa](#solución-api-declarativa)
-4. [Arquitectura Interna](#arquitectura-interna)
-5. [Código del Usuario vs Código de la Librería](#código-del-usuario-vs-código-de-la-librería)
-6. [Stack Tecnológico](#stack-tecnológico)
-7. [Estructura de Librería](#estructura-de-librería)
-8. [Implementación Detallada](#implementación-detallada)
-9. [Consideraciones para Agentes de IA](#consideraciones-para-agentes-de-ia)
+4. [Similitudes con SyntroJS](#similitudes-con-syntrojs)
+5. [Ventajas Exclusivas de .NET](#ventajas-exclusivas-de-net)
+6. [Swagger y Documentación Automática](#swagger-y-documentación-automática)
+7. [Observabilidad y Logging](#observabilidad-y-logging)
+8. [Arquitectura Interna](#arquitectura-interna)
+9. [Stack Tecnológico](#stack-tecnológico)
+10. [Implementación Detallada](#implementación-detallada)
+11. [Consideraciones para Agentes de IA](#consideraciones-para-agentes-de-ia)
 
 ---
 
 ## 🎯 Visión General
 
-**SyntroJS for .NET** es una librería que abstrae toda la complejidad de arquitectura empresarial (CQRS, SAGAs, Event-Driven, Proyecciones) detrás de una API declarativa extremadamente simple, similar a SyntroJS pero para .NET.
+**SintroNet** es una librería de .NET que abstrae toda la complejidad de arquitectura empresarial (CQRS, SAGAs, Event-Driven, Proyecciones) detrás de una API declarativa extremadamente simple, inspirada en **SyntroJS** pero aprovechando las ventajas únicas de .NET.
 
 ### Principios Fundamentales
 
@@ -29,7 +31,10 @@
 2. **Abstracción Total**: CQRS, SAGAs, eventos, proyecciones son implícitos
 3. **Zero Boilerplate**: No hay CommandHandlers, QueryHandlers, EventHandlers manuales
 4. **Auto-Orchestration**: SAGAs se generan automáticamente desde la configuración
-5. **Type-Safe**: Todo fuertemente tipado con mejor performance en .NET
+5. **Type-Safe**: Todo fuertemente tipado con compilación estática
+6. **Observability First**: Logging, métricas y tracing con mínima configuración
+7. **Swagger Integrado**: OpenAPI y documentación interactiva automática
+8. **Performance Nativo**: Aprovecha .NET para máximo rendimiento
 
 ---
 
@@ -140,6 +145,266 @@ app.Run();
 - ✅ Mapeos DTO ↔ Aggregate
 - ✅ Migraciones EF Core
 - ✅ Queries optimizadas con Dapper
+- ✅ OpenAPI/Swagger automático
+- ✅ Logging estructurado
+- ✅ Métricas y trazabilidad
+
+---
+
+## 🔄 Similitudes con SyntroJS
+
+### API Fluent Similar
+
+**SintroNet** toma inspiración directa de **SyntroJS**:
+
+#### SyntroJS (TypeScript/Node.js)
+```typescript
+app.post('/orders', {
+  body: OrderSchema,
+  status: 201,
+  dependencies: { db: inject(getDatabase) },
+  handler: ({ body, dependencies }) => 
+    dependencies.db.orders.create(body)
+});
+```
+
+#### SintroNet (C#)
+```csharp
+app.Entity<Order>()
+    .Write(model => model
+        .AutoCreateEndpoint()  // POST /api/orders
+        .UseAggregate<OrderAggregate>()
+        .Dependencies(db => db.Use<Database>())
+    );
+```
+
+### Características Compartidas
+
+| Característica | SyntroJS | SintroNet |
+|----------------|----------|-----------|
+| **API Declarativa** | ✅ | ✅ |
+| **Zero Boilerplate** | ✅ | ✅ |
+| **Dependency Injection** | ✅ | ✅ |
+| **Validación Automática** | ✅ | ✅ |
+| **OpenAPI/Swagger** | ✅ | ✅ |
+| **Type-Safe** | ✅ TypeScript | ✅ C# Strong Typing |
+| **Event-Driven** | ✅ | ✅ |
+| **CQRS** | Manual | ✅ Auto-generado |
+| **SAGAs** | Manual | ✅ Auto-orquestadas |
+
+---
+
+## 🚀 Ventajas Exclusivas de .NET
+
+### 1. Compilación Estática
+```csharp
+// ❌ Error en COMPILACIÓN, no en runtime
+app.Entity<Order>()
+    .Write(model => model
+        .AutoCreateEndpoint()
+        .InvalidMethod()  // ← Errores detectados en dev
+    );
+```
+
+### 2. Performance Nativo
+```csharp
+// .NET compilado a máquina nativa
+// - 10x más rápido que Node.js para CPU-bound
+// - Menor consumo de memoria
+// - Mejor latencia
+```
+
+### 3. Tooling Ecosystem
+```csharp
+// JetBrains Rider / Visual Studio
+// - IntelliSense perfecto
+// - Refactoring automático
+// - Debug visual
+// - Profiling integrado
+```
+
+### 4. Generics y Type System Avanzado
+```csharp
+// Type inference extremo
+app.Entity<Order>()
+    .Read(model => model
+        .AutoGetByIdEndpoint<Guid>()  // Type inferido
+        .AutoListEndpoint()            // PagedResponse<T> inferido
+        .AutoSearchEndpoint(query => query
+            .Where(o => o.Total > 100)  // Expression trees compiladas
+        )
+    );
+```
+
+### 5. Null Safety
+```csharp
+// C# 11 nullable reference types
+public record OrderDto(
+    Guid Id,
+    string CustomerName,  // Non-nullable
+    string? Notes        // Nullable explícito
+);
+```
+
+### 6. Pattern Matching Avanzado
+```csharp
+app.Entity<Order>()
+    .Saga("OrderProcessing", saga => saga
+        .Step<OrderPlacedEvent>(async ctx => 
+            ctx.Order.Status switch
+            {
+                OrderStatus.Draft => await ProcessDraft(ctx),
+                OrderStatus.Pending => await ProcessPending(ctx),
+                _ => throw new InvalidOperationException()
+            }
+        )
+    );
+```
+
+---
+
+## 📋 Swagger y Documentación Automática
+
+### Auto-Generación de OpenAPI
+
+**SintroNet** genera automáticamente OpenAPI 3.0 desde la configuración declarativa:
+
+```csharp
+var app = SyntroApp.Create()
+    .EnableSwagger(config => config
+        .Title("E-Commerce API")
+        .Description("API for managing orders and products")
+        .Version("v1")
+        .AddServer("https://api.example.com")
+        .AddServer("https://staging.example.com", "Staging")
+    );
+
+app.Entity<Order>()
+    .Write(model => model
+        .AutoCreateEndpoint()
+        .Summary("Create a new order")
+        .Description("Allows customers to create orders")
+        .ProducesResponse<OrderDto>(201, "Order created successfully")
+        .ProducesResponse(400, "Validation error")
+    )
+    .Read(model => model
+        .AutoGetByIdEndpoint()
+        .Summary("Get order by ID")
+        .ProducesResponse<OrderDto>(200, "Order found")
+        .ProducesResponse(404, "Order not found")
+    );
+```
+
+### UI Interactiva
+
+```
+GET /swagger        → Swagger UI (interactive)
+GET /swagger/v1/swagger.json  → OpenAPI spec
+GET /redoc         → ReDoc (alternative UI)
+```
+
+### Documentación Automática
+
+```csharp
+public record OrderDto(
+    /// <summary>Unique order identifier</summary>
+    /// <example>123e4567-e89b-12d3-a456-426614174000</example>
+    Guid Id,
+    
+    /// <summary>Customer ID who placed the order</summary>
+    Guid CustomerId,
+    
+    /// <summary>Total amount including tax</summary>
+    /// <example>99.99</example>
+    decimal Total,
+    
+    /// <summary>Order status</summary>
+    /// <example>Pending</example>
+    OrderStatus Status
+);
+```
+
+---
+
+## 📊 Observabilidad y Logging
+
+### Logging Estructurado Automático
+
+```csharp
+var app = SyntroApp.Create()
+    .UseLogger(config => config
+        .AddConsole()                    // Console logs
+        .AddSeq("http://localhost:5341")  // Seq aggregation
+        .AddApplicationInsights()         // Azure telemetry
+        .SetMinimumLevel(LogLevel.Information)
+    );
+
+// Los logs se generan automáticamente:
+// [INFO] Order created: { OrderId: "abc", CustomerId: "xyz", Total: 99.99 }
+// [INFO] Command processed: CreateOrderCommand in 45ms
+// [ERROR] Validation failed: { Field: "CustomerId", Error: "Required" }
+```
+
+### Logging a Demanda
+
+```csharp
+app.Entity<Order>()
+    .Write(model => model
+        .AutoCreateEndpoint()
+        .LogRequest()     // Log incoming requests
+        .LogResponse()    // Log outgoing responses
+        .LogPerformance() // Log execution time
+        .LogErrors()      // Log exceptions
+    );
+```
+
+### Métricas Automáticas
+
+```csharp
+var app = SyntroApp.Create()
+    .UseMetrics(config => config
+        .Counter("orders_created_total")
+        .Histogram("order_processing_duration_ms")
+        .Gauge("active_orders_count")
+    );
+
+// Métricas expuestas automáticamente en /metrics (Prometheus format)
+```
+
+### Distributed Tracing
+
+```csharp
+var app = SyntroApp.Create()
+    .UseTracing(config => config
+        .AddOpenTelemetry()  // OpenTelemetry estándar
+        .AddJaeger()         // Jaeger integration
+        .AddZipkin()         // Zipkin integration
+    );
+
+// Traces automáticos para:
+// - Request lifecycle
+// - Database queries
+// - External API calls
+// - SAGA steps
+// - Event publishing
+```
+
+### Observabilidad Completa
+
+```csharp
+var app = SyntroApp.Create()
+    .EnableObservability(config => config
+        .RequestId()              // Correlation IDs
+        .UserAgent()              // Client info
+        .Duration()               // Request duration
+        .StatusCodes()            // Response codes
+        .ExceptionDetails()       // Stack traces
+        .CustomTags(tags => tags  // Custom metadata
+            .Add("environment", "production")
+            .Add("version", "1.0.0")
+        )
+    );
+```
 
 ---
 
