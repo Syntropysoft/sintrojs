@@ -24,4 +24,4 @@ export * from './plugins';
 /**
  * Current version
  */
-export const VERSION = '0.3.1-alpha';
+export const VERSION = '0.3.4-alpha';

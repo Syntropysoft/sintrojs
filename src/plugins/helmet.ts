@@ -91,36 +91,61 @@ export interface HelmetOptions {
 }
 
 /**
+ * Detect if running in Bun runtime
+ */
+function isBunRuntime(): boolean {
+  return typeof (globalThis as { Bun?: unknown }).Bun !== 'undefined';
+}
+
+/**
+ * Detect if server is Fastify instance
+ */
+function isFastifyInstance(server: unknown): server is FastifyInstance {
+  return (
+    server !== null &&
+    typeof server === 'object' &&
+    'register' in server &&
+    typeof (server as { register: unknown }).register === 'function'
+  );
+}
+
+/**
  * Register Helmet plugin
+ * Works with both Fastify (Node.js) and Bun runtimes
  *
- * @param fastify - Fastify instance
+ * @param server - Server instance (FastifyInstance for Node.js, any for Bun)
  * @param options - Helmet options
  *
  * @example
  * ```typescript
  * import { registerHelmet } from 'tinyapi/plugins';
  *
- * // Enable all security headers (default)
- * await registerHelmet(app.getRawFastify());
+ * // With Fastify (Node.js)
+ * await registerHelmet(app.getRawServer());
  *
- * // Custom configuration
- * await registerHelmet(app.getRawFastify(), {
- *   contentSecurityPolicy: {
- *     directives: {
- *       defaultSrc: ["'self'"],
- *       styleSrc: ["'self'", "'unsafe-inline'"],
- *     },
- *   },
- * });
+ * // With Bun - Security headers are configured at adapter level
+ * // See BunAdapter configuration for security headers support
  * ```
  */
-export async function registerHelmet(
-  fastify: FastifyInstance,
-  options: HelmetOptions = {},
-): Promise<void> {
+export async function registerHelmet(server: unknown, options: HelmetOptions = {}): Promise<void> {
   // Guard clauses
-  if (!fastify) {
-    throw new Error('Fastify instance is required');
+  if (!server) {
+    throw new Error('Server instance is required');
+  }
+
+  // Detect runtime
+  if (isBunRuntime()) {
+    console.warn(
+      '⚠️  Helmet plugin: Bun runtime detected. Security headers configuration is handled at the adapter level in Bun.',
+    );
+    return;
+  }
+
+  // Check if it's a Fastify instance
+  if (!isFastifyInstance(server)) {
+    throw new Error(
+      'Helmet plugin: Unsupported server type. Expected FastifyInstance for Node.js runtime.',
+    );
   }
 
   // Dynamic import to keep @fastify/helmet as optional dependency
@@ -135,7 +160,7 @@ export async function registerHelmet(
   }
 
   // Pass options directly - Fastify handles undefined values correctly
-  await fastify.register(fastifyHelmet, {
+  await server.register(fastifyHelmet, {
     global: options.global ?? true,
     contentSecurityPolicy: options.contentSecurityPolicy,
     crossOriginEmbedderPolicy: options.crossOriginEmbedderPolicy,

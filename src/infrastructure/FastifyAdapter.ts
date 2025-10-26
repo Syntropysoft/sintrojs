@@ -11,6 +11,7 @@ import { BackgroundTasks } from '../application/BackgroundTasks';
 import { DependencyInjector } from '../application/DependencyInjector';
 import type { DependencyMetadata } from '../application/DependencyInjector';
 import { ErrorHandler } from '../application/ErrorHandler';
+import { MiddlewareRegistry } from '../application/MiddlewareRegistry';
 import { SchemaValidator } from '../application/SchemaValidator';
 import type { Route } from '../domain/Route';
 import type { HttpMethod, RequestContext } from '../domain/types';
@@ -27,6 +28,8 @@ export interface FastifyAdapterConfig {
  * Fastify adapter implementation
  */
 class FastifyAdapterImpl {
+  private middlewareRegistry?: MiddlewareRegistry;
+
   /**
    * Creates and configures Fastify instance
    *
@@ -43,6 +46,13 @@ class FastifyAdapterImpl {
     });
 
     return instance;
+  }
+
+  /**
+   * Set middleware registry for this adapter
+   */
+  setMiddlewareRegistry(registry: MiddlewareRegistry): void {
+    this.middlewareRegistry = registry;
   }
 
   /**
@@ -71,6 +81,14 @@ class FastifyAdapterImpl {
       try {
         // Build request context from Fastify request
         const context = this.buildContext(request);
+
+        // Execute middlewares if registry is available
+        if (this.middlewareRegistry) {
+          const middlewares = this.middlewareRegistry.getMiddlewares(route.path, route.method);
+          if (middlewares.length > 0) {
+            await this.middlewareRegistry.executeMiddlewares(middlewares, context);
+          }
+        }
 
         // Resolve dependencies if specified
         if (route.config.dependencies) {
@@ -229,7 +247,31 @@ class FastifyAdapterImpl {
 /**
  * Exported singleton (Module Pattern)
  */
-export const FastifyAdapter = new FastifyAdapterImpl();
+class FastifyAdapterSingleton {
+  private static instance: FastifyAdapterImpl = new FastifyAdapterImpl();
+
+  static create(config?: FastifyAdapterConfig): FastifyInstance {
+    return FastifyAdapterSingleton.instance.create(config);
+  }
+
+  static setMiddlewareRegistry(registry: MiddlewareRegistry): void {
+    FastifyAdapterSingleton.instance.setMiddlewareRegistry(registry);
+  }
+
+  static registerRoute(fastify: FastifyInstance, route: Route): void {
+    FastifyAdapterSingleton.instance.registerRoute(fastify, route);
+  }
+
+  static async listen(fastify: FastifyInstance, port: number, host = '0.0.0.0'): Promise<string> {
+    return FastifyAdapterSingleton.instance.listen(fastify, port, host);
+  }
+
+  static async close(fastify: FastifyInstance): Promise<void> {
+    return FastifyAdapterSingleton.instance.close(fastify);
+  }
+}
+
+export const FastifyAdapter = FastifyAdapterSingleton;
 
 /**
  * Factory for testing

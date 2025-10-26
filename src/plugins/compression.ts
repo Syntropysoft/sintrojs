@@ -62,32 +62,64 @@ export interface CompressionOptions {
 }
 
 /**
+ * Detect if running in Bun runtime
+ */
+function isBunRuntime(): boolean {
+  return typeof (globalThis as { Bun?: unknown }).Bun !== 'undefined';
+}
+
+/**
+ * Detect if server is Fastify instance
+ */
+function isFastifyInstance(server: unknown): server is FastifyInstance {
+  return (
+    server !== null &&
+    typeof server === 'object' &&
+    'register' in server &&
+    typeof (server as { register: unknown }).register === 'function'
+  );
+}
+
+/**
  * Register Compression plugin
+ * Works with both Fastify (Node.js) and Bun runtimes
  *
- * @param fastify - Fastify instance
+ * @param server - Server instance (FastifyInstance for Node.js, any for Bun)
  * @param options - Compression options
  *
  * @example
  * ```typescript
  * import { registerCompression } from 'tinyapi/plugins';
  *
- * // Enable compression with defaults
- * await registerCompression(app.getRawFastify());
+ * // With Fastify (Node.js)
+ * await registerCompression(app.getRawServer());
  *
- * // Custom threshold and level
- * await registerCompression(app.getRawFastify(), {
- *   threshold: 2048, // Only compress responses > 2KB
- *   zlibOptions: { level: 9 }, // Maximum compression
- * });
+ * // With Bun - Compression is configured at adapter level
+ * // See BunAdapter configuration for compression support
  * ```
  */
 export async function registerCompression(
-  fastify: FastifyInstance,
+  server: unknown,
   options: CompressionOptions = {},
 ): Promise<void> {
   // Guard clauses
-  if (!fastify) {
-    throw new Error('Fastify instance is required');
+  if (!server) {
+    throw new Error('Server instance is required');
+  }
+
+  // Detect runtime
+  if (isBunRuntime()) {
+    console.warn(
+      '⚠️  Compression plugin: Bun runtime detected. Compression is handled at the adapter level in Bun.',
+    );
+    return;
+  }
+
+  // Check if it's a Fastify instance
+  if (!isFastifyInstance(server)) {
+    throw new Error(
+      'Compression plugin: Unsupported server type. Expected FastifyInstance for Node.js runtime.',
+    );
   }
 
   // Dynamic import to keep @fastify/compress as optional dependency
@@ -103,7 +135,7 @@ export async function registerCompression(
   }
 
   // Pass options directly - Fastify handles undefined values correctly
-  await fastify.register(fastifyCompress, {
+  await server.register(fastifyCompress, {
     global: options.global ?? true,
     threshold: options.threshold ?? 1024,
     removeContentLengthHeader: options.removeContentLengthHeader ?? true,

@@ -106,7 +106,7 @@ export interface SyntroJSConfig {
  */
 export class SyntroJS {
   private readonly config: SyntroJSConfig;
-  private readonly fastify: FastifyInstance;
+  private readonly server: unknown; // Generic server (FastifyInstance or Bun Server)
   private readonly adapter:
     | typeof FastifyAdapter
     | typeof UltraFastAdapter
@@ -141,8 +141,8 @@ export class SyntroJS {
     // Choose adapter based on runtime and config (pure function)
     this.adapter = this.selectOptimalAdapter();
 
-    // Create Fastify instance via adapter (composition)
-    this.fastify = this.createFastifyInstance();
+    // Create server instance via adapter (composition)
+    this.server = this.createServerInstance();
 
     // Register OpenAPI endpoint
     this.registerOpenAPIEndpoint();
@@ -181,16 +181,16 @@ export class SyntroJS {
   }
 
   /**
-   * Create Fastify instance using composition pattern
+   * Create server instance using composition pattern
    *
-   * @returns Configured Fastify instance
+   * @returns Configured server instance
    */
-  private createFastifyInstance(): FastifyInstance {
+  private createServerInstance(): unknown {
     if (this.adapter === FluentAdapter) {
       return this.createFluentAdapter();
     }
 
-    return this.adapter.create() as FastifyInstance;
+    return this.adapter.create();
   }
 
   /**
@@ -198,7 +198,7 @@ export class SyntroJS {
    *
    * @returns Configured FluentAdapter instance
    */
-  private createFluentAdapter(): FastifyInstance {
+  private createFluentAdapter(): unknown {
     const fluentAdapter = new FluentAdapter();
 
     // Apply fluent configuration using functional composition
@@ -455,7 +455,7 @@ export class SyntroJS {
     this.registerAllRoutes();
 
     // Start server via adapter
-    const address = await FastifyAdapter.listen(this.fastify, port, host);
+    const address = await this.getAdapterListenMethod()(this.server, port, host);
 
     this.isStarted = true;
 
@@ -463,6 +463,22 @@ export class SyntroJS {
     this.showRuntimeInfo(address);
 
     return address;
+  }
+
+  /**
+   * Gets the appropriate listen method based on adapter
+   *
+   * @returns Listen method
+   */
+  private getAdapterListenMethod(): (server: unknown, port: number, host: string) => Promise<string> {
+    if (this.adapter === BunAdapter) {
+      return async (server, port, host) => BunAdapter.listen(server, port, host);
+    } else if (this.adapter === FluentAdapter) {
+      return async (server, port, host) => FluentAdapter.listen(server as FastifyInstance, port, host);
+    } else {
+      // FastifyAdapter or other Fastify-based adapters
+      return async (server, port, host) => FastifyAdapter.listen(server as FastifyInstance, port, host);
+    }
   }
 
   /**
@@ -491,19 +507,45 @@ export class SyntroJS {
       throw new Error('Server is not started');
     }
 
-    await FastifyAdapter.close(this.fastify);
+    await this.getAdapterCloseMethod()(this.server);
 
     this.isStarted = false;
   }
 
   /**
-   * Gets the underlying Fastify instance
+   * Gets the appropriate close method based on adapter
+   *
+   * @returns Close method
+   */
+  private getAdapterCloseMethod(): (server: unknown) => Promise<void> {
+    if (this.adapter === BunAdapter) {
+      return async (server) => BunAdapter.close(server);
+    } else if (this.adapter === FluentAdapter) {
+      return async (server) => FluentAdapter.close(server as FastifyInstance);
+    } else {
+      // FastifyAdapter or other Fastify-based adapters
+      return async (server) => FastifyAdapter.close(server as FastifyInstance);
+    }
+  }
+
+  /**
+   * Gets the underlying server instance
+   * Use with caution - breaks abstraction
+   *
+   * @returns Server instance (FastifyInstance for Fastify adapters, Server for Bun)
+   */
+  getRawServer(): unknown {
+    return this.server;
+  }
+
+  /**
+   * Gets the underlying Fastify instance (deprecated, use getRawServer)
    * Use with caution - breaks abstraction
    *
    * @returns Fastify instance
    */
   getRawFastify(): FastifyInstance {
-    return this.fastify;
+    return this.server as FastifyInstance;
   }
 
   /**
@@ -544,14 +586,29 @@ export class SyntroJS {
   }
 
   /**
-   * Registers all routes from RouteRegistry with Fastify
+   * Registers all routes from RouteRegistry with the appropriate adapter
    */
   private registerAllRoutes(): void {
+    // Configure middleware registry for adapters that support it
+    if (this.adapter === BunAdapter) {
+      (BunAdapter as any).setMiddlewareRegistry(this.middlewareRegistry);
+    } else if (this.adapter === FastifyAdapter) {
+      FastifyAdapter.setMiddlewareRegistry(this.middlewareRegistry);
+    }
+
     const routes = RouteRegistry.getAll();
 
     // Functional: forEach for side effects (registration)
     for (const route of routes) {
-      this.adapter.registerRoute(this.fastify, route);
+      if (this.adapter === BunAdapter) {
+        BunAdapter.registerRoute(this.server, route);
+      } else if (this.adapter === FluentAdapter) {
+        // FluentAdapter handles its own registration during listen
+        FluentAdapter.registerRoute(this.server as FastifyInstance, route);
+      } else {
+        // FastifyAdapter or other Fastify-based adapters
+        FastifyAdapter.registerRoute(this.server as FastifyInstance, route);
+      }
     }
   }
 
@@ -559,29 +616,39 @@ export class SyntroJS {
    * Registers OpenAPI and docs endpoints
    */
   private registerOpenAPIEndpoint(): void {
-    // OpenAPI JSON spec
-    this.fastify.get('/openapi.json', async () => {
-      return this.getOpenAPISpec();
+    // Register /openapi.json endpoint
+    this.registerRoute('GET', '/openapi.json', {
+      handler: async () => {
+        return this.getOpenAPISpec();
+      },
     });
 
-    // Swagger UI
-    this.fastify.get('/docs', async (_request, reply) => {
-      const html = DocsRenderer.renderSwaggerUI({
-        openApiUrl: '/openapi.json',
-        title: this.config.title,
-      });
-
-      return reply.type('text/html').send(html);
+    // Register /docs endpoint (Swagger UI)
+    this.registerRoute('GET', '/docs', {
+      handler: async () => {
+        const html = DocsRenderer.renderSwaggerUI({
+          openApiUrl: '/openapi.json',
+          title: this.config.title,
+        });
+        // For Fastify, return HTML with proper content-type
+        // For Bun, we'll need to handle this in the adapter
+        return new Response(html, {
+          headers: { 'Content-Type': 'text/html' },
+        });
+      },
     });
 
-    // ReDoc
-    this.fastify.get('/redoc', async (_request, reply) => {
-      const html = DocsRenderer.renderReDoc({
-        openApiUrl: '/openapi.json',
-        title: this.config.title,
-      });
-
-      return reply.type('text/html').send(html);
+    // Register /redoc endpoint
+    this.registerRoute('GET', '/redoc', {
+      handler: async () => {
+        const html = DocsRenderer.renderReDoc({
+          openApiUrl: '/openapi.json',
+          title: this.config.title,
+        });
+        return new Response(html, {
+          headers: { 'Content-Type': 'text/html' },
+        });
+      },
     });
   }
 

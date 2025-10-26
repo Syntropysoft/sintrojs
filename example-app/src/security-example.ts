@@ -3,8 +3,8 @@
  * Demonstrates OAuth2, JWT, HTTPBearer, HTTPBasic, and APIKey authentication
  */
 
-import type { FastifyRequest } from 'fastify';
 import { HTTPException, SyntroJS, inject } from 'syntrojs';
+import type { RequestContext } from 'syntrojs';
 import {
   APIKeyHeader,
   APIKeyQuery,
@@ -53,7 +53,7 @@ const apiKeyQueryScheme = new APIKeyQuery('api_key');
 // Helper: Get user from JWT
 // ============================================
 
-async function getUserFromJWT(request: FastifyRequest): Promise<JWTPayload> {
+async function getUserFromJWT(request: RequestContext): Promise<JWTPayload> {
   const token = await oauth2Scheme.validate(request);
   const payload = verifyJWT(token, { secret: JWT_SECRET });
   return payload;

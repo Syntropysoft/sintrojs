@@ -2,8 +2,16 @@
  * API Key authentication (Header, Cookie, Query)
  */
 
-import type { FastifyRequest } from 'fastify';
 import { HTTPException } from '../domain/HTTPException';
+
+/**
+ * Generic request interface for security modules
+ */
+export interface SecurityRequest {
+  headers: Record<string, string | string[] | undefined>;
+  cookies?: Record<string, string>;
+  query?: Record<string, string | string[] | undefined>;
+}
 
 /**
  * API Key authentication via HTTP Header
@@ -35,26 +43,29 @@ export class APIKeyHeader {
   /**
    * Validate and extract API key from header
    *
-   * @param request - Fastify request
+   * @param request - Request object with headers
    * @returns API key string
    * @throws HTTPException 403 if API key is missing
    */
-  async validate(request: FastifyRequest): Promise<string> {
+  async validate(request: SecurityRequest): Promise<string> {
     // Header names are case-insensitive in HTTP
     const headerName = this.name.toLowerCase();
-    const apiKey = request.headers[headerName] as string | undefined;
+    const apiKey = request.headers[headerName];
 
     // Guard: Missing API key
     if (!apiKey) {
       throw new HTTPException(403, 'Not authenticated');
     }
 
+    // Convert to string if array
+    const apiKeyStr = Array.isArray(apiKey) ? apiKey[0] : apiKey;
+
     // Guard: Empty API key
-    if (apiKey.trim() === '') {
+    if (!apiKeyStr || apiKeyStr.trim() === '') {
       throw new HTTPException(403, 'Not authenticated');
     }
 
-    return apiKey.trim();
+    return apiKeyStr.trim();
   }
 }
 
@@ -88,14 +99,12 @@ export class APIKeyCookie {
   /**
    * Validate and extract API key from cookie
    *
-   * @param request - Fastify request
+   * @param request - Request object with cookies
    * @returns API key string
    * @throws HTTPException 403 if API key is missing
    */
-  async validate(request: FastifyRequest): Promise<string> {
-    // Get cookie (Fastify parses cookies automatically if @fastify/cookie is registered)
-    // biome-ignore lint/suspicious/noExplicitAny: Fastify cookies plugin extends request
-    const apiKey = (request as any).cookies?.[this.name];
+  async validate(request: SecurityRequest): Promise<string> {
+    const apiKey = request.cookies?.[this.name];
 
     // Guard: Missing API key
     if (!apiKey) {
@@ -147,7 +156,7 @@ export class APIKeyQuery {
    * @returns API key string
    * @throws HTTPException 403 if API key is missing
    */
-  async validate(request: FastifyRequest): Promise<string> {
+  async validate(request: SecurityRequest): Promise<string> {
     // Get query parameter
     const query = request.query as Record<string, string | undefined>;
     const apiKey = query[this.name];

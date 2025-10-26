@@ -3,8 +3,15 @@
  * HTTP Basic authentication
  */
 
-import type { FastifyRequest } from 'fastify';
 import { HTTPException } from '../domain/HTTPException';
+
+/**
+ * Generic request interface for security modules
+ */
+export interface SecurityRequest {
+  headers: Record<string, string | string[] | undefined>;
+  cookies?: Record<string, string>;
+}
 
 /**
  * HTTP Basic authentication credentials
@@ -36,11 +43,11 @@ export class HTTPBasic {
   /**
    * Validate and extract Basic auth credentials from Authorization header
    *
-   * @param request - Fastify request
+   * @param request - Request object with headers
    * @returns Decoded credentials (username and password)
    * @throws HTTPException 401 if credentials are missing or invalid format
    */
-  async validate(request: FastifyRequest): Promise<HTTPBasicCredentials> {
+  async validate(request: SecurityRequest): Promise<HTTPBasicCredentials> {
     const authHeader = request.headers.authorization;
 
     // Guard: Missing Authorization header
@@ -48,15 +55,18 @@ export class HTTPBasic {
       throw new HTTPException(401, 'Not authenticated', { 'WWW-Authenticate': 'Basic' });
     }
 
+    // Convert to string if array
+    const authHeaderStr = Array.isArray(authHeader) ? authHeader[0] : authHeader;
+
     // Guard: Invalid format
-    if (!authHeader.startsWith('Basic ')) {
+    if (!authHeaderStr?.startsWith('Basic ')) {
       throw new HTTPException(401, 'Invalid authentication credentials', {
         'WWW-Authenticate': 'Basic',
       });
     }
 
     // Extract base64 credentials
-    const base64Credentials = authHeader.slice(6).trim(); // Remove 'Basic ' prefix
+    const base64Credentials = authHeaderStr.slice(6).trim(); // Remove 'Basic ' prefix
 
     // Guard: Empty credentials
     if (base64Credentials === '') {

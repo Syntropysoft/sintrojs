@@ -60,32 +60,62 @@ export interface CorsOptions {
 }
 
 /**
+ * Detect if running in Bun runtime
+ */
+function isBunRuntime(): boolean {
+  return typeof (globalThis as { Bun?: unknown }).Bun !== 'undefined';
+}
+
+/**
+ * Detect if server is Fastify instance
+ */
+function isFastifyInstance(server: unknown): server is FastifyInstance {
+  return (
+    server !== null &&
+    typeof server === 'object' &&
+    'register' in server &&
+    typeof (server as { register: unknown }).register === 'function'
+  );
+}
+
+/**
  * Register CORS plugin
+ * Works with both Fastify (Node.js) and Bun runtimes
  *
- * @param fastify - Fastify instance
+ * @param server - Server instance (FastifyInstance for Node.js, any for Bun)
  * @param options - CORS options
  *
  * @example
  * ```typescript
  * import { registerCors } from 'tinyapi/plugins';
  *
- * // Allow all origins
- * await registerCors(app.getRawFastify(), { origin: '*' });
+ * // With Fastify (Node.js)
+ * await registerCors(app.getRawServer(), { origin: '*' });
  *
- * // Allow specific origins
- * await registerCors(app.getRawFastify(), {
- *   origin: ['https://example.com', 'https://api.example.com'],
- *   credentials: true,
- * });
+ * // With Bun - CORS is configured at adapter level
+ * // See BunAdapter configuration for CORS support
  * ```
  */
-export async function registerCors(
-  fastify: FastifyInstance,
-  options: CorsOptions = {},
-): Promise<void> {
+export async function registerCors(server: unknown, options: CorsOptions = {}): Promise<void> {
   // Guard clauses
-  if (!fastify) {
-    throw new Error('Fastify instance is required');
+  if (!server) {
+    throw new Error('Server instance is required');
+  }
+
+  // Detect runtime
+  if (isBunRuntime()) {
+    console.warn(
+      '⚠️  CORS plugin: Bun runtime detected. CORS configuration is handled at the adapter level in Bun. ' +
+        'Use BunAdapter configuration to set CORS headers.',
+    );
+    return;
+  }
+
+  // Check if it's a Fastify instance
+  if (!isFastifyInstance(server)) {
+    throw new Error(
+      'CORS plugin: Unsupported server type. Expected FastifyInstance for Node.js runtime.',
+    );
   }
 
   // Dynamic import to keep @fastify/cors as optional dependency
@@ -100,7 +130,7 @@ export async function registerCors(
   }
 
   // Pass options directly - Fastify handles undefined values correctly
-  await fastify.register(fastifyCors, {
+  await server.register(fastifyCors, {
     origin: options.origin ?? true,
     credentials: options.credentials ?? false,
     methods: options.methods,

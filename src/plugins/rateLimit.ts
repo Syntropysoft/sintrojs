@@ -84,42 +84,64 @@ export interface RateLimitOptions {
 }
 
 /**
+ * Detect if running in Bun runtime
+ */
+function isBunRuntime(): boolean {
+  return typeof (globalThis as { Bun?: unknown }).Bun !== 'undefined';
+}
+
+/**
+ * Detect if server is Fastify instance
+ */
+function isFastifyInstance(server: unknown): server is FastifyInstance {
+  return (
+    server !== null &&
+    typeof server === 'object' &&
+    'register' in server &&
+    typeof (server as { register: unknown }).register === 'function'
+  );
+}
+
+/**
  * Register Rate Limiting plugin
+ * Works with both Fastify (Node.js) and Bun runtimes
  *
- * @param fastify - Fastify instance
+ * @param server - Server instance (FastifyInstance for Node.js, any for Bun)
  * @param options - Rate limit options
  *
  * @example
  * ```typescript
  * import { registerRateLimit } from 'tinyapi/plugins';
  *
- * // Basic rate limiting (100 requests per minute)
- * await registerRateLimit(app.getRawFastify());
+ * // With Fastify (Node.js)
+ * await registerRateLimit(app.getRawServer());
  *
- * // Custom limits
- * await registerRateLimit(app.getRawFastify(), {
- *   max: 50,
- *   timeWindow: '1 minute',
- * });
- *
- * // Per-endpoint rate limiting
- * await registerRateLimit(app.getRawFastify(), {
- *   max: 10,
- *   timeWindow: '15 minutes',
- *   keyGenerator: (request) => {
- *     // Rate limit by API key instead of IP
- *     return request.headers['x-api-key'] || request.ip;
- *   },
- * });
+ * // With Bun - Rate limiting is configured at adapter level
+ * // See BunAdapter configuration for rate limiting support
  * ```
  */
 export async function registerRateLimit(
-  fastify: FastifyInstance,
+  server: unknown,
   options: RateLimitOptions = {},
 ): Promise<void> {
   // Guard clauses
-  if (!fastify) {
-    throw new Error('Fastify instance is required');
+  if (!server) {
+    throw new Error('Server instance is required');
+  }
+
+  // Detect runtime
+  if (isBunRuntime()) {
+    console.warn(
+      '⚠️  Rate Limiting plugin: Bun runtime detected. Rate limiting is handled at the adapter level in Bun.',
+    );
+    return;
+  }
+
+  // Check if it's a Fastify instance
+  if (!isFastifyInstance(server)) {
+    throw new Error(
+      'Rate Limiting plugin: Unsupported server type. Expected FastifyInstance for Node.js runtime.',
+    );
   }
 
   // Dynamic import to keep @fastify/rate-limit as optional dependency
@@ -135,7 +157,7 @@ export async function registerRateLimit(
   }
 
   // Pass options directly - Fastify handles undefined values correctly
-  await fastify.register(fastifyRateLimit, {
+  await server.register(fastifyRateLimit, {
     max: options.max ?? 100,
     timeWindow: options.timeWindow ?? 60000,
     cache: options.cache ?? 10000,
