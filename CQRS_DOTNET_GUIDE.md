@@ -1,330 +1,194 @@
-# CQRS + SAGA + Event-Driven Architecture en .NET
-## Guía Completa para Agentes de IA
+# SyntroJS for .NET - Guía de Implementación
+## Framework Minimalista para CQRS + SAGA + Event-Driven
 
-> **Filosofía:** "Separar es poder. Unwrite optimizado no compite con un read optimizado. La consistencia eventual permite escalar sin límites."
+> **Filosofía:** "Minimal en configuración. Máximo en potencia. La complejidad empresarial reducida a APIs declarativas."
 
 ---
 
 ## 📚 Índice
 
 1. [Visión General](#visión-general)
-2. [Filosofía de Diseño](#filosofía-de-diseño)
-3. [Arquitectura](#arquitectura)
-4. [Stack Tecnológico](#stack-tecnológico)
-5. [Estructura de Proyecto](#estructura-de-proyecto)
-6. [Implementación](#implementación)
-7. [Casos de Uso](#casos-de-uso)
-8. [Consideraciones para Agentes de IA](#consideraciones-para-agentes-de-ia)
+2. [El Problema que Resolvemos](#el-problema-que-resolvemos)
+3. [Solución: API Declarativa](#solución-api-declarativa)
+4. [Arquitectura Interna](#arquitectura-interna)
+5. [Código del Usuario vs Código de la Librería](#código-del-usuario-vs-código-de-la-librería)
+6. [Stack Tecnológico](#stack-tecnológico)
+7. [Estructura de Librería](#estructura-de-librería)
+8. [Implementación Detallada](#implementación-detallada)
+9. [Consideraciones para Agentes de IA](#consideraciones-para-agentes-de-ia)
 
 ---
 
 ## 🎯 Visión General
 
-Esta arquitectura combina **CQRS** (Command Query Responsibility Segregation), **SAGA Pattern**, y **Proyecciones Materializadas** para crear sistemas escalables de alta performance.
+**SyntroJS for .NET** es una librería que abstrae toda la complejidad de arquitectura empresarial (CQRS, SAGAs, Event-Driven, Proyecciones) detrás de una API declarativa extremadamente simple, similar a SyntroJS pero para .NET.
 
 ### Principios Fundamentales
 
-1. **Separación de Reads y Writes**: Bases de datos diferentes, modelos diferentes, optimizaciones diferentes
-2. **Event-Driven**: Todo evento es una oportunidad de propagación de estado
-3. **Consistencia Eventual**: Permitir inconsistencias temporales para ganar performance
-4. **SAGA Orchestration**: Manejar workflows complejos distribuidos transaccionalmente
+1. **Configuración Declarativa**: El usuario define QUÉ necesita, la librería maneja CÓMO
+2. **Abstracción Total**: CQRS, SAGAs, eventos, proyecciones son implícitos
+3. **Zero Boilerplate**: No hay CommandHandlers, QueryHandlers, EventHandlers manuales
+4. **Auto-Orchestration**: SAGAs se generan automáticamente desde la configuración
+5. **Type-Safe**: Todo fuertemente tipado con mejor performance en .NET
 
 ---
 
-## 🧠 Filosofía de Diseño
+## ❌ El Problema que Resolvemos
 
-### 1. Separación de Concerns (CQRS Core)
-
-```csharp
-// ❌ MAL: Mezclar read y write en el mismo modelo
-public class Order
-{
-    public int Id { get; set; }
-    public string CustomerName { get; set; }
-    public decimal Total { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public List<OrderItem> Items { get; set; }
-    
-    // Write methods
-    public void AddItem(OrderItem item) { }
-    public void MarkAsPaid() { }
-    
-    // Read methods
-    public decimal CalculateDiscount() { }
-    public List<OrderItem> GetItemsByCategory(string category) { }
-}
-```
-
-**Problemas:**
-- ❌ Imposible optimizar reads y writes por separado
-- ❌ Modelo de dominio mezclado con queries
-- ❌ Scaling horizontal limitado
+### Código Tradicional (Sin Framework)
 
 ```csharp
-// ✅ BIEN: Separar Write Model y Read Model
+// ❌ El usuario necesita escribir MILES de líneas:
 
-// Write Model (Domain)
-public class OrderAggregate
-{
-    public Guid Id { get; private set; }
-    private List<OrderItem> _items = new();
-    private decimal _total;
-    
-    public void AddItem(ProductId productId, int quantity, decimal price)
-    {
-        var item = new OrderItem(productId, quantity, price);
-        _items.Add(item);
-        _total += item.SubTotal;
-        
-        AddDomainEvent(new OrderItemAddedEvent(Id, productId, quantity));
-    }
-    
-    public void MarkAsPaid(PaymentId paymentId)
-    {
-        AddDomainEvent(new OrderPaidEvent(Id, paymentId, _total));
-    }
+// 1. Domain Aggregate
+public class Order : AggregateRoot { /* 100+ líneas */ }
+
+// 2. Command
+public class CreateOrderCommand : IRequest<OrderDto> { }
+
+// 3. Command Handler
+public class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, OrderDto> 
+{ 
+    /* 50+ líneas de lógica boilerplate */
 }
 
-// Read Model (View)
-public class OrderView
+// 4. Query
+public class GetOrderByIdQuery : IRequest<OrderDto> { }
+
+// 5. Query Handler
+public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, OrderDto>
 {
-    public Guid Id { get; set; }
-    public string CustomerName { get; set; }
-    public decimal Total { get; set; }
-    public decimal Discount { get; set; }  // Pre-calculado
-    public int ItemCount { get; set; }     // Pre-calculado
-    public DateTime CreatedAt { get; set; }
-    public string Status { get; set; }
+    /* 50+ líneas de lógica boilerplate */
 }
 
-public class OrderItemView
-{
-    public Guid OrderId { get; set; }
-    public string ProductName { get; set; }
-    public int Quantity { get; set; }
-    public decimal UnitPrice { get; set; }
-    public decimal SubTotal { get; set; }
-    public string Category { get; set; }  // Pre-joined
-}
-```
+// 6. Event Handlers
+public class OrderPlacedEventHandler : IEventHandler<OrderPlacedEvent> { }
+public class OrderProjectionHandler : IConsumer<OrderPlacedEvent> { }
 
-**Beneficios:**
-- ✅ Write Model optimizado para consistencia (ACID)
-- ✅ Read Model denormalizado para performance
-- ✅ Scaling independiente de reads y writes
+// 7. SAGA
+public class OrderProcessingSaga : ISaga { /* 200+ líneas */ }
 
-### 2. Event-Driven Everything
-
-```csharp
-// Todo lo que pasa en el sistema es un evento
-public interface IDomainEvent
-{
-    Guid EventId { get; }
-    DateTime OccurredAt { get; }
-    string EventType { get; }
-}
-
-// Eventos de Dominio
-public record OrderPlacedEvent(
-    Guid OrderId,
-    Guid CustomerId,
-    decimal Total,
-    List<OrderItemDto> Items
-) : IDomainEvent
-{
-    public Guid EventId { get; } = Guid.NewGuid();
-    public DateTime OccurredAt { get; } = DateTime.UtcNow;
-    public string EventType => "OrderPlaced";
-}
-
-// Los eventos disparan proyecciones automáticamente
-public class OrderProjection : IEventHandler<OrderPlacedEvent>
-{
-    public async Task Handle(OrderPlacedEvent @event, CancellationToken ct)
-    {
-        // 1. Actualizar Read Model
-        await UpdateReadModel(@event);
-        
-        // 2. Actualizar Cache
-        await UpdateCache(@event);
-        
-        // 3. Emitir notificaciones
-        await NotifyStakeholders(@event);
-        
-        // 4. Actualizar Analytics
-        await UpdateAnalytics(@event);
-    }
-}
-```
-
-### 3. SAGA Pattern para Transacciones Distribuidas
-
-```csharp
-// ❌ MAL: Intentar transacción distribuida ACID
-public class OrderService
-{
-    public async Task PlaceOrder(OrderDto order)
-    {
-        using var transaction = _db.BeginTransaction();
-        try
-        {
-            await ReserveInventory(order.Items);
-            await ChargeCustomer(order.CustomerId, order.Total);
-            await CreateOrder(order);
-            
-            transaction.Commit();
-        }
-        catch
-        {
-            transaction.Rollback();
-            throw;
-        }
-    }
-}
-
-// Problema: ¿Y si el siguiente servicio está inactivo?
-// Toda la transacción falla, incluso si ya pagó el cliente.
-```
-
-```csharp
-// ✅ BIEN: SAGA Pattern con compensación
-public class OrderProcessingSaga :
-    ISaga,
-    InitiatedBy<OrderPlacedEvent>,
-    Orchestrates<InventoryReservedEvent>,
-    Orchestrates<PaymentProcessedEvent>,
-    Orchestrates<InventoryReservationFailedEvent>,
-    Orchestrates<PaymentFailedEvent>
-{
-    public Guid CorrelationId { get; set; }
-    public OrderState State { get; set; }
-    public int CustomerId { get; set; }
-    public List<OrderItemDto> Items { get; set; }
-    public decimal Total { get; set; }
-
-    // Paso 1: Orden creada → Reservar inventario
-    public async Task Consume(ConsumeContext<OrderPlacedEvent> context)
-    {
-        CorrelationId = context.Message.OrderId;
-        State = OrderState.ReservingInventory;
-        
-        await context.Publish(new ReserveInventoryCommand
-        {
-            OrderId = CorrelationId,
-            Items = context.Message.Items
-        });
-    }
-
-    // Paso 2: Inventario reservado → Procesar pago
-    public async Task Consume(ConsumeContext<InventoryReservedEvent> context)
-    {
-        State = OrderState.ProcessingPayment;
-        
-        await context.Publish(new ProcessPaymentCommand
-        {
-            OrderId = CorrelationId,
-            CustomerId = CustomerId,
-            Amount = Total
-        });
-    }
-
-    // Éxito: Pago procesado → Orden completa
-    public async Task Consume(ConsumeContext<PaymentProcessedEvent> context)
-    {
-        State = OrderState.Completed;
-        
-        await context.Publish(new OrderCompletedEvent
-        {
-            OrderId = CorrelationId
-        });
-    }
-
-    // Compensación: Si falla inventario → Cancelar orden
-    public async Task Consume(ConsumeContext<InventoryReservationFailedEvent> context)
-    {
-        State = OrderState.Cancelled;
-        
-        await context.Publish(new OrderCancelledEvent
-        {
-            OrderId = CorrelationId,
-            Reason = "Insufficient inventory"
-        });
-    }
-
-    // Compensación: Si falla pago → Liberar inventario
-    public async Task Consume(ConsumeContext<PaymentFailedEvent> context)
-    {
-        State = OrderState.Cancelled;
-        
-        // Rollback: Liberar inventario que ya se reservó
-        await context.Publish(new ReleaseInventoryCommand
-        {
-            OrderId = CorrelationId,
-            Items = Items
-        });
-        
-        await context.Publish(new OrderCancelledEvent
-        {
-            OrderId = CorrelationId,
-            Reason = "Payment failed"
-        });
-    }
-}
+// 8. DTOs, Mappings, Configuraciones...
+// TOTAL: 2000+ líneas para una entidad simple
 ```
 
 ---
 
-## 🏗️ Arquitectura
+## ✅ Solución: API Declarativa
+
+### Código con SyntroJS for .NET
+
+```csharp
+// ✅ El usuario escribe SOLO 20 líneas:
+
+using SyntroJS;
+
+var app = SyntroApp.Create();
+
+// Definir entidad Order con configuración declarativa
+app.Entity<Order>()
+    .Write(model => model
+        .Aggregate<OrderAggregate>()  // La librería crea el aggregate
+        .AutoCreateEndpoint()          // POST /api/orders
+        .AutoUpdateEndpoint()          // PUT /api/orders/{id}
+        .AutoDeleteEndpoint()          // DELETE /api/orders/{id}
+        .OnCreated("OrderPlaced")      // Emite evento automáticamente
+    )
+    .Read(model => model
+        .AutoGetByIdEndpoint()         // GET /api/orders/{id}
+        .AutoListEndpoint()            // GET /api/orders
+        .AutoSearchEndpoint()          // GET /api/orders?search=...
+        .Projection<OrderView>()       // Proyección automática
+        .Cache(duration: 5.Minutes())  // Cache automático
+    )
+    .Saga("OrderProcessing", saga => saga
+        .Step<OrderPlacedEvent>(async (ctx, next) =>
+        {
+            // Reservar inventario
+            await ReserveInventory(ctx.Order.Items);
+            await ctx.Publish("InventoryReserved");
+        })
+        .Step<InventoryReservedEvent>(async (ctx, next) =>
+        {
+            // Procesar pago
+            await ProcessPayment(ctx.Order.Total);
+            await ctx.Publish("PaymentProcessed");
+        })
+        .Step<PaymentProcessedEvent>(async (ctx, next) =>
+        {
+            // Completar orden
+            await CompleteOrder(ctx.OrderId);
+        })
+        .Compensate(async (ctx) =>
+        {
+            // Rollback automático si falla
+            await ReleaseInventory(ctx.Order.Items);
+        })
+    );
+
+app.Run();
+```
+
+**Lo que la librería genera automáticamente:**
+- ✅ Commands y Command Handlers
+- ✅ Queries y Query Handlers
+- ✅ Event Handlers
+- ✅ Projections
+- ✅ SAGA completa con compensación
+- ✅ Endpoints REST
+- ✅ Validación automática
+- ✅ Mapeos DTO ↔ Aggregate
+- ✅ Migraciones EF Core
+- ✅ Queries optimizadas con Dapper
+
+---
+
+## 🏗️ Arquitectura Interna
+
+La librería internamente organiza todo como arquitectura CQRS/SAGA:
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                         API Layer (Minimal API)                 │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
-│  │  Commands    │  │   Queries    │  │   WebSocket  │         │
-│  │   (POST)     │  │    (GET)     │  │  (Real-time) │         │
-│  └──────────────┘  └──────────────┘  └──────────────┘         │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    Application Layer (MediatR)                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐         │
-│  │  Command     │  │   Query      │  │   Event      │         │
-│  │  Handlers    │  │   Handlers   │  │   Handlers   │         │
-│  └──────────────┘  └──────────────┘  └──────────────┘         │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-              ┌───────────────┴───────────────┐
-              ▼                               ▼
-┌─────────────────────────┐      ┌─────────────────────────┐
-│   Domain Layer          │      │   Messaging Layer       │
-│  ┌─────────────────┐   │      │  ┌──────────────────┐   │
-│  │   Aggregates    │   │      │  │  MassTransit/    │   │
-│  │   (Write Model) │   │      │  │  NServiceBus     │   │
-│  └─────────────────┘   │      │  └──────────────────┘   │
-│  ┌─────────────────┐   │      │  ┌──────────────────┐   │
-│  │  Domain Events  │   │      │  │  Event Bus       │   │
-│  └─────────────────┘   │      │  └──────────────────┘   │
-└─────────────────────────┘      └─────────────────────────┘
-              │                               │
-              ▼                               ▼
-┌─────────────────────────┐      ┌─────────────────────────┐
-│   Infrastructure Layer  │      │   Event Handlers        │
-│  ┌─────────────────┐   │      │  ┌──────────────────┐   │
-│  │  Write DB       │   │      │  │  Projections     │   │
-│  │  (EF Core)      │   │      │  │  Read Model      │   │
-│  └─────────────────┘   │      │  │  Updates         │   │
-│  ┌─────────────────┐   │      │  └──────────────────┘   │
-│  │  Read DB        │   │      │  ┌──────────────────┐   │
-│  │  (Dapper)       │   │      │  │  SAGA            │   │
-│  └─────────────────┘   │      │  │  Orchestration   │   │
-│  ┌─────────────────┐   │      │  └──────────────────┘   │
-│  │  Redis Cache    │   │      │  ┌──────────────────┐   │
-│  └─────────────────┘   │      │  │  Notifications   │   │
-│  ┌─────────────────┐   │      │  └──────────────────┘   │
-│  │  Azure Storage  │   │      │                         │
-│  └─────────────────┘   │      │                         │
-└─────────────────────────┘      └─────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                   SyntroApp (User Code)                     │
+│  app.Entity<Order>().Write().Read().Saga()                  │
+└───────────────────────────┬─────────────────────────────────┘
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│              SyntroJS.Core (Library Core)                   │
+│  ┌────────────────────────────────────────────────┐        │
+│  │  EntityRegistry: Convierte configuración       │        │
+│  │  declarativa en arquitectura CQRS              │        │
+│  └────────────────────────────────────────────────┘        │
+│  ┌────────────────────────────────────────────────┐        │
+│  │  CommandGenerator: Genera Commands + Handlers  │        │
+│  └────────────────────────────────────────────────┘        │
+│  ┌────────────────────────────────────────────────┐        │
+│  │  QueryGenerator: Genera Queries + Handlers     │        │
+│  └────────────────────────────────────────────────┘        │
+│  ┌────────────────────────────────────────────────┐        │
+│  │  ProjectionGenerator: Genera proyecciones      │        │
+│  └────────────────────────────────────────────────┘        │
+│  ┌────────────────────────────────────────────────┐        │
+│  │  SagaGenerator: Genera SAGAs con compensación  │        │
+│  └────────────────────────────────────────────────┘        │
+└───────────────────────────┬─────────────────────────────────┘
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│          SyntroJS.Infrastructure (Generated Code)           │
+│  ┌──────────────────┐  ┌──────────────────┐                │
+│  │  Commands/       │  │  Queries/        │                │
+│  │  Handlers        │  │  Handlers        │                │
+│  └──────────────────┘  └──────────────────┘                │
+│  ┌──────────────────┐  ┌──────────────────┐                │
+│  │  Events/         │  │  Sagas/          │                │
+│  │  Projections     │  │  Orchestration   │                │
+│  └──────────────────┘  └──────────────────┘                │
+└───────────────────────────┬─────────────────────────────────┘
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│              MassTransit + MediatR + EF Core                │
+│              (Orquestación, Event Bus, Persistence)         │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
