@@ -1780,6 +1780,464 @@ public class Order : AggregateRoot
 
 ---
 
+## 🧪 Estrategia de Testing
+
+### Filosofía: Testing como Superpoder
+
+**SintroNet** sigue la filosofía de **SyntroJS**: "Testing no es una molestia, es un superpoder que te da confianza para refactorizar agresivamente."
+
+### Pirámide de Testing
+
+```
+        ╱╲
+       ╱E2E╲
+      ╱────╲
+     ╱      ╲
+    ╱Integration╲
+   ╱────────────╲
+  ╱              ╲
+ ╱    Unit        ╲
+╱──────────────────╲
+```
+
+**Ratio recomendado:**
+- **80% Unit Tests** - Rápidos, aislados, feedback inmediato
+- **15% Integration Tests** - Validar interacciones
+- **5% E2E Tests** - Validar flujos críticos
+
+---
+
+### 1. Testing de Agregados (Unitario)
+
+#### Objetivo
+Testear la **lógica de negocio pura** y la **emisión de eventos de dominio** sin dependencias externas.
+
+#### Principios
+- ✅ Sin mocks
+- ✅ Sin bases de datos
+- ✅ Sin frameworks pesados
+- ✅ Test de 100ms o menos
+
+#### Ejemplo
+
+```csharp
+[Fact]
+public void AddItem_Should_EmitOrderItemAddedEvent()
+{
+    // Arrange
+    var order = Order.Create(customerId, shippingAddress);
+    
+    // Act
+    order.AddItem(productId, 2, 99.99m);
+    
+    // Assert
+    var events = order.DomainEvents;
+    events.Should().ContainSingle(e => 
+        e is OrderItemAddedEvent added && 
+        added.Quantity == 2 &&
+        added.UnitPrice == 99.99m
+    );
+}
+
+[Fact]
+public void AddItem_When_OrderIsPaid_Should_Throw()
+{
+    // Arrange
+    var order = Order.Create(customerId, shippingAddress);
+    order.MarkAsPaid(paymentId);
+    
+    // Act & Assert
+    Assert.Throws<InvalidOperationException>(() => 
+        order.AddItem(productId, 1, 50m)
+    );
+}
+
+[Fact]
+public void CalculateTotal_Should_SumAllItems()
+{
+    // Arrange
+    var order = Order.Create(customerId, shippingAddress);
+    order.AddItem(product1, 2, 50m);  // 100
+    order.AddItem(product2, 1, 75m);  // 75
+    
+    // Act
+    var total = order.CalculateTotal();
+    
+    // Assert
+    total.Amount.Should().Be(175m);
+}
+```
+
+**Beneficios:**
+- ⚡ Tests ultra-rápidos (< 10ms)
+- 🎯 Enfoque en lógica de negocio
+- 🔒 Valida invariantes del dominio
+- 🧹 Sin infraestructura
+
+---
+
+### 2. Testing de Command Handlers (Integración)
+
+#### Objetivo
+Validar la **orquestación** entre handler, repositorio y bus de eventos.
+
+#### Estrategia
+- ✅ Repositorio en memoria
+- ✅ Bus de eventos mockeado
+- ✅ Base de datos en memoria (SQLite)
+
+#### Ejemplo
+
+```csharp
+public class CreateOrderCommandHandlerTests : IDisposable
+{
+    private readonly DbContext _dbContext;
+    private readonly Mock<IPublishEndpoint> _publishEndpoint;
+    private readonly CreateOrderCommandHandler _handler;
+    
+    public CreateOrderCommandHandlerTests()
+    {
+        _dbContext = new WriteDbContext(/* SQLite in-memory */);
+        _publishEndpoint = new Mock<IPublishEndpoint>();
+        _handler = new CreateOrderCommandHandler(
+            new OrderRepository(_dbContext),
+            _publishEndpoint.Object
+        );
+    }
+    
+    [Fact]
+    public async Task Handle_Should_SaveOrderAndPublishEvent()
+    {
+        // Arrange
+        var command = new CreateOrderCommand
+        {
+            CustomerId = customerId,
+            Items = new[] { new OrderItemDto(productId, 2, 50m) }
+        };
+        
+        // Act
+        var result = await _handler.Handle(command, CancellationToken.None);
+        
+        // Assert - Order persisted
+        var order = await _dbContext.Orders.FindAsync(result.Id);
+        order.Should().NotBeNull();
+        order.Items.Should().HaveCount(1);
+        
+        // Assert - Event published
+        _publishEndpoint.Verify(p => 
+            p.Publish(It.Is<OrderPlacedEvent>(
+                e => e.OrderId == result.Id
+            ), It.IsAny<CancellationToken>()),
+            Times.Once
+        );
+    }
+}
+```
+
+**Beneficios:**
+- ✅ Valida SRP (handler solo orquesta)
+- ✅ Integra repositorio y eventos
+- ✅ Rápido (< 500ms)
+
+---
+
+### 3. Testing de Proyecciones (Integración)
+
+#### Objetivo
+Validar que los eventos actualizan correctamente el read model.
+
+#### Estrategia
+- ✅ Event bus en memoria
+- ✅ Read database en memoria
+- ✅ Verificar estado final
+
+#### Ejemplo
+
+```csharp
+[Fact]
+public async Task OrderPlacedEvent_Should_UpdateOrderView()
+{
+    // Arrange
+    var @event = new OrderPlacedEvent
+    {
+        OrderId = Guid.NewGuid(),
+        CustomerId = Guid.NewGuid(),
+        Total = 150m,
+        Items = new[] { new OrderItemDto(productId, 2, 50m) }
+    };
+    
+    var projection = new OrderProjection(readDbContext);
+    
+    // Act
+    await projection.Handle(@event, CancellationToken.None);
+    
+    // Assert
+    var view = await readDbContext.OrderViews.FindAsync(@event.OrderId);
+    view.Should().NotBeNull();
+    view.Total.Should().Be(150m);
+    view.ItemCount.Should().Be(1);
+    view.Status.Should().Be("Draft");
+}
+```
+
+**Beneficios:**
+- ✅ Valida consistencia eventual
+- ✅ Verifica denormalización
+- ✅ Asegura proyecciones correctas
+
+---
+
+### 4. Testing de Queries (Integración)
+
+#### Objetivo
+Validar que los read models se consultan correctamente.
+
+#### Estrategia
+- ✅ Pre-popular base de datos
+- ✅ Ejecutar query handler
+- ✅ Verificar DTO resultante
+
+#### Ejemplo
+
+```csharp
+[Fact]
+public async Task GetOrderById_Should_ReturnCachedOrder()
+{
+    // Arrange - Pre-populate
+    var orderView = new OrderView
+    {
+        Id = orderId,
+        CustomerId = customerId,
+        Total = 200m,
+        Status = "Paid"
+    };
+    await readDbContext.OrderViews.AddAsync(orderView);
+    await readDbContext.SaveChangesAsync();
+    
+    var handler = new GetOrderByIdQueryHandler(readDbContext, cache);
+    
+    // Act
+    var result = await handler.Handle(
+        new GetOrderByIdQuery { OrderId = orderId },
+        CancellationToken.None
+    );
+    
+    // Assert
+    result.Id.Should().Be(orderId);
+    result.Total.Should().Be(200m);
+    result.Status.Should().Be("Paid");
+}
+```
+
+**Beneficios:**
+- ✅ Valida separación CQRS
+- ✅ Verifica optimizaciones (Dapper)
+- ✅ Asegura caching
+
+---
+
+### 5. Testing de Sagas (End-to-End)
+
+#### Objetivo
+Validar el flujo completo de una transacción distribuida.
+
+#### Estrategia
+- ✅ MassTransit Test Framework
+- ✅ Saga en memoria
+- ✅ Validar transiciones de estado
+
+#### Ejemplo
+
+```csharp
+public class OrderProcessingSagaTests : InMemoryTestFixture
+{
+    [Fact]
+    public async Task OrderFlow_Should_Complete_Successfully()
+    {
+        // Arrange
+        var saga = new OrderProcessingSaga();
+        var sagaRepository = new InMemorySagaRepository<OrderProcessingState>();
+        
+        // Act - Initiate saga
+        await saga.Initialize(
+            new OrderPlacedEvent { OrderId = orderId },
+            sagaRepository
+        );
+        
+        // Assert - Step 1: Inventory should be reserved
+        var state = await sagaRepository.Get(orderId);
+        state.CurrentState.Should().Be("ReservingInventory");
+        
+        // Act - Simulate inventory reserved
+        await saga.Handle(
+            new InventoryReservedEvent { OrderId = orderId }
+        );
+        
+        // Assert - Step 2: Payment should be processed
+        state = await sagaRepository.Get(orderId);
+        state.CurrentState.Should().Be("ProcessingPayment");
+        
+        // Act - Simulate payment processed
+        await saga.Handle(
+            new PaymentProcessedEvent { OrderId = orderId }
+        );
+        
+        // Assert - Final: Order completed
+        state = await sagaRepository.Get(orderId);
+        state.CurrentState.Should().Be("Completed");
+    }
+    
+    [Fact]
+    public async Task PaymentFails_Should_Compensate()
+    {
+        // Arrange
+        var saga = InitializeSaga();
+        
+        // Act - Payment fails
+        await saga.Handle(
+            new PaymentFailedEvent { OrderId = orderId }
+        );
+        
+        // Assert - Compensate
+        var state = await sagaRepository.Get(orderId);
+        state.CurrentState.Should().Be("Compensating");
+        
+        // Assert - Inventory released
+        busMock.Verify(b => b.Publish(
+            It.Is<ReleaseInventoryCommand>(c => c.OrderId == orderId),
+            It.IsAny<CancellationToken>()
+        ), Times.Once);
+    }
+}
+```
+
+**Beneficios:**
+- ✅ Valida flujo completo
+- ✅ Asegura compensaciones
+- ✅ Behavior emergente verificado
+
+---
+
+### 6. Mutation Testing con Stryker
+
+#### ¿Por qué Mutation Testing?
+
+**Problema:** Coverage del 80% no garantiza tests útiles.
+
+```csharp
+// Test con cobertura alta, pero inútil
+[Fact]
+public void CalculateTotal_Should_ReturnSomething()
+{
+    var total = order.CalculateTotal();
+    Assert.NotNull(total);  // ❌ No valida nada útil
+}
+```
+
+**Solución:** Stryker introduce "mutantes" (bugs artificiales) y verifica que tus tests los matan.
+
+#### Configuración
+
+```xml
+<ItemGroup>
+  <PackageReference Include="Stryker.NET" Version="1.17.0" />
+</ItemGroup>
+```
+
+```json
+// stryker-config.json
+{
+  "mutate": [
+    "src/**/*.cs"
+  ],
+  "test-projects": [
+    "tests/**/*.csproj"
+  ],
+  "thresholds": {
+    "high": 80,
+    "break": 70
+  }
+}
+```
+
+#### Ejecutar
+
+```bash
+dotnet stryker
+```
+
+**Output:**
+```
+All mutants have been tested, and your mutation score has been calculated
+┌───────────────────────────────────────────────────────────────┐
+│                      Mutation Score                           │
+├───────────────────────────────────────────────────────────────┤
+│ Killed   │ 157 (82.2%)                                        │
+│ Survived │ 34 (17.8%)                                         │
+│ Timeout  │ 0 (0%)                                             │
+├───────────────────────────────────────────────────────────────┤
+│ Total    │ 191 mutations                                      │
+└───────────────────────────────────────────────────────────────┘
+```
+
+#### Mutantes Comunes
+
+```csharp
+// Original
+if (quantity > 0) { ... }
+
+// Mutante 1: Condición inversada
+if (quantity <= 0) { ... }  // ❌ ¿Tu test falla? ¡Perfecto!
+
+// Mutante 2: Operador cambiado
+if (quantity < 0) { ... }   // ❌ ¿Tu test falla? ¡Perfecto!
+
+// Mutante 3: Eliminar condición
+{ ... }                     // ❌ ¿Tu test falla? ¡Perfecto!
+```
+
+#### Integración Continua
+
+```yaml
+# .github/workflows/mutation-testing.yml
+name: Mutation Testing
+
+on: [pull_request]
+
+jobs:
+  mutation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '8.0'
+      
+      - name: Run Stryker
+        run: dotnet stryker
+      
+      - name: Upload Report
+        uses: actions/upload-artifact@v2
+        with:
+          name: mutation-report
+          path: MutationReport.html
+```
+
+---
+
+### Métricas de Testing
+
+| Métrica | Objetivo | Herramienta |
+|---------|----------|-------------|
+| **Coverage** | > 80% | Coverlet |
+| **Mutation Score** | > 75% | Stryker |
+| **Test Speed** | < 30s (unitarios) | xUnit |
+| **Failing Tests** | 0 | CI/CD |
+
+---
+
 ## 🤖 Consideraciones para Agentes de IA
 
 ### Patrones Clave a Entender
