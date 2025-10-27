@@ -1395,6 +1395,391 @@ GET /api/orders/123e4567-e89b-12d3-a456-426614174000
 
 ---
 
+## 🏛️ Principios de Diseño: SOLID, DDD, Programación Funcional
+
+### SOLID Principles
+
+**Todo el código generado por SintroNet sigue estrictamente los principios SOLID:**
+
+#### Single Responsibility Principle (SRP)
+
+```csharp
+// ✅ BIEN: Cada clase tiene UNA responsabilidad
+public class OrderRepository
+{
+    // Responsabilidad ÚNICA: Persistencia de Orders
+    public async Task<Order> GetByIdAsync(Guid id) { ... }
+    public async Task SaveAsync(Order order) { ... }
+}
+
+public class OrderProjection
+{
+    // Responsabilidad ÚNICA: Actualizar Read Models
+    public async Task Handle(OrderPlacedEvent @event) { ... }
+}
+
+// ❌ MAL: Violación SRP
+public class OrderService
+{
+    // ❌ Persiste, proyecta, notifica, calcula todo en uno
+    public async Task CreateOrder(...) 
+    {
+        await _db.Save(order);
+        await UpdateProjection(order);
+        await SendNotification(order);
+        await CalculateMetrics(order);
+    }
+}
+```
+
+#### Open/Closed Principle (OCP)
+
+```csharp
+// ✅ Extensible sin modificar código existente
+public interface IOrderValidator
+{
+    ValidationResult Validate(Order order);
+}
+
+// Nueva validación sin tocar código existente
+public class VipCustomerValidator : IOrderValidator
+{
+    public ValidationResult Validate(Order order) { ... }
+}
+
+app.Entity<Order>()
+    .Write(model => model
+        .WithValidator<BasicOrderValidator>()
+        .WithValidator<VipCustomerValidator>()  // ← Nuevo sin romper existente
+    );
+```
+
+#### Liskov Substitution Principle (LSP)
+
+```csharp
+// ✅ Cualquier implementación de IRepository es intercambiable
+public interface IRepository<T>
+{
+    Task<T> GetByIdAsync(Guid id);
+}
+
+// Todas estas implementaciones son intercambiables
+public class SqlOrderRepository : IRepository<Order> { ... }
+public class InMemoryOrderRepository : IRepository<Order> { ... }
+public class CosmosOrderRepository : IRepository<Order> { ... }
+```
+
+#### Interface Segregation Principle (ISP)
+
+```csharp
+// ✅ Interfaces pequeñas y específicas
+public interface IReadRepository<T>
+{
+    Task<T> GetByIdAsync(Guid id);
+    Task<List<T>> ListAsync();
+}
+
+public interface IWriteRepository<T>
+{
+    Task SaveAsync(T entity);
+    Task DeleteAsync(Guid id);
+}
+
+// ❌ MAL: Interface grande y monolítica
+public interface IRepository<T>  // ❌ Puede que no necesites Delete
+{
+    Task<T> GetByIdAsync(Guid id);
+    Task<List<T>> ListAsync();
+    Task SaveAsync(T entity);
+    Task DeleteAsync(Guid id);
+    Task UpdateAsync(T entity);
+    Task<bool> ExistsAsync(Guid id);
+}
+```
+
+#### Dependency Inversion Principle (DIP)
+
+```csharp
+// ✅ Dependencias hacia abstracciones, no implementaciones
+public class OrderCommandHandler
+{
+    private readonly IOrderRepository _repository;  // ← Abstracción
+    
+    public OrderCommandHandler(IOrderRepository repository)
+    {
+        _repository = repository;
+    }
+}
+
+// ❌ MAL: Dependencia directa a implementación
+public class OrderCommandHandler
+{
+    private readonly SqlOrderRepository _repository;  // ❌ Acoplamiento
+}
+```
+
+### Domain-Driven Design (DDD)
+
+#### Ubicuous Language (Lenguaje ubicuo)
+
+```csharp
+// ✅ Usa el lenguaje del negocio
+public class Order : AggregateRoot
+{
+    public void MarkAsPaid() { ... }           // "Marcar como pagado"
+    public void ShipTo(Address address) { ... } // "Enviar a"
+}
+
+// ❌ MAL: Usa lenguaje técnico
+public class Order
+{
+    public void UpdateStatusToPaid() { ... }  // ❌ Muy técnico
+    public void AssignDestination(Address a) { ... }  // ❌ Ambiguo
+}
+```
+
+#### Aggregate Roots
+
+```csharp
+// ✅ Order es el Aggregate Root
+public class Order : AggregateRoot
+{
+    private readonly List<OrderItem> _items = new();
+    
+    // Solo Order puede modificar sus Items (encapsulación)
+    public void AddItem(ProductId productId, int quantity, decimal price)
+    {
+        // Validación de invariantes
+        if (Status != OrderStatus.Draft)
+            throw new InvalidOperationException("Cannot modify completed order");
+        
+        _items.Add(new OrderItem(productId, quantity, price));
+    }
+}
+```
+
+#### Value Objects
+
+```csharp
+// ✅ Value Objects inmutables
+public record Money
+{
+    public decimal Amount { get; init; }
+    public string Currency { get; init; }
+    
+    public Money(decimal amount, string currency)
+    {
+        if (amount < 0)
+            throw new ArgumentException("Amount cannot be negative");
+        if (string.IsNullOrWhiteSpace(currency))
+            throw new ArgumentException("Currency is required");
+        
+        Amount = amount;
+        Currency = currency;
+    }
+    
+    // Inmutable: Operaciones crean nuevo valor
+    public Money Add(Money other)
+    {
+        if (Currency != other.Currency)
+            throw new InvalidOperationException("Cannot add different currencies");
+        
+        return new Money(Amount + other.Amount, Currency);
+    }
+}
+```
+
+#### Domain Events
+
+```csharp
+// ✅ Eventos de dominio con significado de negocio
+public record OrderPlacedEvent : IDomainEvent
+{
+    public Guid OrderId { get; init; }
+    public Guid CustomerId { get; init; }
+    public Money Total { get; init; }  // ← Value Object
+    public DateTime OccuredAt { get; init; } = DateTime.UtcNow;
+}
+```
+
+### Programación Funcional
+
+#### Funciones Puras
+
+```csharp
+// ✅ Función pura: Sin side effects, siempre mismo resultado
+public static Money CalculateDiscount(Money total, decimal percentage)
+{
+    return new Money(total.Amount * percentage / 100, total.Currency);
+}
+
+// ❌ MAL: Impura, side effect
+public static Money CalculateDiscount(Money total, decimal percentage)
+{
+    _logger.Info("Calculating discount");  // ❌ Side effect
+    return new Money(total.Amount * percentage / 100, total.Currency);
+}
+```
+
+#### Immutabilidad
+
+```csharp
+// ✅ Records inmutables por defecto
+public record OrderDto(
+    Guid Id,
+    Money Total,
+    OrderStatus Status
+);
+
+// Modificación crea nuevo objeto
+var original = new OrderDto(Id, Total, OrderStatus.Draft);
+var updated = original with { Status = OrderStatus.Paid };  // ← Nuevo objeto
+```
+
+#### Expresiones vs Sentencias
+
+```csharp
+// ✅ Expresiones (funcional)
+var total = items.Sum(i => i.Price * i.Quantity);
+
+// ❌ MAL: Imperativo
+decimal total = 0;
+foreach (var item in items)
+{
+    total += item.Price * item.Quantity;
+}
+
+// ✅ Chaining funcional
+var orders = await _repository
+    .Query(o => o.Status == OrderStatus.Paid)
+    .Where(o => o.CreatedAt > DateTime.UtcNow.AddDays(-30))
+    .Select(o => o.Total)
+    .Sum();
+```
+
+### Guard Clauses (Cláusulas de Guarda)
+
+#### Fail Fast Pattern
+
+```csharp
+// ✅ Cláusulas de guarda al inicio
+public void AddItem(ProductId productId, int quantity, decimal price)
+{
+    // Guard clauses primero
+    if (productId == null)
+        throw new ArgumentNullException(nameof(productId));
+    
+    if (quantity <= 0)
+        throw new ArgumentException("Quantity must be positive", nameof(quantity));
+    
+    if (price < 0)
+        throw new ArgumentException("Price cannot be negative", nameof(price));
+    
+    if (Status != OrderStatus.Draft)
+        throw new InvalidOperationException("Cannot modify completed order");
+    
+    // Happy path después
+    var item = new OrderItem(productId, quantity, price);
+    _items.Add(item);
+    Total = _items.Sum(i => i.SubTotal);
+}
+
+// ❌ MAL: Guard clauses mezcladas
+public void AddItem(ProductId productId, int quantity, decimal price)
+{
+    var item = new OrderItem(productId, quantity, price);  // ❌ Podría fallar
+    
+    if (Status != OrderStatus.Draft)  // ❌ Demasiado tarde
+        throw new InvalidOperationException("Cannot modify completed order");
+    
+    _items.Add(item);
+}
+```
+
+#### Result Pattern (Funcional)
+
+```csharp
+// ✅ Result pattern para manejo funcional de errores
+public record Result<T>
+{
+    public bool IsSuccess { get; init; }
+    public T Value { get; init; }
+    public string Error { get; init; }
+    
+    public static Result<T> Success(T value) => new() { IsSuccess = true, Value = value };
+    public static Result<T> Failure(string error) => new() { IsSuccess = false, Error = error };
+}
+
+public Result<Order> AddItem(ProductId productId, int quantity, decimal price)
+{
+    // Guard clauses retornan Result
+    if (productId == null)
+        return Result<Order>.Failure("Product ID is required");
+    
+    if (quantity <= 0)
+        return Result<Order>.Failure("Quantity must be positive");
+    
+    // Happy path
+    var item = new OrderItem(productId, quantity, price);
+    _items.Add(item);
+    
+    return Result<Order>.Success(this);
+}
+
+// Uso con chaining funcional
+var result = order
+    .AddItem(productId, quantity, price)
+    .Map(o => o.CalculateTotal())
+    .Map(o => o.ApplyDiscount(discountCode));
+```
+
+### Combinando Todo
+
+```csharp
+// ✅ Ejemplo completo aplicando todos los principios
+public class Order : AggregateRoot
+{
+    private readonly List<OrderItem> _items = new();
+    
+    // DDD: Ubicuous Language
+    // Guard Clauses: Fail fast
+    // Inmutabilidad: Muta solo internamente
+    public Result<Order> AddItem(ProductId productId, int quantity, Money price)
+    {
+        // Guard clauses
+        if (productId == null)
+            return Result<Order>.Failure("Product ID is required");
+        
+        if (quantity <= 0)
+            return Result<Order>.Failure("Quantity must be positive");
+        
+        if (price.Amount < 0)
+            return Result<Order>.Failure("Price cannot be negative");
+        
+        if (Status != OrderStatus.Draft)
+            return Result<Order>.Failure("Cannot modify completed order");
+        
+        // Domain logic (pure)
+        var item = new OrderItem(productId, quantity, price);
+        _items.Add(item);
+        
+        // Immutability: crear nuevo evento en lugar de mutar
+        AddDomainEvent(new OrderItemAddedEvent(Id, productId, quantity));
+        
+        return Result<Order>.Success(this);
+    }
+    
+    // Funcional: método puro sin side effects
+    private Money CalculateTotal() =>
+        _items.Aggregate(
+            new Money(0, "USD"),
+            (sum, item) => sum.Add(item.SubTotal)
+        );
+}
+```
+
+---
+
 ## 🤖 Consideraciones para Agentes de IA
 
 ### Patrones Clave a Entender
@@ -1415,6 +1800,21 @@ GET /api/orders/123e4567-e89b-12d3-a456-426614174000
    - Pre-cálculo
    - Denormalización
    - Caching
+
+5. **Sigue SOLID, DDD, y Programación Funcional**
+   - Single Responsibility: Una clase, una razón para cambiar
+   - Domain-Driven: Lenguaje ubicuo, agregados, value objects
+   - Funcional: Funciones puras, inmutabilidad, guard clauses
+
+### Código de Ejemplo Generado
+
+Todos los ejemplos de código en esta guía siguen estrictamente:
+- ✅ SOLID Principles
+- ✅ Domain-Driven Design (DDD)
+- ✅ Programación Funcional
+- ✅ Guard Clauses (Fail Fast)
+
+Cada handler, aggregate, y servicio implementa estos principios para garantizar código mantenible, testeable y escalable.
 
 ### Comandos Útiles
 
