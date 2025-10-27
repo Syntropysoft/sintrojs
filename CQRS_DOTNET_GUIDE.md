@@ -458,6 +458,321 @@ La librería internamente organiza todo como arquitectura CQRS/SAGA:
 
 ---
 
+## 🔐 Idempotencia Automática (Inbox Pattern)
+
+### El Problema de Mensajes Duplicados
+
+En sistemas distribuidos basados en eventos, los message brokers garantizan entrega "at-least-once" (al menos una vez). Esto significa que el mismo mensaje puede entregarse múltiples veces.
+
+**Consecuencias sin Idempotencia:**
+```csharp
+// ❌ Sin idempotencia: Procesar pago DOS veces
+PaymentProcessedEvent (ID: "abc-123") → Procesar $100
+PaymentProcessedEvent (ID: "abc-123") → Procesar $100 OTRA VEZ ❌
+
+// Cliente cobrado $200 en lugar de $100
+```
+
+### Solución: Inbox Pattern Automático
+
+**SintroNet** implementa automáticamente el **Inbox Pattern**, garantizando que cada mensaje se procese exactamente una vez:
+
+```csharp
+app.Entity<Order>()
+    .Write(model => model
+        .AutoCreateEndpoint()
+        .WithIdempotency()  // ← Una sola línea habilita idempotencia
+    );
+
+// También funciona en SAGAs
+app.Saga("OrderProcessing", saga => saga
+    .Step<PaymentProcessedEvent>(async (ctx, next) => 
+    {
+        await ProcessPayment(ctx.Amount);
+    })
+    .WithIdempotency()  // ← Protege contra duplicados
+);
+```
+
+### ¿Cómo Funciona Internamente?
+
+La librería mantiene una tabla `inbox_messages`:
+
+```sql
+CREATE TABLE inbox_messages (
+    id UUID PRIMARY KEY,        -- Message ID único
+    handler_name VARCHAR(255),  -- Handler que procesa el mensaje
+    processed_at TIMESTAMP,     -- Cuándo se procesó
+    payload TEXT                -- Serialización del mensaje
+);
+```
+
+**Flujo Automático:**
+1. Mensaje llega con ID `"abc-123"`
+2. Librería verifica: `SELECT * FROM inbox_messages WHERE id = 'abc-123'`
+3. Si existe → Ignora mensaje (ya procesado)
+4. Si no existe → Procesa mensaje y guarda en `inbox_messages`
+
+### Configuración Avanzada
+
+```csharp
+app.UseInbox(config => config
+    .Provider<SqlServerInbox>()  // PostgreSQL, MySQL, etc.
+    .RetentionDays(90)            // Limpiar mensajes antiguos
+    .BatchSize(100)                // Procesar en lotes
+);
+```
+
+**Beneficios:**
+- ✅ Garantía de procesamiento exactamente-una-vez
+- ✅ Zero configuración por default
+- ✅ Transparente para el desarrollador
+- ✅ Soporte multi-provider (SQL, MongoDB, etc.)
+
+---
+
+## 📦 Event Sourcing (Opcional)
+
+### ¿Qué es Event Sourcing?
+
+**Event Sourcing** es una estrategia de persistencia donde en lugar de guardar el **estado actual** del agregado, guardamos la **secuencia inmutable de eventos** que ocurrieron.
+
+### Comparación: Estado vs Eventos
+
+| Aspecto | Estado Tradicional | Event Sourcing |
+|---------|-------------------|----------------|
+| **Persistencia** | Tabla `Orders` con estado actual | Tabla `events` con historia |
+| **Queries** | ✅ Directo (SELECT * FROM Orders) | ❌ Requiere replay eventos |
+| **Auditoría** | ❌ Limitada (solo estado actual) | ✅ Historial completo |
+| **Time Travel** | ❌ Imposible | ✅ Ver estado en cualquier momento |
+| **Nuevas Proyecciones** | ❌ Requiere migración | ✅ Replay eventos históricos |
+| **Debugging** | ❌ Solo estado actual | ✅ Ver exactamente qué pasó |
+
+### API Declarativa con Event Sourcing
+
+```csharp
+app.Entity<Order>()
+    .Write(model => model
+        .UseEventSourcing()        // ← Habilita Event Sourcing
+        .AutoCreateEndpoint()
+        .SnapshotEvery(100)        // Performance: snapshot cada 100 eventos
+    );
+```
+
+### Flujo Interno
+
+```csharp
+// 1. Comando llega: CreateOrderCommand
+var command = new CreateOrderCommand { CustomerId = "abc", Items = [...] };
+
+// 2. Librería reconstruye agregado (si existe)
+var order = await eventStore.GetAggregate<Order>(orderId);
+// Reproduce eventos: OrderCreated → OrderItemAdded → OrderPaid
+
+// 3. Ejecuta lógica de negocio
+order.AddItem(newItem);
+
+// 4. Guarda NUEVO evento (no actualiza estado)
+await eventStore.AppendEvent(new OrderItemAddedEvent { ... });
+```
+
+### Configuración
+
+```csharp
+app.UseEventStore(config => config
+    .Provider<PostgresEventStore>()  // o SQL Server, MongoDB
+    .EnableSnapshots()                // Performance
+    .RetentionPolicy(years: 7)        // Retención histórica
+);
+```
+
+**Casos de Uso:**
+- ✅ Sistemas financieros (auditoría completa requerida)
+- ✅ Sistemas de compliance (historial inmutable)
+- ✅ Analytics y machine learning (todos los eventos históricos)
+- ✅ Domain Events complejos (workflow rastreado)
+
+---
+
+## 🔄 Evolución de Esquemas de Eventos
+
+### El Problema del Versionado
+
+Los eventos evolucionan con el tiempo:
+```csharp
+// Versión 1 (t0)
+public record OrderPlacedEvent(
+    Guid OrderId,
+    Guid CustomerId,
+    decimal Total
+);
+
+// Versión 2 (t1) - Campo nuevo añadido
+public record OrderPlacedEvent(
+    Guid OrderId,
+    Guid CustomerId,
+    decimal Total,
+    string? DiscountCode  // ← Nuevo campo
+);
+```
+
+**Problema:** Consumidores antiguos procesando eventos nuevos rompen.
+
+### Estrategias
+
+#### 1. Tolerant Reader (Recomendado)
+
+Diseña consumidores que ignoren campos desconocidos:
+
+```csharp
+public class OrderProjection : IEventHandler<OrderPlacedEvent>
+{
+    public async Task Handle(OrderPlacedEvent @event)
+    {
+        // ✅ IGNORA campos desconocidos
+        // @event.DiscountCode será null para eventos v1, OK!
+        
+        await UpdateProjection(@event.OrderId, @event.CustomerId, @event.Total);
+    }
+}
+```
+
+#### 2. Campos Opcionales Siempre
+
+```csharp
+// ✅ BIEN: Nuevos campos siempre opcionales
+public record OrderPlacedEvent(
+    Guid OrderId,
+    string? DiscountCode = null,  // ← Nullable con default
+    Guid? CampaignId = null
+);
+```
+
+#### 3. Upcasting Automático
+
+**SintroNet** puede convertir eventos v1 a v2 automáticamente:
+
+```csharp
+app.Events(config => config
+    .Upcast<OrderPlacedEventV1, OrderPlacedEventV2>(v1 => new OrderPlacedEventV2
+    {
+        OrderId = v1.OrderId,
+        CustomerId = v1.CustomerId,
+        Total = v1.Total,
+        DiscountCode = null  // ← Valor por defecto
+    })
+);
+```
+
+**Flujo:**
+1. Evento v1 deserializado desde almacenamiento
+2. Upcaster convierte a v2 en memoria
+3. Handler recibe evento v2
+4. Transparente para consumidor
+
+#### 4. Versionado en Nombre (Breaking Changes)
+
+Para cambios incompatibles:
+
+```csharp
+// Eventos completamente diferentes
+public record OrderPlacedV2Event(...) { }
+public record OrderPlacedV3Event(...) { }
+
+// Consumidores específicos
+app.Consume<OrderPlacedV2Event>(...)
+app.Consume<OrderPlacedV3Event>(...)
+```
+
+### Mejores Prácticas
+
+1. **Siempre** añade campos opcionales
+2. **Nunca** elimines campos existentes
+3. **Usa** Tolerant Reader por defecto
+4. **Documenta** cambios de schema
+5. **Versiona** para breaking changes
+
+---
+
+## 🎼 SAGAs: Orquestación vs Coreografía
+
+### Orquestación (Centralizada)
+
+Una clase central orquesta el flujo completo:
+
+```csharp
+app.Saga("OrderProcessing", saga => saga
+    .Orchestration()  // ← Modo orquestado
+    .Step<OrderPlacedEvent>(async (ctx, next) => 
+    {
+        await ReserveInventory(ctx);
+        await ctx.Publish("InventoryReserved");
+    })
+    .Step<InventoryReservedEvent>(async (ctx, next) => 
+    {
+        await ProcessPayment(ctx);
+        await ctx.Publish("PaymentProcessed");
+    })
+);
+```
+
+**Características:**
+- ✅ Flujo centralizado y fácil de entender
+- ✅ Monitoreo en un solo lugar
+- ✅ Lógica de compensación compleja
+- ❌ Acoplamiento entre servicios
+
+**Ideal para:** Workflows complejos (3+ pasos), transacciones críticas
+
+### Coreografía (Descentralizada)
+
+Cada servicio reacciona a eventos publicados:
+
+```csharp
+// Order Service
+app.Consume<PaymentProcessedEvent>(async (@event) => 
+{
+    await MarkOrderAsCompleted(@event.OrderId);
+});
+
+// Inventory Service
+app.Consume<OrderPlacedEvent>(async (@event) => 
+{
+    await ReserveInventory(@event.Items);
+    await ctx.Publish("InventoryReserved");
+});
+
+// Payment Service
+app.Consume<InventoryReservedEvent>(async (@event) => 
+{
+    await ChargeCustomer(@event.OrderId);
+    await ctx.Publish("PaymentProcessed");
+});
+```
+
+**Características:**
+- ✅ Desacoplamiento total
+- ✅ Autonomía de servicios
+- ✅ Escalabilidad independiente
+- ❌ Flujo distribuido (más difícil debuggear)
+
+**Ideal para:** Workflows simples (2-3 pasos), microservicios independientes
+
+### Decisión
+
+| Criterio | Orquestación | Coreografía |
+|----------|--------------|-------------|
+| **Complejidad** | Alta | Baja |
+| **Pasos** | 3+ | 1-3 |
+| **Compensación** | Compleja | Simple |
+| **Desacoplamiento** | Medio | Alto |
+| **Debugging** | Fácil | Difícil |
+| **Monitoreo** | Centralizado | Distribuido |
+
+**Recomendación:** Orquestación para workflows críticos, Coreografía para notificaciones simples.
+
+---
+
 ## 🛠️ Stack Tecnológico
 
 ### Core Framework
