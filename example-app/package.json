@@ -1,0 +1,28 @@
+{
+  "name": "syntrojs-example-app",
+  "version": "1.0.0",
+  "description": "Example application using SyntroJS",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "dev:advanced": "tsx watch src/advanced-example.ts",
+    "dev:plugins": "tsx watch src/plugins-example.ts",
+    "dev:security": "tsx watch src/security-example.ts",
+    "start": "tsx src/index.ts",
+    "start:advanced": "tsx src/advanced-example.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "syntrojs": "workspace:*",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  }
+}

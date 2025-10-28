@@ -1,0 +1,127 @@
+{
+  "name": "syntrojs",
+  "version": "0.3.9-alpha",
+  "description": "🔥 DUAL RUNTIME: FastAPI for Node.js AND Bun - Same Code, Maximum Performance | ⚡ 3.8x Faster with Bun | 🚀 89.3% of Fastify with Node.js",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "npm run build -- --watch",
+    "lint": "biome check src tests",
+    "format": "biome format --write .",
+    "test": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:mutation": "stryker run",
+    "test:mutate": "tsx run-smart-mutator.ts --mode smart",
+    "test:mutate:full": "tsx run-smart-mutator.ts --mode full",
+    "test:mutate:ci": "tsx run-smart-mutator.ts --mode smart --forceFull",
+    "test:universal": "vitest run tests/universal",
+    "test:node": "vitest run tests/universal tests/node",
+    "test:bun": "bun test tests/universal tests/bun",
+    "test:all": "pnpm test:node && pnpm test:bun",
+    "lint:fix": "biome check --write src tests",
+    "typecheck": "tsc --noEmit --skipLibCheck",
+    "ci:strict": "pnpm lint && pnpm typecheck && pnpm test:coverage",
+    "ci:permissive": "pnpm typecheck && pnpm test:coverage",
+    "ci:node": "pnpm lint && pnpm typecheck && pnpm test:node",
+    "ci:bun": "pnpm lint && pnpm typecheck && pnpm test:bun",
+    "benchmark": "node final-performance-benchmark.cjs",
+    "benchmark:final": "node final-performance-benchmark.cjs",
+    "benchmark:ultrafast": "node ultrafast-optimization-benchmark.cjs",
+    "benchmark:express": "node syntrojs-vs-express.cjs",
+    "benchmark:diagnostic": "node benchmarks/diagnostic-baseline.cjs"
+  },
+  "keywords": [
+    "fastapi",
+    "api",
+    "framework",
+    "typescript",
+    "fastify",
+    "zod",
+    "openapi",
+    "swagger",
+    "validation",
+    "type-safe"
+  ],
+  "author": "SyntropySoft",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Syntropysoft/sintrojs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Syntropysoft/sintrojs/issues"
+  },
+  "homepage": "https://github.com/Syntropysoft/sintrojs#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "dependencies": {
+    "@fastify/static": "^7.0.0",
+    "fastify": "^4.26.0",
+    "zod": "^3.22.4",
+    "zod-to-json-schema": "^3.22.4"
+  },
+  "optionalDependencies": {
+    "redoc": "^2.5.2",
+    "swagger-ui-dist": "^5.30.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.5.3",
+    "@fastify/compress": "^7.0.0",
+    "@fastify/cors": "^9.0.0",
+    "@fastify/helmet": "^11.1.1",
+    "@fastify/rate-limit": "^9.1.0",
+    "@stryker-mutator/core": "8.7.1",
+    "@stryker-mutator/typescript-checker": "8.7.1",
+    "@stryker-mutator/vitest-runner": "8.7.1",
+    "@types/node": "^18.19.0",
+    "@vitest/coverage-v8": "^1.2.2",
+    "@vitest/ui": "^1.2.2",
+    "express": "^5.1.0",
+    "tsup": "^8.0.1",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  },
+  "peerDependencies": {
+    "@fastify/compress": "^7.0.0 || ^8.0.0",
+    "@fastify/cors": "^9.0.0 || ^10.0.0 || ^11.0.0",
+    "@fastify/helmet": "^11.0.0 || ^12.0.0 || ^13.0.0",
+    "@fastify/rate-limit": "^9.0.0 || ^10.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@fastify/compress": {
+      "optional": true
+    },
+    "@fastify/cors": {
+      "optional": true
+    },
+    "@fastify/helmet": {
+      "optional": true
+    },
+    "@fastify/rate-limit": {
+      "optional": true
+    }
+  }
+}
