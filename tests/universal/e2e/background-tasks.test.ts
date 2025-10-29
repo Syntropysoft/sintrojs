@@ -6,17 +6,35 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
 import { inject } from '../../../src/application/DependencyInjector';
 import { SyntroJS } from '../../../src/core';
+import * as LoggerHelper from '../../../src/infrastructure/LoggerHelper';
+import { getLogger, loggerRegistry } from '@syntrojs/logger/registry';
+import { ArrayTransport } from '@syntrojs/logger';
 
 describe('Background Tasks E2E', () => {
   let app: SyntroJS;
   let server: string | null = null;
-  let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  let transport: ArrayTransport;
+  let getComponentLoggerSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
+    // Clear registry to ensure fresh logger instances
+    loggerRegistry.clear();
+    
     app = new SyntroJS();
-    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    
+    // Create ArrayTransport to capture logs
+    transport = new ArrayTransport();
+    
+    // Create logger with ArrayTransport BEFORE getComponentLogger is called
+    const logger = getLogger('syntrojs', {
+      level: 'info',
+      transport,
+    });
+    
+    // Mock getComponentLogger to return logger with our transport
+    getComponentLoggerSpy = vi.spyOn(LoggerHelper, 'getComponentLogger').mockReturnValue(
+      logger.withSource('background-tasks')
+    );
   });
 
   afterEach(async () => {
@@ -24,8 +42,9 @@ describe('Background Tasks E2E', () => {
       await app.close();
       server = null;
     }
-    consoleWarnSpy.mockRestore();
-    consoleErrorSpy.mockRestore();
+    transport.clear();
+    loggerRegistry.clear(); // Clear registry after test
+    getComponentLoggerSpy.mockRestore();
   });
 
   test('executes background task without blocking response', async () => {
@@ -153,10 +172,17 @@ describe('Background Tasks E2E', () => {
     // Wait for task to complete
     await new Promise((resolve) => setTimeout(resolve, 200));
 
+    // Wait a bit more for async logging
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    
     // Should have warned about slow task
-    expect(consoleWarnSpy).toHaveBeenCalled();
-    expect(consoleWarnSpy.mock.calls[0][0]).toContain('slow-email');
-    expect(consoleWarnSpy.mock.calls[0][0]).toContain('100ms');
+    const entries = transport.getParsedEntries();
+    const warnEntry = entries.find((e) => 
+      e.level === 'warn' &&
+      (e.message?.includes('100ms') || e.msg?.includes('100ms'))
+    );
+    expect(warnEntry).toBeDefined();
+    expect(warnEntry?.taskName).toBe('slow-email');
   });
 
   test('multiple background tasks execute concurrently', async () => {
@@ -266,7 +292,16 @@ describe('Background Tasks E2E', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 100));
 
+    // Wait a bit more for async logging
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    
     // Should have logged timeout error
-    expect(consoleWarnSpy.mock.calls.length + consoleErrorSpy.mock.calls.length).toBeGreaterThan(0);
+    const entries = transport.getParsedEntries();
+    const errorEntries = entries.filter(
+      (e) => e.level === 'error' && 
+      (e.message === 'Background task error' || e.msg === 'Background task error' ||
+       e.message === 'Background task failed' || e.msg === 'Background task failed')
+    );
+    expect(errorEntries.length).toBeGreaterThan(0);
   });
 });
