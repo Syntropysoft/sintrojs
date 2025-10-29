@@ -1,9 +1,9 @@
 import { defineConfig } from 'tsup';
-import { 
-  dependencies, 
-  devDependencies, 
+import {
+  dependencies,
+  devDependencies,
+  optionalDependencies,
   peerDependencies,
-  optionalDependencies 
 } from './package.json';
 
 export default defineConfig({

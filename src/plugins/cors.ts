@@ -139,6 +139,5 @@ export async function registerCors(server: unknown, options: CorsOptions = {}): 
     maxAge: options.maxAge,
     preflightContinue: options.preflightContinue,
     strictPreflight: options.strictPreflight,
-    // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   } as any);
 }

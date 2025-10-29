@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { ErrorHandler } from '../../../src/application/ErrorHandler';
 import { RouteRegistry } from '../../../src/application/RouteRegistry';
-import { SyntroJS, SyntroJS } from '../../../src/core';
+import { SyntroJS } from '../../../src/core';
 
 describe('OpenAPI E2E', () => {
   let app: SyntroJS;

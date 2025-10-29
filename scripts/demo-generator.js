@@ -2,7 +2,7 @@
 
 /**
  * 🚀 SYNTRoJS DEMO GENERATOR - BRUTAL EDITION
- * 
+ *
  * Genera demos automáticamente para mostrar el poder de SyntroJS:
  * - Dual Runtime (Node.js + Bun)
  * - Tree Shaking Dinámico
@@ -10,9 +10,9 @@
  * - Migración sin cambios de código
  */
 
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
-import { execSync } from 'child_process';
-import { join } from 'path';
+import { execSync } from 'node:child_process';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
 const DEMO_DIR = 'examples/demo-brutal';
 const DOC_DIR = 'examples/documentation';
@@ -31,12 +31,16 @@ const DEMO_CONFIGS = [
       compression: false,
       cors: false,
       helmet: false,
-      rateLimit: false
+      rateLimit: false,
     },
     routes: [
       { method: 'GET', path: '/hello', handler: 'return { message: "Hello from minimal API!" };' },
-      { method: 'GET', path: '/ping', handler: 'return { status: "ok", timestamp: new Date().toISOString() };' }
-    ]
+      {
+        method: 'GET',
+        path: '/ping',
+        handler: 'return { status: "ok", timestamp: new Date().toISOString() };',
+      },
+    ],
   },
   {
     name: 'standard-api',
@@ -50,13 +54,25 @@ const DEMO_CONFIGS = [
       compression: false,
       cors: false,
       helmet: false,
-      rateLimit: false
+      rateLimit: false,
     },
     routes: [
-      { method: 'GET', path: '/users', handler: 'return { users: [{ id: 1, name: "John" }, { id: 2, name: "Jane" }] };' },
-      { method: 'POST', path: '/users', handler: 'return { message: "User created", id: Math.floor(Math.random() * 1000) };' },
-      { method: 'GET', path: '/health', handler: 'return { status: "healthy", uptime: process.uptime() };' }
-    ]
+      {
+        method: 'GET',
+        path: '/users',
+        handler: 'return { users: [{ id: 1, name: "John" }, { id: 2, name: "Jane" }] };',
+      },
+      {
+        method: 'POST',
+        path: '/users',
+        handler: 'return { message: "User created", id: Math.floor(Math.random() * 1000) };',
+      },
+      {
+        method: 'GET',
+        path: '/health',
+        handler: 'return { status: "healthy", uptime: process.uptime() };',
+      },
+    ],
   },
   {
     name: 'production-api',
@@ -70,14 +86,31 @@ const DEMO_CONFIGS = [
       compression: true,
       cors: true,
       helmet: true,
-      rateLimit: true
+      rateLimit: true,
     },
     routes: [
-      { method: 'GET', path: '/api/users', handler: 'return { users: [{ id: 1, name: "John", email: "john@example.com" }] };' },
-      { method: 'POST', path: '/api/users', handler: 'return { message: "User created", id: Math.floor(Math.random() * 1000) };' },
-      { method: 'GET', path: '/api/health', handler: 'return { status: "healthy", uptime: process.uptime(), memory: process.memoryUsage() };' },
-      { method: 'GET', path: '/api/stats', handler: 'return { requests: Math.floor(Math.random() * 1000), uptime: process.uptime() };' }
-    ]
+      {
+        method: 'GET',
+        path: '/api/users',
+        handler: 'return { users: [{ id: 1, name: "John", email: "john@example.com" }] };',
+      },
+      {
+        method: 'POST',
+        path: '/api/users',
+        handler: 'return { message: "User created", id: Math.floor(Math.random() * 1000) };',
+      },
+      {
+        method: 'GET',
+        path: '/api/health',
+        handler:
+          'return { status: "healthy", uptime: process.uptime(), memory: process.memoryUsage() };',
+      },
+      {
+        method: 'GET',
+        path: '/api/stats',
+        handler: 'return { requests: Math.floor(Math.random() * 1000), uptime: process.uptime() };',
+      },
+    ],
   },
   {
     name: 'microservice-api',
@@ -91,24 +124,40 @@ const DEMO_CONFIGS = [
       compression: true,
       cors: true,
       helmet: true,
-      rateLimit: false
+      rateLimit: false,
     },
     routes: [
-      { method: 'GET', path: '/service/status', handler: 'return { service: "user-service", version: "1.0.0", status: "running" };' },
-      { method: 'GET', path: '/service/metrics', handler: 'return { requests: Math.floor(Math.random() * 100), errors: Math.floor(Math.random() * 5) };' },
-      { method: 'POST', path: '/service/health', handler: 'return { health: "ok", timestamp: new Date().toISOString() };' }
-    ]
-  }
+      {
+        method: 'GET',
+        path: '/service/status',
+        handler: 'return { service: "user-service", version: "1.0.0", status: "running" };',
+      },
+      {
+        method: 'GET',
+        path: '/service/metrics',
+        handler:
+          'return { requests: Math.floor(Math.random() * 100), errors: Math.floor(Math.random() * 5) };',
+      },
+      {
+        method: 'POST',
+        path: '/service/health',
+        handler: 'return { health: "ok", timestamp: new Date().toISOString() };',
+      },
+    ],
+  },
 ];
 
 // Función para generar el código de la API
 function generateAPICode(config) {
   const configString = JSON.stringify(config.config, null, 2);
-  const routesCode = config.routes.map(route => 
-    `  .${route.method.toLowerCase()}('${route.path}', (ctx) => {
+  const routesCode = config.routes
+    .map(
+      (route) =>
+        `  .${route.method.toLowerCase()}('${route.path}', (ctx) => {
     ${route.handler}
-  })`
-  ).join('\n');
+  })`,
+    )
+    .join('\n');
 
   return `import { SyntroJS } from '../../../dist/index.js';
 
@@ -125,7 +174,7 @@ console.log('⚙️  Configuración:', ${configString});
 console.log('🌐 Servidor corriendo en http://localhost:3000');
 console.log('📖 Documentación: http://localhost:3000/docs');
 console.log('🔗 Endpoints disponibles:');
-${config.routes.map(route => `console.log('   ${route.method} http://localhost:3000${route.path}');`).join('\n')}
+${config.routes.map((route) => `console.log('   ${route.method} http://localhost:3000${route.path}');`).join('\n')}
 `;
 }
 
@@ -138,11 +187,14 @@ import { performance } from 'perf_hooks';
 // ${config.description}
 
 const api = new SyntroJS()
-${config.routes.map(route => 
-  `  .${route.method.toLowerCase()}('${route.path}', (ctx) => {
+${config.routes
+  .map(
+    (route) =>
+      `  .${route.method.toLowerCase()}('${route.path}', (ctx) => {
     ${route.handler}
-  })`
-).join('\n')}
+  })`,
+  )
+  .join('\n')}
   .listen(3000);
 
 console.log('🚀 ${config.title} - Benchmark Mode');
@@ -491,7 +543,7 @@ function main() {
 
   // Generar demos
   console.log('🔥 Generando demos brutales...');
-  DEMO_CONFIGS.forEach(config => {
+  DEMO_CONFIGS.forEach((config) => {
     const demoPath = join(DEMO_DIR, config.name);
     if (!existsSync(demoPath)) {
       mkdirSync(demoPath, { recursive: true });
@@ -538,7 +590,7 @@ ${JSON.stringify(config.config, null, 2)}
 
 ## 🔗 Endpoints
 
-${config.routes.map(route => `- **${route.method}** \`${route.path}\``).join('\n')}
+${config.routes.map((route) => `- **${route.method}** \`${route.path}\``).join('\n')}
 `;
     writeFileSync(join(demoPath, 'README.md'), readmeCode);
 

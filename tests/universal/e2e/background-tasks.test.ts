@@ -2,13 +2,13 @@
  * E2E tests for Background Tasks
  */
 
+import { ArrayTransport } from '@syntrojs/logger';
+import { getLogger, loggerRegistry } from '@syntrojs/logger/registry';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
 import { inject } from '../../../src/application/DependencyInjector';
 import { SyntroJS } from '../../../src/core';
 import * as LoggerHelper from '../../../src/infrastructure/LoggerHelper';
-import { getLogger, loggerRegistry } from '@syntrojs/logger/registry';
-import { ArrayTransport } from '@syntrojs/logger';
 
 describe('Background Tasks E2E', () => {
   let app: SyntroJS;
@@ -19,22 +19,22 @@ describe('Background Tasks E2E', () => {
   beforeEach(() => {
     // Clear registry to ensure fresh logger instances
     loggerRegistry.clear();
-    
+
     app = new SyntroJS();
-    
+
     // Create ArrayTransport to capture logs
     transport = new ArrayTransport();
-    
+
     // Create logger with ArrayTransport BEFORE getComponentLogger is called
     const logger = getLogger('syntrojs', {
       level: 'info',
       transport,
     });
-    
+
     // Mock getComponentLogger to return logger with our transport
-    getComponentLoggerSpy = vi.spyOn(LoggerHelper, 'getComponentLogger').mockReturnValue(
-      logger.withSource('background-tasks')
-    );
+    getComponentLoggerSpy = vi
+      .spyOn(LoggerHelper, 'getComponentLogger')
+      .mockReturnValue(logger.withSource('background-tasks'));
   });
 
   afterEach(async () => {
@@ -174,12 +174,11 @@ describe('Background Tasks E2E', () => {
 
     // Wait a bit more for async logging
     await new Promise((resolve) => setTimeout(resolve, 10));
-    
+
     // Should have warned about slow task
     const entries = transport.getParsedEntries();
-    const warnEntry = entries.find((e) => 
-      e.level === 'warn' &&
-      (e.message?.includes('100ms') || e.msg?.includes('100ms'))
+    const warnEntry = entries.find(
+      (e) => e.level === 'warn' && (e.message?.includes('100ms') || e.msg?.includes('100ms')),
     );
     expect(warnEntry).toBeDefined();
     expect(warnEntry?.taskName).toBe('slow-email');
@@ -294,13 +293,16 @@ describe('Background Tasks E2E', () => {
 
     // Wait a bit more for async logging
     await new Promise((resolve) => setTimeout(resolve, 10));
-    
+
     // Should have logged timeout error
     const entries = transport.getParsedEntries();
     const errorEntries = entries.filter(
-      (e) => e.level === 'error' && 
-      (e.message === 'Background task error' || e.msg === 'Background task error' ||
-       e.message === 'Background task failed' || e.msg === 'Background task failed')
+      (e) =>
+        e.level === 'error' &&
+        (e.message === 'Background task error' ||
+          e.msg === 'Background task error' ||
+          e.message === 'Background task failed' ||
+          e.msg === 'Background task failed'),
     );
     expect(errorEntries.length).toBeGreaterThan(0);
   });

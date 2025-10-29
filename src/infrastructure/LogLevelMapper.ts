@@ -12,12 +12,13 @@ import type { LogLevel } from '@syntrojs/logger';
  * HTTP status code range to log level mapping
  * Strategy Pattern: Dictionary replaces ternary/switch
  */
-const STATUS_CODE_TO_LOG_LEVEL: Readonly<Array<{ predicate: (statusCode: number) => boolean; level: LogLevel }>> =
-  Object.freeze([
-    { predicate: (statusCode: number) => statusCode >= 500, level: 'error' as const },
-    { predicate: (statusCode: number) => statusCode >= 400, level: 'warn' as const },
-    { predicate: () => true, level: 'info' as const }, // Default case
-  ]);
+const STATUS_CODE_TO_LOG_LEVEL: Readonly<
+  Array<{ predicate: (statusCode: number) => boolean; level: LogLevel }>
+> = Object.freeze([
+  { predicate: (statusCode: number) => statusCode >= 500, level: 'error' as const },
+  { predicate: (statusCode: number) => statusCode >= 400, level: 'warn' as const },
+  { predicate: () => true, level: 'info' as const }, // Default case
+]);
 
 /**
  * Maps HTTP status code to appropriate log level
@@ -38,4 +39,3 @@ export function getLogLevelForStatusCode(statusCode: number): LogLevel {
   // Guard clause: ensure we always return a level (fallback to info)
   return mapping?.level ?? 'info';
 }
-

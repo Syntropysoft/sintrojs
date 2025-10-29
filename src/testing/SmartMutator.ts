@@ -24,9 +24,9 @@
  * ```
  */
 
+import { execSync } from 'node:child_process';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { execSync } from 'node:child_process';
 
 /**
  * Mutation analysis result
@@ -154,17 +154,13 @@ export class SmartMutator {
   /**
    * Apply mode-specific configuration overrides
    */
-  private static applyModeOverrides(
-    mode: 'smart' | 'full',
-    forceFull: boolean,
-    config: any,
-  ): void {
+  private static applyModeOverrides(mode: 'smart' | 'full', forceFull: boolean, config: any): void {
     // Determine if we should use smart mode
     const useSmartMode = mode === 'smart' && !forceFull;
-    
+
     if (useSmartMode) {
       console.log('🧬 SmartMutator (Smart Mode)');
-      this.overrideWithChangedFiles(config);
+      SmartMutator.overrideWithChangedFiles(config);
     } else {
       const modeLabel = forceFull ? 'Full Mode - Forced' : 'Full Mode';
       console.log(`🧬 SmartMutator (${modeLabel})`);
@@ -176,15 +172,15 @@ export class SmartMutator {
    * Load config file or create default
    */
   private static async loadOrCreateConfig(configPath: string): Promise<any> {
-    const config = await this.loadStrykerConfig(configPath);
-    
+    const config = await SmartMutator.loadStrykerConfig(configPath);
+
     if (config) {
       console.log(`✅ Loaded Stryker config from ${configPath}`);
       return config;
     }
-    
+
     console.warn(`⚠️  Could not load ${configPath}, using default config`);
-    return this.createDefaultConfig();
+    return SmartMutator.createDefaultConfig();
   }
 
   /**
@@ -214,15 +210,15 @@ export class SmartMutator {
    * Override config with only changed files
    */
   private static overrideWithChangedFiles(config: any): void {
-    const changedFiles = this.getChangedFiles();
-    
+    const changedFiles = SmartMutator.getChangedFiles();
+
     if (changedFiles.length === 0) {
       console.log('📝 No changed files detected, falling back to full mutation coverage...');
       return;
     }
 
     console.log(`📝 Detected ${changedFiles.length} changed files:`);
-    changedFiles.forEach(file => console.log(`   - ${file}`));
+    changedFiles.forEach((file) => console.log(`   - ${file}`));
     config.mutate = changedFiles;
   }
 
@@ -237,36 +233,38 @@ export class SmartMutator {
       // Get changed files from git
       const gitDiff = execSync('git diff --name-only HEAD', { encoding: 'utf8' });
       const gitStatus = execSync('git status --porcelain', { encoding: 'utf8' });
-      
+
       // Combine both modified and untracked files
       const allFiles = new Set<string>();
-      
+
       // Add files from git diff
-      gitDiff.split('\n').forEach(file => {
+      gitDiff.split('\n').forEach((file) => {
         if (file.trim()) allFiles.add(file.trim());
       });
-      
+
       // Add files from git status (includes untracked files)
-      gitStatus.split('\n').forEach(line => {
+      gitStatus.split('\n').forEach((line) => {
         const file = line.substring(3).trim();
         if (file && (line.startsWith('M') || line.startsWith('A'))) {
           allFiles.add(file);
         }
       });
-      
+
       // Filter: only TypeScript files in src/, excluding tests and testing utilities
       const isSourceFile = (file: string): boolean => {
         const normalized = file.replace(/\\/g, '/');
-        return normalized.includes('src/') && 
-               normalized.endsWith('.ts') && 
-               !normalized.includes('.test.ts') && 
-               !normalized.includes('.spec.ts') &&
-               !normalized.includes('SmartMutator.ts') &&
-               !normalized.includes('TinyTest.ts');
+        return (
+          normalized.includes('src/') &&
+          normalized.endsWith('.ts') &&
+          !normalized.includes('.test.ts') &&
+          !normalized.includes('.spec.ts') &&
+          !normalized.includes('SmartMutator.ts') &&
+          !normalized.includes('TinyTest.ts')
+        );
       };
-      
+
       const tsFiles = Array.from(allFiles).filter(isSourceFile);
-      
+
       return tsFiles;
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
@@ -301,15 +299,15 @@ export class SmartMutator {
 
     // Load or create configuration
     const configPath = strykerConfigFile || 'stryker.config.mjs';
-    const strykerConfig = await this.loadOrCreateConfig(configPath);
+    const strykerConfig = await SmartMutator.loadOrCreateConfig(configPath);
 
     // Apply mode-specific overrides
-    this.applyModeOverrides(mode, forceFull, strykerConfig);
+    SmartMutator.applyModeOverrides(mode, forceFull, strykerConfig);
 
     const stryker = new Stryker(strykerConfig);
     const strykerResult = await stryker.runMutationTest();
 
     // Process results into report
-    return this.createMutationReport(strykerResult, startTime, mode);
+    return SmartMutator.createMutationReport(strykerResult, startTime, mode);
   }
 }

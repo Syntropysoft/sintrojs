@@ -26,8 +26,8 @@
  * ```
  */
 
-import { getComponentLogger } from '../infrastructure/LoggerHelper';
 import { extractLoggerErrorInfo } from '../infrastructure/ErrorExtractor';
+import { getComponentLogger } from '../infrastructure/LoggerHelper';
 
 /**
  * Background task function type
@@ -113,7 +113,7 @@ class BackgroundTasksImpl {
               duration,
               threshold: this.WARNING_THRESHOLD_MS,
             },
-            `Background task took too long (>${this.WARNING_THRESHOLD_MS}ms threshold). Consider using a job queue (BullMQ) for heavy operations.`
+            `Background task took too long (>${this.WARNING_THRESHOLD_MS}ms threshold). Consider using a job queue (BullMQ) for heavy operations.`,
           );
         }
 
@@ -132,7 +132,7 @@ class BackgroundTasksImpl {
             taskName,
             error: errorInfo,
           },
-          'Background task failed'
+          'Background task failed',
         );
 
         // Call onError callback
@@ -159,7 +159,7 @@ class BackgroundTasksImpl {
           taskName,
           error: errorInfo,
         },
-        'Background task error'
+        'Background task error',
       );
     });
   }

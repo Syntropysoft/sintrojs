@@ -11,11 +11,11 @@ import { BackgroundTasks } from '../application/BackgroundTasks';
 import { DependencyInjector } from '../application/DependencyInjector';
 import type { DependencyMetadata } from '../application/DependencyInjector';
 import { ErrorHandler } from '../application/ErrorHandler';
-import { MiddlewareRegistry } from '../application/MiddlewareRegistry';
+import type { MiddlewareRegistry } from '../application/MiddlewareRegistry';
 import { SchemaValidator } from '../application/SchemaValidator';
 import type { Route } from '../domain/Route';
 import type { HttpMethod, RequestContext } from '../domain/types';
-import { integrateLogger, type LoggerIntegrationConfig } from './LoggerIntegration';
+import { type LoggerIntegrationConfig, integrateLogger } from './LoggerIntegration';
 
 /**
  * Fastify adapter configuration
@@ -53,7 +53,9 @@ class FastifyAdapterImpl {
     // Integrate @syntrojs/logger if enabled
     if (config.syntroLogger) {
       const loggerConfig: LoggerIntegrationConfig =
-        typeof config.syntroLogger === 'boolean' ? { enabled: config.syntroLogger } : config.syntroLogger;
+        typeof config.syntroLogger === 'boolean'
+          ? { enabled: config.syntroLogger }
+          : config.syntroLogger;
       integrateLogger(instance, loggerConfig);
     }
 
@@ -146,13 +148,17 @@ class FastifyAdapterImpl {
         // Check if result is a RouteResponse object (has status, body, headers)
         // This allows handlers to return { status, body, headers } for full control
         if (result && typeof result === 'object' && 'status' in result && 'body' in result) {
-          const response = result as { status: number; body: unknown; headers?: Record<string, string> };
-          
+          const response = result as {
+            status: number;
+            body: unknown;
+            headers?: Record<string, string>;
+          };
+
           // Set content type first if provided
-          if (response.headers && response.headers['Content-Type']) {
+          if (response.headers?.['Content-Type']) {
             reply.type(response.headers['Content-Type']);
           }
-          
+
           // Set other headers if provided
           if (response.headers) {
             for (const [key, value] of Object.entries(response.headers)) {
@@ -161,7 +167,7 @@ class FastifyAdapterImpl {
               }
             }
           }
-          
+
           return reply.status(response.status).send(response.body);
         }
 
@@ -208,14 +214,10 @@ class FastifyAdapterImpl {
     return {
       method: request.method as HttpMethod,
       path: request.url,
-      // biome-ignore lint/suspicious/noExplicitAny: Fastify params type is unknown, we validate later
       params: request.params as any,
-      // biome-ignore lint/suspicious/noExplicitAny: Fastify query type is unknown, we validate later
       query: request.query as any,
-      // biome-ignore lint/suspicious/noExplicitAny: Fastify body type is unknown, we validate later
       body: request.body as any,
       headers: request.headers as Record<string, string>,
-      // biome-ignore lint/suspicious/noExplicitAny: Cookies plugin may not be installed
       cookies: (request as any).cookies ?? {},
       correlationId: (request.headers['x-correlation-id'] as string) ?? this.generateId(),
       timestamp: new Date(),

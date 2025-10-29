@@ -5,12 +5,12 @@
  * Provides automatic request/response logging with correlation IDs
  */
 
-import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { getLogger } from '@syntrojs/logger/registry';
 import { AsyncContext } from '@syntrojs/logger';
 import { JsonTransport } from '@syntrojs/logger';
-import { setComponentLoggingEnabled } from './LoggerHelper';
+import { getLogger } from '@syntrojs/logger/registry';
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { getLogLevelForStatusCode } from './LogLevelMapper';
+import { setComponentLoggingEnabled } from './LoggerHelper';
 
 /**
  * Logger integration configuration
@@ -40,7 +40,7 @@ export interface LoggerIntegrationConfig {
  */
 export function integrateLogger(
   fastify: FastifyInstance,
-  config: LoggerIntegrationConfig = {}
+  config: LoggerIntegrationConfig = {},
 ): void {
   // Guard clause: Logger disabled
   if (config.enabled === false) {
@@ -146,7 +146,10 @@ export function integrateLogger(
     // Use type-safe method calls instead of indexing
     switch (level) {
       case 'error':
-        responseLogger.error(responseData, `${request.method} ${request.url} - ${reply.statusCode}`);
+        responseLogger.error(
+          responseData,
+          `${request.method} ${request.url} - ${reply.statusCode}`,
+        );
         break;
       case 'warn':
         responseLogger.warn(responseData, `${request.method} ${request.url} - ${reply.statusCode}`);
@@ -198,4 +201,3 @@ export function integrateLogger(
     logger.info({ name: loggerName }, 'SyntroJS server shutting down');
   });
 }
-

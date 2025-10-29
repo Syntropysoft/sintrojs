@@ -103,16 +103,18 @@ export interface SyntroJSConfig {
   runtime?: 'auto' | 'node' | 'bun';
 
   /** Documentation endpoints configuration */
-  docs?: boolean | {
-    /** Enable root landing page (default: true) */
-    landingPage?: boolean;
-    /** Enable Swagger UI at /docs (default: true) */
-    swagger?: boolean;
-    /** Enable ReDoc at /redoc (default: true) */
-    redoc?: boolean;
-    /** Enable OpenAPI JSON at /openapi.json (default: true) */
-    openapi?: boolean;
-  };
+  docs?:
+    | boolean
+    | {
+        /** Enable root landing page (default: true) */
+        landingPage?: boolean;
+        /** Enable Swagger UI at /docs (default: true) */
+        swagger?: boolean;
+        /** Enable ReDoc at /redoc (default: true) */
+        redoc?: boolean;
+        /** Enable OpenAPI JSON at /openapi.json (default: true) */
+        openapi?: boolean;
+      };
 }
 
 /**
@@ -254,7 +256,9 @@ export class SyntroJS {
       let configuredAdapter = adapter.standard();
       if (this.config.syntroLogger) {
         configuredAdapter = configuredAdapter.withSyntroLogger(
-          typeof this.config.syntroLogger === 'boolean' ? this.config.syntroLogger : this.config.syntroLogger,
+          typeof this.config.syntroLogger === 'boolean'
+            ? this.config.syntroLogger
+            : this.config.syntroLogger,
         );
       }
       return configuredAdapter;
@@ -505,20 +509,62 @@ export class SyntroJS {
     if (docsEnabled) {
       // "Escandaloso" warning in red background
       console.error('\n');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '╔════════════════════════════════════════════════════════════════╗');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '║                                                                ║');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '║         ⚠️   SECURITY WARNING   ⚠️                             ║');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '║                                                                ║');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '╠════════════════════════════════════════════════════════════════╣');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '║  DOCUMENTATION IS ENABLED IN PRODUCTION!                       ║');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '║                                                                ║');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '║  This exposes your entire API structure to potential attackers!║');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '║                                                                ║');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '║  🔒 TO FIX: Add docs: false to your configuration              ║');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '║                                                                ║');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '║  const app = new SyntroJS({ docs: false });                    ║');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '║                                                                ║');
-      console.error('\x1b[41m\x1b[37m%s\x1b[0m', '╚════════════════════════════════════════════════════════════════╝');
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '╔════════════════════════════════════════════════════════════════╗',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '║                                                                ║',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '║         ⚠️   SECURITY WARNING   ⚠️                             ║',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '║                                                                ║',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '╠════════════════════════════════════════════════════════════════╣',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '║  DOCUMENTATION IS ENABLED IN PRODUCTION!                       ║',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '║                                                                ║',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '║  This exposes your entire API structure to potential attackers!║',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '║                                                                ║',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '║  🔒 TO FIX: Add docs: false to your configuration              ║',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '║                                                                ║',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '║  const app = new SyntroJS({ docs: false });                    ║',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '║                                                                ║',
+      );
+      console.error(
+        '\x1b[41m\x1b[37m%s\x1b[0m',
+        '╚════════════════════════════════════════════════════════════════╝',
+      );
       console.error('\n');
     }
   }
@@ -548,7 +594,7 @@ export class SyntroJS {
       await this.registerOpenAPIEndpoints();
       this.openAPIEndpointsRegistered = true;
     }
-    
+
     // Register all routes
     this.registerAllRoutes();
 
@@ -568,15 +614,21 @@ export class SyntroJS {
    *
    * @returns Listen method
    */
-  private getAdapterListenMethod(): (server: unknown, port: number, host: string) => Promise<string> {
+  private getAdapterListenMethod(): (
+    server: unknown,
+    port: number,
+    host: string,
+  ) => Promise<string> {
     if (this.adapter === BunAdapter) {
       return async (server, port, host) => BunAdapter.listen(server, port, host);
-    } else if (this.adapter === FluentAdapter) {
-      return async (server, port, host) => FluentAdapter.listen(server as FastifyInstance, port, host);
-    } else {
-      // FastifyAdapter or other Fastify-based adapters
-      return async (server, port, host) => FastifyAdapter.listen(server as FastifyInstance, port, host);
     }
+    if (this.adapter === FluentAdapter) {
+      return async (server, port, host) =>
+        FluentAdapter.listen(server as FastifyInstance, port, host);
+    }
+    // FastifyAdapter or other Fastify-based adapters
+    return async (server, port, host) =>
+      FastifyAdapter.listen(server as FastifyInstance, port, host);
   }
 
   /**
@@ -618,12 +670,12 @@ export class SyntroJS {
   private getAdapterCloseMethod(): (server: unknown) => Promise<void> {
     if (this.adapter === BunAdapter) {
       return async (server) => BunAdapter.close(server);
-    } else if (this.adapter === FluentAdapter) {
-      return async (server) => FluentAdapter.close(server as FastifyInstance);
-    } else {
-      // FastifyAdapter or other Fastify-based adapters
-      return async (server) => FastifyAdapter.close(server as FastifyInstance);
     }
+    if (this.adapter === FluentAdapter) {
+      return async (server) => FluentAdapter.close(server as FastifyInstance);
+    }
+    // FastifyAdapter or other Fastify-based adapters
+    return async (server) => FastifyAdapter.close(server as FastifyInstance);
   }
 
   /**
@@ -713,7 +765,9 @@ export class SyntroJS {
   /**
    * Helper to check if docs endpoint should be enabled
    */
-  private shouldEnableDocsEndpoint(endpoint: 'landingPage' | 'swagger' | 'redoc' | 'openapi'): boolean {
+  private shouldEnableDocsEndpoint(
+    endpoint: 'landingPage' | 'swagger' | 'redoc' | 'openapi',
+  ): boolean {
     const docsConfig = this.config.docs;
 
     // If docs is false, disable everything
@@ -743,7 +797,10 @@ export class SyntroJS {
    *
    * @returns Object with detection results
    */
-  private async detectLocalAssets(): Promise<{ swaggerInstalled: boolean; redocInstalled: boolean }> {
+  private async detectLocalAssets(): Promise<{
+    swaggerInstalled: boolean;
+    redocInstalled: boolean;
+  }> {
     let swaggerInstalled = false;
     let redocInstalled = false;
 
@@ -863,7 +920,7 @@ export class SyntroJS {
   private renderWelcomePage(): string {
     const title = this.config.title || 'SyntroJS API';
     const version = this.config.version || '1.0.0';
-    
+
     return `<!DOCTYPE html>
 <html>
 <head>

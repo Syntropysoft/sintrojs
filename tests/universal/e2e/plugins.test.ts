@@ -19,9 +19,7 @@ describe('Plugins E2E', () => {
 
       await expect(registerHelmet(null as any)).rejects.toThrow('Server instance is required');
 
-      await expect(registerCompression(null as any)).rejects.toThrow(
-        'Server instance is required',
-      );
+      await expect(registerCompression(null as any)).rejects.toThrow('Server instance is required');
 
       await expect(registerRateLimit(null as any)).rejects.toThrow('Server instance is required');
     });

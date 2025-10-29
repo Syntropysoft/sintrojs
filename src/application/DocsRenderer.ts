@@ -48,13 +48,15 @@ class DocsRendererImpl {
     const assetsUrl = config.assetsUrl || '/docs-assets';
 
     // Determine asset URLs based on mode
-    const cssUrl = assetMode === 'local' 
-      ? `${assetsUrl}/swagger-ui.css`
-      : 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css';
-    
-    const jsUrl = assetMode === 'local'
-      ? `${assetsUrl}/swagger-ui-bundle.js`
-      : 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js';
+    const cssUrl =
+      assetMode === 'local'
+        ? `${assetsUrl}/swagger-ui.css`
+        : 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css';
+
+    const jsUrl =
+      assetMode === 'local'
+        ? `${assetsUrl}/swagger-ui-bundle.js`
+        : 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js';
 
     // Return HTML with Swagger UI from local or CDN
     return `<!DOCTYPE html>
@@ -115,9 +117,10 @@ class DocsRendererImpl {
     const assetsUrl = config.assetsUrl || '/docs-assets';
 
     // Determine asset URL based on mode
-    const jsUrl = assetMode === 'local'
-      ? `${assetsUrl}/redoc.standalone.js`
-      : 'https://cdn.jsdelivr.net/npm/redoc@latest/bundles/redoc.standalone.js';
+    const jsUrl =
+      assetMode === 'local'
+        ? `${assetsUrl}/redoc.standalone.js`
+        : 'https://cdn.jsdelivr.net/npm/redoc@latest/bundles/redoc.standalone.js';
 
     // Return HTML with ReDoc from local or CDN
     return `<!DOCTYPE html>

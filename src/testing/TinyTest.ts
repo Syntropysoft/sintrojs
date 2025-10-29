@@ -72,7 +72,6 @@ export interface ContractTestOptions {
 export interface PropertyTestOptions {
   schema: ZodSchema;
   iterations?: number;
-  // biome-ignore lint/suspicious/noExplicitAny: The response type is dynamic based on route schema
   property: (response: any) => boolean;
 }
 
@@ -170,7 +169,6 @@ export class TinyTest extends SyntroJS {
     if (contentType?.includes('application/json')) {
       data = (await response.json()) as T;
     } else {
-      // biome-ignore lint/suspicious/noExplicitAny: Non-JSON responses
       data = (await response.text()) as any;
     }
 

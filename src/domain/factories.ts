@@ -9,8 +9,8 @@
  * - Immutability: No side effects, pure functions
  */
 
-import type { MiddlewareConfig, RequestContext, RouteConfig } from './types';
 import type { FastifyReply } from 'fastify';
+import type { MiddlewareConfig, RequestContext, RouteConfig } from './types';
 
 // ===== GUARD CLAUSES =====
 
@@ -46,9 +46,9 @@ export const isValidationError = (errorMessage: string, bodyDetail?: string): bo
   const validationKeywords = ['validation', 'Validation', 'invalid', 'Invalid'];
   const message = errorMessage.toLowerCase();
   const detail = bodyDetail?.toLowerCase() || '';
-  
-  return validationKeywords.some(keyword => 
-    message.includes(keyword.toLowerCase()) || detail.includes(keyword.toLowerCase())
+
+  return validationKeywords.some(
+    (keyword) => message.includes(keyword.toLowerCase()) || detail.includes(keyword.toLowerCase()),
   );
 };
 
@@ -56,16 +56,23 @@ export const isValidationError = (errorMessage: string, bodyDetail?: string): bo
  * Función pura para extraer información del error
  * Principio: Functional Programming + Immutability
  */
-export const extractErrorInfo = (error: unknown, body: unknown): {
+export const extractErrorInfo = (
+  error: unknown,
+  body: unknown,
+): {
   readonly message: string;
   readonly detail: string;
 } => {
   const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-  const bodyObj = body as Record<string, unknown> || {};
-  
+  const bodyObj = (body as Record<string, unknown>) || {};
+
   return {
     message: (bodyObj.message as string) || errorMessage || 'An error occurred',
-    detail: (bodyObj.detail as string) || (bodyObj.error as string) || errorMessage || 'Internal Server Error',
+    detail:
+      (bodyObj.detail as string) ||
+      (bodyObj.error as string) ||
+      errorMessage ||
+      'Internal Server Error',
   };
 };
 
@@ -73,14 +80,19 @@ export const extractErrorInfo = (error: unknown, body: unknown): {
  * Función pura para crear errores de validación estructurados
  * Principio: Functional Programming + Immutability
  */
-export const createValidationErrors = (field: string, message: string): Array<{
+export const createValidationErrors = (
+  field: string,
+  message: string,
+): Array<{
   readonly field: string;
   readonly message: string;
 }> => {
-  return [{
-    field: field,
-    message: message,
-  }];
+  return [
+    {
+      field: field,
+      message: message,
+    },
+  ];
 };
 
 /**
@@ -89,7 +101,7 @@ export const createValidationErrors = (field: string, message: string): Array<{
  */
 export const createImmutableContext = (
   context: RequestContext,
-  dependencies: Record<string, unknown>
+  dependencies: Record<string, unknown>,
 ): RequestContext => {
   return Object.freeze({
     ...context,
@@ -113,7 +125,8 @@ export interface BaseFactory<TInput, TOutput> {
  * Factory para manejo de dependencias
  * Principio: Single Responsibility (SOLID)
  */
-export interface DependencyResolverFactory extends BaseFactory<RequestContext, (() => Promise<void>) | undefined> {
+export interface DependencyResolverFactory
+  extends BaseFactory<RequestContext, (() => Promise<void>) | undefined> {
   readonly dependencies: Record<string, unknown>;
   resolve(context: RequestContext): Promise<(() => Promise<void>) | undefined>;
   cleanup(): Promise<void>;
@@ -207,11 +220,11 @@ export const createDependencyResolverFactory = (
       // Implementación funcional sin mutación
       const { DependencyInjector } = await import('../application/DependencyInjector');
       const resolved = await DependencyInjector.resolve(this.dependencies as any, context);
-      
+
       // Actualizar el contexto original con las dependencias resueltas
       // (necesario para que FluentAdapter pueda acceder a ellas)
       context.dependencies = resolved.resolved || {};
-      
+
       // Devolver función de cleanup pura
       return resolved.cleanup;
     },
@@ -246,12 +259,12 @@ export const createErrorHandlerFactory = (): ErrorHandlerFactory => {
       // Usar ErrorHandler de SyntroJS
       const { ErrorHandler } = await import('../application/ErrorHandler');
       const response = await ErrorHandler.handle(error as Error, context);
-      
+
       // Usar funciones puras para procesar el error
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       const errorInfo = extractErrorInfo(error, response.body);
       const validationDetected = isValidationError(errorMessage, errorInfo.detail);
-      
+
       return {
         status: response.status,
         headers: response.headers || {},
@@ -260,7 +273,9 @@ export const createErrorHandlerFactory = (): ErrorHandlerFactory => {
           message: errorInfo.message,
           path: context.path || '/',
           timestamp: new Date().toISOString(),
-          errors: validationDetected ? createValidationErrors('email', 'Invalid email format') : undefined,
+          errors: validationDetected
+            ? createValidationErrors('email', 'Invalid email format')
+            : undefined,
         },
       };
     },
@@ -281,7 +296,10 @@ export const createSchemaFactory = <T>(schema: unknown): SchemaFactory<T> => {
 
   // Función pura para validar con schema
   const validateWithSchema = (data: unknown, schemaInstance: unknown): T => {
-    if (schemaInstance && typeof (schemaInstance as { parse: (data: unknown) => T }).parse === 'function') {
+    if (
+      schemaInstance &&
+      typeof (schemaInstance as { parse: (data: unknown) => T }).parse === 'function'
+    ) {
       return (schemaInstance as { parse: (data: unknown) => T }).parse(data);
     }
     return data as T;

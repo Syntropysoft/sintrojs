@@ -9,8 +9,8 @@
 
 const fastify = require('fastify');
 const express = require('express');
-const http = require('http');
-const { performance } = require('perf_hooks');
+const http = require('node:http');
+const { performance } = require('node:perf_hooks');
 
 const TEST_DURATION = 3000; // 3 seconds
 
@@ -348,19 +348,19 @@ async function main() {
     // Results
     console.log('\n📊 FINAL PERFORMANCE RESULTS');
     console.log('============================');
-    console.log(`SyntroJS UltraFast:`);
+    console.log('SyntroJS UltraFast:');
     console.log(`   10 concurrent:  ${rps10uf} req/sec`);
     console.log(`   100 concurrent: ${rps100uf} req/sec`);
     console.log(`   1000 concurrent: ${rps1000uf} req/sec`);
-    console.log(`SyntroJS Standard:`);
+    console.log('SyntroJS Standard:');
     console.log(`   10 concurrent:  ${rps10s} req/sec`);
     console.log(`   100 concurrent: ${rps100s} req/sec`);
     console.log(`   1000 concurrent: ${rps1000s} req/sec`);
-    console.log(`Fastify:`);
+    console.log('Fastify:');
     console.log(`   10 concurrent:  ${rps10f} req/sec`);
     console.log(`   100 concurrent: ${rps100f} req/sec`);
     console.log(`   1000 concurrent: ${rps1000f} req/sec`);
-    console.log(`Express:`);
+    console.log('Express:');
     console.log(`   10 concurrent:  ${rps10e} req/sec`);
     console.log(`   100 concurrent: ${rps100e} req/sec`);
     console.log(`   1000 concurrent: ${rps1000e} req/sec`);
@@ -370,7 +370,7 @@ async function main() {
     const improvement100 = ((rps100uf - rps100s) / rps100s) * 100;
     const improvement1000 = ((rps1000uf - rps1000s) / rps1000s) * 100;
 
-    console.log(`\n📈 ULTRAFAST vs STANDARD IMPROVEMENTS`);
+    console.log('\n📈 ULTRAFAST vs STANDARD IMPROVEMENTS');
     console.log('=====================================');
     console.log(`10 concurrent:  ${improvement10.toFixed(1)}% improvement`);
     console.log(`100 concurrent: ${improvement100.toFixed(1)}% improvement`);
@@ -384,7 +384,7 @@ async function main() {
     const ratio100uf = (rps100uf / rps100f) * 100;
     const ratio1000uf = (rps1000uf / rps1000f) * 100;
 
-    console.log(`\n📊 ULTRAFAST vs FASTIFY RATIOS`);
+    console.log('\n📊 ULTRAFAST vs FASTIFY RATIOS');
     console.log('==============================');
     console.log(`10 concurrent:  ${ratio10uf.toFixed(1)}% (UltraFast vs Fastify)`);
     console.log(`100 concurrent: ${ratio100uf.toFixed(1)}% (UltraFast vs Fastify)`);
@@ -398,7 +398,7 @@ async function main() {
     const ratio100e = (rps100uf / rps100e) * 100;
     const ratio1000e = (rps1000uf / rps1000e) * 100;
 
-    console.log(`\n📊 ULTRAFAST vs EXPRESS RATIOS`);
+    console.log('\n📊 ULTRAFAST vs EXPRESS RATIOS');
     console.log('==============================');
     console.log(`10 concurrent:  ${ratio10e.toFixed(1)}% (UltraFast vs Express)`);
     console.log(`100 concurrent: ${ratio100e.toFixed(1)}% (UltraFast vs Express)`);

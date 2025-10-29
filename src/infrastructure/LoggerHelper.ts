@@ -8,9 +8,9 @@
  * Principles: SOLID, DDD, Functional Programming, Guard Clauses
  */
 
-import { getLogger } from '@syntrojs/logger/registry';
 import { AsyncContext, JsonTransport } from '@syntrojs/logger';
 import type { Logger } from '@syntrojs/logger';
+import { getLogger } from '@syntrojs/logger/registry';
 import { createNoOpLogger } from './NoOpLogger';
 
 /**
@@ -80,10 +80,7 @@ export function setComponentLoggingEnabled(enabled: boolean): void {
  * @param config - Logger configuration
  * @returns Logger instance or no-op logger
  */
-export function getComponentLogger(
-  componentName: string,
-  config: LoggerHelperConfig = {}
-): Logger {
+export function getComponentLogger(componentName: string, config: LoggerHelperConfig = {}): Logger {
   // Guard clauses
   if (!componentName || typeof componentName !== 'string') {
     throw new Error('Component name must be a non-empty string');
@@ -116,4 +113,3 @@ export function getComponentLogger(
 
   return contextLogger;
 }
-

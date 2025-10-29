@@ -143,6 +143,5 @@ export async function registerCompression(
     zlibOptions: options.zlibOptions,
     brotliOptions: options.brotliOptions,
     customTypes: options.customTypes,
-    // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   } as any);
 }

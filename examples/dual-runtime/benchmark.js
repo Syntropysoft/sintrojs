@@ -38,12 +38,12 @@ async function startBenchmark() {
       console.log(`✅ Bun server started at ${bunAddress}`);
 
       console.log('\n📊 Benchmark URLs:');
-      console.log(`Node.js: http://localhost:3001/benchmark`);
-      console.log(`Bun:     http://localhost:3002/benchmark`);
+      console.log('Node.js: http://localhost:3001/benchmark');
+      console.log('Bun:     http://localhost:3002/benchmark');
 
       console.log('\n🧪 Test commands:');
-      console.log(`curl http://localhost:3001/hello`);
-      console.log(`curl http://localhost:3002/hello`);
+      console.log('curl http://localhost:3001/hello');
+      console.log('curl http://localhost:3002/hello');
     } catch (bunError) {
       console.log(`⚠️  Bun server failed: ${bunError.message}`);
       console.log('💡 Make sure Bun is installed: curl -fsSL https://bun.sh/install | bash');

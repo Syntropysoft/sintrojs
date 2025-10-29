@@ -8,8 +8,8 @@
 
 const express = require('express');
 const fastify = require('fastify');
-const http = require('http');
-const { performance } = require('perf_hooks');
+const http = require('node:http');
+const { performance } = require('node:perf_hooks');
 
 const TEST_DURATION = 3000; // 3 seconds
 
@@ -218,15 +218,15 @@ async function main() {
     // Results
     console.log('\n📊 COMPARISON RESULTS');
     console.log('=====================');
-    console.log(`Express:`);
+    console.log('Express:');
     console.log(`   10 concurrent:  ${rps10e} req/sec`);
     console.log(`   100 concurrent: ${rps100e} req/sec`);
     console.log(`   1000 concurrent: ${rps1000e} req/sec`);
-    console.log(`SyntroJS Simulation:`);
+    console.log('SyntroJS Simulation:');
     console.log(`   10 concurrent:  ${rps10s} req/sec`);
     console.log(`   100 concurrent: ${rps100s} req/sec`);
     console.log(`   1000 concurrent: ${rps1000s} req/sec`);
-    console.log(`Fastify:`);
+    console.log('Fastify:');
     console.log(`   10 concurrent:  ${rps10f} req/sec`);
     console.log(`   100 concurrent: ${rps100f} req/sec`);
     console.log(`   1000 concurrent: ${rps1000f} req/sec`);
@@ -236,7 +236,7 @@ async function main() {
     const ratio100 = (rps100s / rps100e) * 100;
     const ratio1000 = (rps1000s / rps1000e) * 100;
 
-    console.log(`\n📊 SYNTRoJS vs EXPRESS RATIOS`);
+    console.log('\n📊 SYNTRoJS vs EXPRESS RATIOS');
     console.log('=============================');
     console.log(`10 concurrent:  ${ratio10.toFixed(1)}% (SyntroJS vs Express)`);
     console.log(`100 concurrent: ${ratio100.toFixed(1)}% (SyntroJS vs Express)`);

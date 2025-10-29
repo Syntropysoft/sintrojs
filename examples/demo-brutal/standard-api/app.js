@@ -5,27 +5,32 @@ import { SyntroJS } from '../../../dist/index.js';
 
 const api = new SyntroJS()
   .get('/users', (ctx) => {
-    return { users: [{ id: 1, name: "John" }, { id: 2, name: "Jane" }] };
+    return {
+      users: [
+        { id: 1, name: 'John' },
+        { id: 2, name: 'Jane' },
+      ],
+    };
   })
   .post('/users', (ctx) => {
-    return { message: "User created", id: Math.floor(Math.random() * 1000) };
+    return { message: 'User created', id: Math.floor(Math.random() * 1000) };
   })
   .get('/health', (ctx) => {
-    return { status: "healthy", uptime: process.uptime() };
+    return { status: 'healthy', uptime: process.uptime() };
   })
   .listen(3000);
 
 console.log('🚀 ⚡ Standard API - Configuración equilibrada');
 console.log('📝 API estándar con características esenciales');
 console.log('⚙️  Configuración:', {
-  "logger": true,
-  "validation": true,
-  "errorHandling": true,
-  "openAPI": true,
-  "compression": false,
-  "cors": false,
-  "helmet": false,
-  "rateLimit": false
+  logger: true,
+  validation: true,
+  errorHandling: true,
+  openAPI: true,
+  compression: false,
+  cors: false,
+  helmet: false,
+  rateLimit: false,
 });
 console.log('🌐 Servidor corriendo en http://localhost:3000');
 console.log('📖 Documentación: http://localhost:3000/docs');

@@ -2,11 +2,11 @@
  * Tests for BackgroundTasks
  */
 
+import { ArrayTransport, CompositeTransport, JsonTransport } from '@syntrojs/logger';
+import { getLogger, loggerRegistry } from '@syntrojs/logger/registry';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { createBackgroundTasks } from '../../../src/application/BackgroundTasks';
 import * as LoggerHelper from '../../../src/infrastructure/LoggerHelper';
-import { getLogger, loggerRegistry } from '@syntrojs/logger/registry';
-import { ArrayTransport, JsonTransport, CompositeTransport } from '@syntrojs/logger';
 
 describe('BackgroundTasks', () => {
   let tasks: ReturnType<typeof createBackgroundTasks>;
@@ -19,24 +19,24 @@ describe('BackgroundTasks', () => {
 
     // Clear registry to ensure fresh logger instances
     loggerRegistry.clear();
-    
+
     // Create ArrayTransport to capture logs for testing
     transport = new ArrayTransport();
-    
+
     // Use CompositeTransport: ArrayTransport for testing + JsonTransport for console visibility (optional)
     // For tests, we only need ArrayTransport
     const compositeTransport = transport;
-    
+
     // Create logger with ArrayTransport BEFORE getComponentLogger is called
     const logger = getLogger('syntrojs', {
       level: 'info',
       transport: compositeTransport,
     });
-    
+
     // Mock getComponentLogger to return logger with our transport
-    getComponentLoggerSpy = vi.spyOn(LoggerHelper, 'getComponentLogger').mockReturnValue(
-      logger.withSource('background-tasks')
-    );
+    getComponentLoggerSpy = vi
+      .spyOn(LoggerHelper, 'getComponentLogger')
+      .mockReturnValue(logger.withSource('background-tasks'));
   });
 
   afterEach(() => {
@@ -106,13 +106,14 @@ describe('BackgroundTasks', () => {
 
       // Wait a bit more for async logging
       await new Promise((resolve) => setTimeout(resolve, 10));
-      
+
       // Should log error but not crash
       const entries = transport.getParsedEntries();
       // Logger may use 'message' or 'msg' field
-      const errorEntry = entries.find((e) => 
-        (e.message === 'Background task failed' || e.msg === 'Background task failed') &&
-        e.level === 'error'
+      const errorEntry = entries.find(
+        (e) =>
+          (e.message === 'Background task failed' || e.msg === 'Background task failed') &&
+          e.level === 'error',
       );
       expect(errorEntry).toBeDefined();
       expect(errorEntry?.taskName).toBeDefined();
@@ -129,12 +130,13 @@ describe('BackgroundTasks', () => {
 
       // Wait a bit more for async logging
       await new Promise((resolve) => setTimeout(resolve, 10));
-      
+
       // Should log error but not crash
       const entries = transport.getParsedEntries();
-      const errorEntry = entries.find((e) => 
-        (e.message === 'Background task failed' || e.msg === 'Background task failed') &&
-        e.level === 'error'
+      const errorEntry = entries.find(
+        (e) =>
+          (e.message === 'Background task failed' || e.msg === 'Background task failed') &&
+          e.level === 'error',
       );
       expect(errorEntry).toBeDefined();
     });
@@ -185,11 +187,10 @@ describe('BackgroundTasks', () => {
 
       // Wait a bit more for async logging
       await new Promise((resolve) => setTimeout(resolve, 10));
-      
+
       const entries = transport.getParsedEntries();
-      const warnEntry = entries.find((e) => 
-        e.level === 'warn' &&
-        (e.message?.includes('100ms') || e.msg?.includes('100ms'))
+      const warnEntry = entries.find(
+        (e) => e.level === 'warn' && (e.message?.includes('100ms') || e.msg?.includes('100ms')),
       );
       expect(warnEntry).toBeDefined();
       expect(warnEntry?.taskName).toBe('slow-task');
@@ -221,11 +222,12 @@ describe('BackgroundTasks', () => {
 
       // Wait a bit more for async logging
       await new Promise((resolve) => setTimeout(resolve, 10));
-      
+
       const entries = transport.getParsedEntries();
-      const errorEntry = entries.find((e) => 
-        e.level === 'error' &&
-        (e.message === 'Background task failed' || e.msg === 'Background task failed')
+      const errorEntry = entries.find(
+        (e) =>
+          e.level === 'error' &&
+          (e.message === 'Background task failed' || e.msg === 'Background task failed'),
       );
       expect(errorEntry).toBeDefined();
       expect(errorEntry?.taskName).toBe('my-custom-task');
@@ -240,11 +242,12 @@ describe('BackgroundTasks', () => {
 
       // Wait a bit more for async logging
       await new Promise((resolve) => setTimeout(resolve, 10));
-      
+
       const entries = transport.getParsedEntries();
-      const errorEntry = entries.find((e) => 
-        e.level === 'error' &&
-        (e.message === 'Background task failed' || e.msg === 'Background task failed')
+      const errorEntry = entries.find(
+        (e) =>
+          e.level === 'error' &&
+          (e.message === 'Background task failed' || e.msg === 'Background task failed'),
       );
       expect(errorEntry).toBeDefined();
       expect(errorEntry?.taskName).toMatch(/^task-\d+$/);
@@ -265,12 +268,13 @@ describe('BackgroundTasks', () => {
 
       // Wait a bit more for async logging
       await new Promise((resolve) => setTimeout(resolve, 10));
-      
+
       // Should log timeout error
       const entries = transport.getParsedEntries();
-      const errorEntry = entries.find((e) => 
-        e.level === 'error' &&
-        (e.message === 'Background task error' || e.msg === 'Background task error')
+      const errorEntry = entries.find(
+        (e) =>
+          e.level === 'error' &&
+          (e.message === 'Background task error' || e.msg === 'Background task error'),
       );
       expect(errorEntry).toBeDefined();
       expect(errorEntry?.taskName).toBe('timeout-task');
@@ -369,11 +373,12 @@ describe('BackgroundTasks', () => {
       expect(task2Executed).toBe(true);
       // Wait a bit more for async logging
       await new Promise((resolve) => setTimeout(resolve, 10));
-      
+
       const entries = transport.getParsedEntries();
-      const errorEntries = entries.filter((e) => 
-        e.level === 'error' &&
-        (e.message === 'Background task failed' || e.msg === 'Background task failed')
+      const errorEntries = entries.filter(
+        (e) =>
+          e.level === 'error' &&
+          (e.message === 'Background task failed' || e.msg === 'Background task failed'),
       );
       expect(errorEntries).toHaveLength(1);
     });
@@ -402,11 +407,12 @@ describe('BackgroundTasks', () => {
 
       // Wait a bit more for async logging
       await new Promise((resolve) => setTimeout(resolve, 10));
-      
+
       const entries = transport.getParsedEntries();
-      const errorEntry = entries.find((e) => 
-        e.level === 'error' &&
-        (e.message === 'Background task failed' || e.msg === 'Background task failed')
+      const errorEntry = entries.find(
+        (e) =>
+          e.level === 'error' &&
+          (e.message === 'Background task failed' || e.msg === 'Background task failed'),
       );
       expect(errorEntry).toBeDefined();
     });
@@ -423,12 +429,10 @@ describe('BackgroundTasks', () => {
 
       // Wait a bit more for async logging
       await new Promise((resolve) => setTimeout(resolve, 10));
-      
+
       // Should have timed out and logged error
       const entries = transport.getParsedEntries();
-      const errorEntry = entries.find((e) => 
-        e.level === 'error' && e.taskName === 'timeout-test'
-      );
+      const errorEntry = entries.find((e) => e.level === 'error' && e.taskName === 'timeout-test');
       expect(errorEntry).toBeDefined();
     });
   });

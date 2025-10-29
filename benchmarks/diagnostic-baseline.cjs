@@ -7,8 +7,8 @@
  */
 
 const fastify = require('fastify');
-const http = require('http');
-const { performance } = require('perf_hooks');
+const http = require('node:http');
+const { performance } = require('node:perf_hooks');
 
 function createFastify() {
   const app = fastify({

@@ -73,10 +73,7 @@ function isProduction(): boolean {
  * @param context - Request context
  * @returns Error response
  */
-export function buildGenericErrorResponse(
-  error: Error,
-  context: RequestContext,
-): RouteResponse {
+export function buildGenericErrorResponse(error: Error, context: RequestContext): RouteResponse {
   // Guard clause: validate error
   if (!error) {
     throw new Error('Error is required');
@@ -91,7 +88,9 @@ export function buildGenericErrorResponse(
   if (matchingPattern) {
     const config = matchingPattern.config;
     const message =
-      typeof config.message === 'function' ? config.message(error) : config.message ?? error.message;
+      typeof config.message === 'function'
+        ? config.message(error)
+        : (config.message ?? error.message);
 
     return {
       status: config.status,
@@ -122,10 +121,7 @@ export function buildGenericErrorResponse(
  * @param context - Request context
  * @returns Error response
  */
-export function buildUnhandledErrorResponse(
-  error: Error,
-  context: RequestContext,
-): RouteResponse {
+export function buildUnhandledErrorResponse(error: Error, context: RequestContext): RouteResponse {
   // Guard clause: validate error
   if (!error) {
     throw new Error('Error is required');
@@ -140,4 +136,3 @@ export function buildUnhandledErrorResponse(
     },
   };
 }
-

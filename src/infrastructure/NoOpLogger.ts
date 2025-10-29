@@ -32,4 +32,3 @@ export function createNoOpLogger(): Logger {
 
   return noOpLogger;
 }
-

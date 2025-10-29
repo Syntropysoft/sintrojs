@@ -10,10 +10,7 @@ import { z } from 'zod';
 import { HTTPException, ValidationException } from '../domain/HTTPException';
 import type { ExceptionHandler, RequestContext, RouteResponse } from '../domain/types';
 import { getComponentLogger } from '../infrastructure/LoggerHelper';
-import {
-  buildGenericErrorResponse,
-  buildUnhandledErrorResponse,
-} from './ErrorResponseBuilder';
+import { buildGenericErrorResponse, buildUnhandledErrorResponse } from './ErrorResponseBuilder';
 
 /**
  * Error handler implementation
@@ -215,7 +212,7 @@ class ErrorHandlerImpl {
           path: context.path,
           method: context.method,
         },
-        'Unhandled error in request handler'
+        'Unhandled error in request handler',
       );
 
       return buildUnhandledErrorResponse(error, context);
@@ -248,7 +245,7 @@ class ErrorHandlerImpl {
         path: context.path,
         method: context.method,
       },
-      'Unhandled generic error'
+      'Unhandled generic error',
     );
 
     // Use ErrorResponseBuilder for consistent error responses

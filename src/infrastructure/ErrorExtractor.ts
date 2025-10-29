@@ -69,4 +69,3 @@ export function extractLoggerErrorInfo(error: unknown): LoggerErrorInfo {
     message: String(error),
   };
 }
-

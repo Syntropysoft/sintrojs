@@ -21,8 +21,8 @@ import type {
   RequestContext,
   SchemaFactory,
 } from '../domain/types';
-import { integrateLogger, type LoggerIntegrationConfig } from './LoggerIntegration';
 import { setComponentLoggingEnabled } from './LoggerHelper';
+import { type LoggerIntegrationConfig, integrateLogger } from './LoggerIntegration';
 
 export interface FluentAdapterConfig {
   /** Enable Fastify built-in logger (legacy) */
@@ -421,13 +421,17 @@ export class FluentAdapter {
 
         // Check if result is a RouteResponse object (has status, body, headers)
         if (result && typeof result === 'object' && 'status' in result && 'body' in result) {
-          const response = result as { status: number; body: unknown; headers?: Record<string, string> };
-          
+          const response = result as {
+            status: number;
+            body: unknown;
+            headers?: Record<string, string>;
+          };
+
           // Set content type first if provided
-          if (response.headers && response.headers['Content-Type']) {
+          if (response.headers?.['Content-Type']) {
             reply.type(response.headers['Content-Type']);
           }
-          
+
           // Set other headers if provided
           if (response.headers) {
             for (const [key, value] of Object.entries(response.headers)) {
@@ -509,7 +513,7 @@ export class FluentAdapter {
 
     const routeKey = `${route.method}:${route.path}`;
     let factory = this.dependencyFactories.get(routeKey);
-    
+
     if (!factory) {
       const { createDependencyResolverFactory } = await import('../domain/factories');
       factory = createDependencyResolverFactory(route.config.dependencies);
@@ -551,7 +555,7 @@ export class FluentAdapter {
       // Usar Factory Pattern para ErrorHandler
       const routeKey = `${route.method}:${route.path}`;
       let factory = this.errorHandlerFactories.get(routeKey);
-      
+
       if (!factory) {
         const { createErrorHandlerFactory } = await import('../domain/factories');
         factory = createErrorHandlerFactory();
@@ -560,14 +564,14 @@ export class FluentAdapter {
 
       if (context) {
         const response = await factory.handle(context, error as Error);
-        
+
         // Aplicar headers si existen
         if (response.headers) {
           for (const [key, value] of Object.entries(response.headers)) {
             reply.header(key, value as string);
           }
         }
-        
+
         return reply.status(response.status).send(response.body);
       }
 
@@ -576,7 +580,8 @@ export class FluentAdapter {
       return reply.status(500).send({ error: errorMessage });
     } catch (handlerError) {
       // Fallback final
-      const errorMessage = handlerError instanceof Error ? handlerError.message : 'Internal Server Error';
+      const errorMessage =
+        handlerError instanceof Error ? handlerError.message : 'Internal Server Error';
       return reply.status(500).send({ error: errorMessage });
     }
   }

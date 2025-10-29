@@ -170,6 +170,5 @@ export async function registerRateLimit(
     ban: options.ban,
     onExceeding: options.onExceeding,
     onBanReach: options.onBanReach,
-    // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   } as any);
 }

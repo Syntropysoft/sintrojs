@@ -11,13 +11,13 @@ interface Bun {
     fetch(request: Request): Promise<Response>;
   }): BunServer;
 }
-import type { Route } from '../domain/Route';
-import type { RequestContext } from '../domain/types';
-import { SchemaValidator } from '../application/SchemaValidator';
 import { DependencyInjector } from '../application/DependencyInjector';
 import type { DependencyMetadata } from '../application/DependencyInjector';
 import { ErrorHandler } from '../application/ErrorHandler';
-import { MiddlewareRegistry } from '../application/MiddlewareRegistry';
+import type { MiddlewareRegistry } from '../application/MiddlewareRegistry';
+import { SchemaValidator } from '../application/SchemaValidator';
+import type { Route } from '../domain/Route';
+import type { RequestContext } from '../domain/types';
 
 /**
  * Bun-specific adapter for maximum performance

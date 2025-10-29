@@ -25,11 +25,15 @@ async function main() {
   });
 
   // Middleware para POST - validación
-  app.use('/users', async (ctx) => {
-    if (ctx.method === 'POST') {
-      console.log('📝 Creating user...');
-    }
-  }, { method: 'POST' });
+  app.use(
+    '/users',
+    async (ctx) => {
+      if (ctx.method === 'POST') {
+        console.log('📝 Creating user...');
+      }
+    },
+    { method: 'POST' },
+  );
 
   // Rutas
   app.get('/hello', {

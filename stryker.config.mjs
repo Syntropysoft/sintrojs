@@ -35,9 +35,9 @@ const config = {
 
   // Thresholds for CI/CD (adjusted for equivalent mutant strategy)
   thresholds: {
-    high: 75,   // Realistic target with equivalent mutants excluded
-    low: 60,    // Minimum acceptable score
-    break: 50,  // Break build below this
+    high: 75, // Realistic target with equivalent mutants excluded
+    low: 60, // Minimum acceptable score
+    break: 50, // Break build below this
   },
 
   // Reporters

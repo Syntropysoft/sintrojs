@@ -7,8 +7,8 @@
  */
 
 const fastify = require('fastify');
-const http = require('http');
-const { performance } = require('perf_hooks');
+const http = require('node:http');
+const { performance } = require('node:perf_hooks');
 
 const TEST_DURATION = 3000; // 3 seconds
 
@@ -297,15 +297,15 @@ async function main() {
     // Results
     console.log('\n📊 OPTIMIZATION RESULTS');
     console.log('=======================');
-    console.log(`SyntroJS Original:`);
+    console.log('SyntroJS Original:');
     console.log(`   10 concurrent:  ${rps10o} req/sec`);
     console.log(`   100 concurrent: ${rps100o} req/sec`);
     console.log(`   1000 concurrent: ${rps1000o} req/sec`);
-    console.log(`SyntroJS UltraFast:`);
+    console.log('SyntroJS UltraFast:');
     console.log(`   10 concurrent:  ${rps10u} req/sec`);
     console.log(`   100 concurrent: ${rps100u} req/sec`);
     console.log(`   1000 concurrent: ${rps1000u} req/sec`);
-    console.log(`Fastify Baseline:`);
+    console.log('Fastify Baseline:');
     console.log(`   10 concurrent:  ${rps10f} req/sec`);
     console.log(`   100 concurrent: ${rps100f} req/sec`);
     console.log(`   1000 concurrent: ${rps1000f} req/sec`);
@@ -315,7 +315,7 @@ async function main() {
     const improvement100 = ((rps100u - rps100o) / rps100o) * 100;
     const improvement1000 = ((rps1000u - rps1000o) / rps1000o) * 100;
 
-    console.log(`\n📈 OPTIMIZATION IMPROVEMENTS`);
+    console.log('\n📈 OPTIMIZATION IMPROVEMENTS');
     console.log('===========================');
     console.log(`10 concurrent:  ${improvement10.toFixed(1)}% improvement`);
     console.log(`100 concurrent: ${improvement100.toFixed(1)}% improvement`);
@@ -329,7 +329,7 @@ async function main() {
     const ratio100u = (rps100u / rps100f) * 100;
     const ratio1000u = (rps1000u / rps1000f) * 100;
 
-    console.log(`\n📊 ULTRAFAST vs FASTIFY RATIOS`);
+    console.log('\n📊 ULTRAFAST vs FASTIFY RATIOS');
     console.log('==============================');
     console.log(`10 concurrent:  ${ratio10u.toFixed(1)}% (UltraFast vs Fastify)`);
     console.log(`100 concurrent: ${ratio100u.toFixed(1)}% (UltraFast vs Fastify)`);

@@ -11,8 +11,7 @@
       "coverage",
       ".turbo",
       ".stryker-tmp",
-      "reports/mutation/mutation-report.json",
-      "example-app"
+      "reports/mutation/mutation-report.json"
     ]
   },
   "linter": {
@@ -37,19 +36,6 @@
   },
   "overrides": [
     {
-      "include": ["tests/**/*.ts"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noExplicitAny": "off"
-          },
-          "complexity": {
-            "noBannedTypes": "off"
-          }
-        }
-      }
-    },
-    {
       "include": ["src/application/ErrorHandler.ts"],
       "linter": {
         "rules": {
@@ -68,12 +54,88 @@
         "rules": {
           "suspicious": {
             "noExplicitAny": "off"
+          },
+          "complexity": {
+            "noStaticOnlyClass": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["src/infrastructure/BunAdapter.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          },
+          "complexity": {
+            "noStaticOnlyClass": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["tests/**/*.ts", "tests/**/*.js"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          },
+          "complexity": {
+            "noBannedTypes": "off",
+            "noStaticOnlyClass": "off",
+            "noForEach": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["benchmarks/**/*.js", "benchmarks/**/*.cjs"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noForEach": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["examples/**/*.js", "examples/**/*.cjs"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noForEach": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": ["scripts/**/*.js"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noForEach": "off"
           }
         }
       }
     },
     {
       "include": ["src/plugins/**/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "include": [
+        "src/core/**/*.ts",
+        "src/domain/**/*.ts",
+        "src/infrastructure/FluentAdapter.ts",
+        "src/infrastructure/UltraFastAdapter.ts"
+      ],
       "linter": {
         "rules": {
           "suspicious": {
@@ -98,6 +160,10 @@
         "rules": {
           "suspicious": {
             "noExplicitAny": "off"
+          },
+          "complexity": {
+            "noStaticOnlyClass": "off",
+            "noForEach": "off"
           }
         }
       }

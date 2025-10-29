@@ -5,7 +5,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
 import { DependencyInjector, inject } from '../../../src/application/DependencyInjector';
-import { SyntroJS, SyntroJS } from '../../../src/core';
+import { SyntroJS } from '../../../src/core';
 
 interface MockDb {
   users: { findAll: () => { id: number; name: string }[] };

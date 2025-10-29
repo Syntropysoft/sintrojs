@@ -175,6 +175,5 @@ export async function registerHelmet(server: unknown, options: HelmetOptions = {
     frameguard: options.frameguard,
     permittedCrossDomainPolicies: options.permittedCrossDomainPolicies,
     xssFilter: options.xssFilter,
-    // biome-ignore lint/suspicious/noExplicitAny: Thin wrapper over Fastify plugin
   } as any);
 }
