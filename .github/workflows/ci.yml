@@ -45,17 +45,14 @@ jobs:
       
       - name: Install dependencies
         run: |
-          # In CI, install only the main package (not example-app which needs workspace:*)
-          # and resolve @syntrojs/logger from npm registry instead of workspace link
+          # In CI, if workspace link doesn't exist, install from npm registry
           if [ ! -d "../syntrojs-logger" ]; then
             # Remove workspace reference temporarily for CI
             sed -i.bak "s| - '../syntrojs-logger'||g" pnpm-workspace.yaml
-            # Remove example-app from workspace temporarily (it needs syntrojs@workspace:*)
-            sed -i.bak "s| - 'example-app'||g" pnpm-workspace.yaml
-            # Install only current package without frozen-lockfile to resolve from npm
-            pnpm install --no-frozen-lockfile --filter .
+            # Install without frozen-lockfile to resolve @syntrojs/logger from npm
+            pnpm install --no-frozen-lockfile
           else
-            # Local development: use frozen-lockfile with full workspace
+            # Local development: use frozen-lockfile with workspace
             pnpm install --frozen-lockfile
           fi
       
@@ -94,17 +91,14 @@ jobs:
       
       - name: Install dependencies
         run: |
-          # In CI, install only the main package (not example-app which needs workspace:*)
-          # and resolve @syntrojs/logger from npm registry instead of workspace link
+          # In CI, if workspace link doesn't exist, install from npm registry
           if [ ! -d "../syntrojs-logger" ]; then
             # Remove workspace reference temporarily for CI
             sed -i.bak "s| - '../syntrojs-logger'||g" pnpm-workspace.yaml
-            # Remove example-app from workspace temporarily (it needs syntrojs@workspace:*)
-            sed -i.bak "s| - 'example-app'||g" pnpm-workspace.yaml
-            # Install only current package without frozen-lockfile to resolve from npm
-            pnpm install --no-frozen-lockfile --filter .
+            # Install without frozen-lockfile to resolve @syntrojs/logger from npm
+            pnpm install --no-frozen-lockfile
           else
-            # Local development: use frozen-lockfile with full workspace
+            # Local development: use frozen-lockfile with workspace
             pnpm install --frozen-lockfile
           fi
       
@@ -135,17 +129,14 @@ jobs:
       
       - name: Install dependencies
         run: |
-          # In CI, install only the main package (not example-app which needs workspace:*)
-          # and resolve @syntrojs/logger from npm registry instead of workspace link
+          # In CI, if workspace link doesn't exist, install from npm registry
           if [ ! -d "../syntrojs-logger" ]; then
             # Remove workspace reference temporarily for CI
             sed -i.bak "s| - '../syntrojs-logger'||g" pnpm-workspace.yaml
-            # Remove example-app from workspace temporarily (it needs syntrojs@workspace:*)
-            sed -i.bak "s| - 'example-app'||g" pnpm-workspace.yaml
-            # Install only current package without frozen-lockfile to resolve from npm
-            pnpm install --no-frozen-lockfile --filter .
+            # Install without frozen-lockfile to resolve @syntrojs/logger from npm
+            pnpm install --no-frozen-lockfile
           else
-            # Local development: use frozen-lockfile with full workspace
+            # Local development: use frozen-lockfile with workspace
             pnpm install --frozen-lockfile
           fi
       
@@ -196,17 +187,14 @@ jobs:
       
       - name: Install dependencies
         run: |
-          # In CI, install only the main package (not example-app which needs workspace:*)
-          # and resolve @syntrojs/logger from npm registry instead of workspace link
+          # In CI, if workspace link doesn't exist, install from npm registry
           if [ ! -d "../syntrojs-logger" ]; then
             # Remove workspace reference temporarily for CI
             sed -i.bak "s| - '../syntrojs-logger'||g" pnpm-workspace.yaml
-            # Remove example-app from workspace temporarily (it needs syntrojs@workspace:*)
-            sed -i.bak "s| - 'example-app'||g" pnpm-workspace.yaml
-            # Install only current package without frozen-lockfile to resolve from npm
-            pnpm install --no-frozen-lockfile --filter .
+            # Install without frozen-lockfile to resolve @syntrojs/logger from npm
+            pnpm install --no-frozen-lockfile
           else
-            # Local development: use frozen-lockfile with full workspace
+            # Local development: use frozen-lockfile with workspace
             pnpm install --frozen-lockfile
           fi
       

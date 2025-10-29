@@ -121,28 +121,6 @@ importers:
         specifier: ^1.2.2
         version: 1.6.1(@types/node@20.19.24)(@vitest/ui@1.6.1)
 
-  example-app:
-    dependencies:
-      syntrojs:
-        specifier: workspace:*
-        version: link:..
-      zod:
-        specifier: ^3.22.4
-        version: 3.25.76
-    devDependencies:
-      '@types/node':
-        specifier: ^18.19.0
-        version: 18.19.130
-      tsx:
-        specifier: ^4.7.1
-        version: 4.20.6
-      typescript:
-        specifier: ^5.3.3
-        version: 5.9.3
-      vitest:
-        specifier: ^1.2.2
-        version: 1.6.1(@types/node@18.19.130)(@vitest/ui@1.6.1)
-
 packages:
 
   /@ampproject/remapping@2.3.0:
