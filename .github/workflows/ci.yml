@@ -43,17 +43,18 @@ jobs:
           which pnpm
           pnpm --version
       
-      - name: Configure workspace for CI
-        run: |
-          # Create CI-safe workspace.yaml (remove external reference)
-          cat > pnpm-workspace.yaml << EOF
-          packages:
-            - '.'
-            - 'example-app'
-          EOF
-      
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          # In CI, if workspace link doesn't exist, install from npm registry
+          if [ ! -d "../syntrojs-logger" ]; then
+            # Remove workspace reference temporarily for CI
+            sed -i.bak "s| - '../syntrojs-logger'||g" pnpm-workspace.yaml
+            # Install without frozen-lockfile to resolve @syntrojs/logger from npm
+            pnpm install --no-frozen-lockfile
+          else
+            # Local development: use frozen-lockfile with workspace
+            pnpm install --frozen-lockfile
+          fi
       
       - name: Run linter
         run: pnpm run lint
@@ -88,17 +89,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       
-      - name: Configure workspace for CI
-        run: |
-          # Create CI-safe workspace.yaml (remove external reference)
-          cat > pnpm-workspace.yaml << EOF
-          packages:
-            - '.'
-            - 'example-app'
-          EOF
-      
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          # In CI, if workspace link doesn't exist, install from npm registry
+          if [ ! -d "../syntrojs-logger" ]; then
+            # Remove workspace reference temporarily for CI
+            sed -i.bak "s| - '../syntrojs-logger'||g" pnpm-workspace.yaml
+            # Install without frozen-lockfile to resolve @syntrojs/logger from npm
+            pnpm install --no-frozen-lockfile
+          else
+            # Local development: use frozen-lockfile with workspace
+            pnpm install --frozen-lockfile
+          fi
       
       - name: Run type check
         run: pnpm run typecheck
@@ -125,17 +127,18 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
       
-      - name: Configure workspace for CI
-        run: |
-          # Create CI-safe workspace.yaml (remove external reference)
-          cat > pnpm-workspace.yaml << EOF
-          packages:
-            - '.'
-            - 'example-app'
-          EOF
-      
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          # In CI, if workspace link doesn't exist, install from npm registry
+          if [ ! -d "../syntrojs-logger" ]; then
+            # Remove workspace reference temporarily for CI
+            sed -i.bak "s| - '../syntrojs-logger'||g" pnpm-workspace.yaml
+            # Install without frozen-lockfile to resolve @syntrojs/logger from npm
+            pnpm install --no-frozen-lockfile
+          else
+            # Local development: use frozen-lockfile with workspace
+            pnpm install --frozen-lockfile
+          fi
       
       - name: Run tests
         run: pnpm test
@@ -182,17 +185,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       
-      - name: Configure workspace for CI
-        run: |
-          # Create CI-safe workspace.yaml (remove external reference)
-          cat > pnpm-workspace.yaml << EOF
-          packages:
-            - '.'
-            - 'example-app'
-          EOF
-      
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          # In CI, if workspace link doesn't exist, install from npm registry
+          if [ ! -d "../syntrojs-logger" ]; then
+            # Remove workspace reference temporarily for CI
+            sed -i.bak "s| - '../syntrojs-logger'||g" pnpm-workspace.yaml
+            # Install without frozen-lockfile to resolve @syntrojs/logger from npm
+            pnpm install --no-frozen-lockfile
+          else
+            # Local development: use frozen-lockfile with workspace
+            pnpm install --frozen-lockfile
+          fi
       
       - name: Build package
         run: pnpm run build
