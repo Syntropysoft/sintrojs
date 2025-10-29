@@ -78,6 +78,7 @@
   },
   "dependencies": {
     "@fastify/static": "^7.0.0",
+    "@syntrojs/logger": "^0.2.1-alpha",
     "fastify": "^4.26.0",
     "zod": "^3.22.4",
     "zod-to-json-schema": "^3.22.4"

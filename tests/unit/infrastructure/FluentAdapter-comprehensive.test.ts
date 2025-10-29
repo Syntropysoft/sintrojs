@@ -9,8 +9,8 @@
  */
 
 import { beforeEach, describe, expect, it } from 'vitest';
-import { MiddlewareRegistry } from '../../../src/application/MiddlewareRegistry';
-import { FluentAdapter } from '../../../src/infrastructure/FluentAdapter';
+import { MiddlewareRegistry } from '../../../../src/application/MiddlewareRegistry';
+import { FluentAdapter } from '../../../../src/infrastructure/FluentAdapter';
 
 describe('FluentAdapter - Comprehensive Coverage Tests', () => {
   let adapter: FluentAdapter;

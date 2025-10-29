@@ -68,7 +68,7 @@ export interface RequestContext<
         name?: string;
         timeout?: number;
         onComplete?: () => void;
-        onError?: (error: Error) => void;
+        onError?: (error: unknown) => void;
       },
     ) => void;
   };

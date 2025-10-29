@@ -26,6 +26,9 @@
  * ```
  */
 
+import { getComponentLogger } from '../infrastructure/LoggerHelper';
+import { extractLoggerErrorInfo } from '../infrastructure/ErrorExtractor';
+
 /**
  * Background task function type
  */
@@ -45,7 +48,7 @@ export interface BackgroundTaskOptions {
   onComplete?: () => void;
 
   /** Callback when task fails */
-  onError?: (error: Error) => void;
+  onError?: (error: unknown) => void;
 }
 
 /**
@@ -103,8 +106,14 @@ class BackgroundTasksImpl {
 
         // Warn if task took too long (potential Event Loop blocking)
         if (duration > this.WARNING_THRESHOLD_MS) {
-          console.warn(
-            `!🚨 Background task '${taskName}' took ${duration}ms (>${this.WARNING_THRESHOLD_MS}ms threshold). Consider using a job queue (BullMQ) for heavy operations.`,
+          const logger = getComponentLogger('background-tasks');
+          logger.warn(
+            {
+              taskName,
+              duration,
+              threshold: this.WARNING_THRESHOLD_MS,
+            },
+            `Background task took too long (>${this.WARNING_THRESHOLD_MS}ms threshold). Consider using a job queue (BullMQ) for heavy operations.`
           );
         }
 
@@ -113,11 +122,21 @@ class BackgroundTasksImpl {
           options.onComplete();
         }
       })
-      .catch((error: Error) => {
+      .catch((error: unknown) => {
         // Log error but don't crash the server
-        console.error(`❌ Background task '${taskName}' failed:`, error);
+        // Functional approach: extract error info safely
+        const errorInfo = extractLoggerErrorInfo(error);
+        const logger = getComponentLogger('background-tasks');
+        logger.error(
+          {
+            taskName,
+            error: errorInfo,
+          },
+          'Background task failed'
+        );
 
         // Call onError callback
+        // error is already unknown type, safe to pass
         if (options?.onError) {
           options.onError(error);
         }
@@ -131,8 +150,17 @@ class BackgroundTasksImpl {
     });
 
     // Race: task vs timeout
-    Promise.race([taskPromise, timeoutPromise]).catch((error) => {
-      console.error(`❌ Background task '${taskName}' error:`, error);
+    Promise.race([taskPromise, timeoutPromise]).catch((error: unknown) => {
+      // Functional approach: extract error info safely
+      const errorInfo = extractLoggerErrorInfo(error);
+      const logger = getComponentLogger('background-tasks');
+      logger.error(
+        {
+          taskName,
+          error: errorInfo,
+        },
+        'Background task error'
+      );
     });
   }
 

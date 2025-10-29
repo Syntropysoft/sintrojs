@@ -9,6 +9,11 @@
 import { z } from 'zod';
 import { HTTPException, ValidationException } from '../domain/HTTPException';
 import type { ExceptionHandler, RequestContext, RouteResponse } from '../domain/types';
+import { getComponentLogger } from '../infrastructure/LoggerHelper';
+import {
+  buildGenericErrorResponse,
+  buildUnhandledErrorResponse,
+} from './ErrorResponseBuilder';
 
 /**
  * Error handler implementation
@@ -189,88 +194,65 @@ class ErrorHandlerImpl {
       };
     });
 
-    // JWTError handler (401) - Convert JWTError to HTTPException format
+    // Generic Error handler - uses ErrorResponseBuilder (Strategy Pattern)
     this.register(Error, (context, error) => {
-      const err = error as Error;
-
-      // Check if it's a JWT error
-      if (err.message.includes('JWT token is required') || err.message.includes('INVALID_TOKEN')) {
-        return {
-          status: 401,
-          headers: {
-            'WWW-Authenticate': 'Bearer',
-          },
-          body: {
-            detail: 'Authentication required',
-            message: err.message,
-            path: context.path,
-          },
-        };
-      }
-
-      // Check if it's a security error (missing credentials)
-      if (
-        err.message.includes('Cannot destructure property') &&
-        err.message.includes('credentials')
-      ) {
-        return {
-          status: 401,
-          headers: {
-            'WWW-Authenticate': 'Basic',
-          },
-          body: {
-            detail: 'Authentication required',
-            message: 'Missing authentication credentials',
-            path: context.path,
-          },
-        };
-      }
-
-      // Default error handling
-      return {
-        status: 500,
-        body: {
-          detail: 'Internal Server Error',
-          message: err.message,
-          path: context.path,
-        },
-      };
+      return buildGenericErrorResponse(error, context);
     });
 
-    // Generic Error handler (500)
+    // Unhandled Error handler (500) - logs and returns generic response
+    // Note: This is registered after generic Error handler as it's more specific
+    // but serves as fallback for truly unhandled errors
     this.register(Error, (context, error) => {
       // Log error for debugging
-      console.error('Unhandled error:', error);
-
-      const isProduction = process.env['NODE_ENV'] === 'production';
-      return {
-        status: 500,
-        body: {
-          detail: isProduction ? 'Internal Server Error' : error.message,
+      const logger = getComponentLogger('error-handler');
+      logger.error(
+        {
+          error: {
+            name: error.name,
+            message: error.message,
+            stack: error.stack,
+          },
           path: context.path,
+          method: context.method,
         },
-      };
+        'Unhandled error in request handler'
+      );
+
+      return buildUnhandledErrorResponse(error, context);
     });
   }
 
   /**
    * Handles generic errors not matched by specific handlers
+   * Uses ErrorResponseBuilder for consistent error responses
    *
    * @param error - Error instance
    * @param context - Request context
    * @returns Generic 500 response
    */
   private handleGenericError(error: Error, context: RequestContext): RouteResponse {
-    console.error('Unhandled error:', error);
+    // Guard clause: validate error
+    if (!error) {
+      throw new Error('Error is required');
+    }
 
-    const isProduction = process.env['NODE_ENV'] === 'production';
-    return {
-      status: 500,
-      body: {
-        detail: isProduction ? 'Internal Server Error' : error.message,
+    // Log error for debugging
+    const logger = getComponentLogger('error-handler');
+    logger.error(
+      {
+        error: {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+        },
         path: context.path,
+        method: context.method,
       },
-    };
+      'Unhandled generic error'
+    );
+
+    // Use ErrorResponseBuilder for consistent error responses
+    return buildUnhandledErrorResponse(error, context);
   }
 
   /**

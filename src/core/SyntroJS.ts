@@ -26,6 +26,7 @@ import type {
 import { BunAdapter } from '../infrastructure/BunAdapter';
 import { FastifyAdapter } from '../infrastructure/FastifyAdapter';
 import { FluentAdapter } from '../infrastructure/FluentAdapter';
+import type { LoggerIntegrationConfig } from '../infrastructure/LoggerIntegration';
 import { RuntimeOptimizer } from '../infrastructure/RuntimeOptimizer';
 import { UltraFastAdapter } from '../infrastructure/UltraFastAdapter';
 import { UltraFastifyAdapter } from '../infrastructure/UltraFastifyAdapter';
@@ -57,8 +58,11 @@ export interface SyntroJSConfig {
   /** API description */
   description?: string;
 
-  /** Enable logger */
+  /** Enable Fastify built-in logger (legacy) */
   logger?: boolean;
+
+  /** Enable @syntrojs/logger integration with request/response logging */
+  syntroLogger?: LoggerIntegrationConfig | boolean;
 
   /** Routes defined as object (alternative to method chaining) */
   routes?: RouteDefinition;
@@ -77,7 +81,12 @@ export interface SyntroJSConfig {
 
   /** Fluent adapter configuration */
   fluentConfig?: {
+    /** Enable Fastify built-in logger (legacy) */
     logger?: boolean;
+    /** Enable @syntrojs/logger integration */
+    syntroLogger?: LoggerIntegrationConfig | boolean;
+    /** Enable component-level logging (ErrorHandler, BackgroundTasks, etc.) */
+    componentLogging?: boolean;
     validation?: boolean;
     errorHandling?: boolean;
     dependencyInjection?: boolean;
@@ -203,6 +212,14 @@ export class SyntroJS {
       return this.createFluentAdapter();
     }
 
+    // Create adapter with logger configuration
+    if (this.adapter === FastifyAdapter) {
+      return FastifyAdapter.create({
+        logger: this.config.logger ?? false,
+        syntroLogger: this.config.syntroLogger,
+      });
+    }
+
     return this.adapter.create();
   }
 
@@ -233,20 +250,48 @@ export class SyntroJS {
     const fluentConfig = this.config.fluentConfig;
 
     if (!fluentConfig) {
-      return adapter.standard();
+      // Use syntroLogger from main config if available
+      let configuredAdapter = adapter.standard();
+      if (this.config.syntroLogger) {
+        configuredAdapter = configuredAdapter.withSyntroLogger(
+          typeof this.config.syntroLogger === 'boolean' ? this.config.syntroLogger : this.config.syntroLogger,
+        );
+      }
+      return configuredAdapter;
     }
 
     // Apply configuration using functional composition
-    return Object.entries(fluentConfig).reduce((acc, [key, value]) => {
+    let configuredAdapter = Object.entries(fluentConfig).reduce((acc, [key, value]) => {
+      // Skip syntroLogger and componentLogging - they need special handling
+      if (key === 'syntroLogger' || key === 'componentLogging') {
+        return acc;
+      }
+
       if (value !== undefined) {
         const methodName =
           `with${key.charAt(0).toUpperCase()}${key.slice(1)}` as keyof FluentAdapter;
         if (typeof acc[methodName] === 'function') {
-          return (acc[methodName] as (value: boolean) => FluentAdapter)(value);
+          // Type-safe call: most with* methods accept boolean, but we allow unknown for flexibility
+          // TypeScript will validate the actual call at runtime
+          return (acc[methodName] as (value: unknown) => FluentAdapter)(value);
         }
       }
       return acc;
     }, adapter);
+
+    // Handle syntroLogger separately (from fluentConfig or main config)
+    const syntroLogger = fluentConfig.syntroLogger ?? this.config.syntroLogger;
+    if (syntroLogger !== undefined) {
+      configuredAdapter = configuredAdapter.withSyntroLogger(syntroLogger);
+    }
+
+    // Handle componentLogging separately (from fluentConfig or main config)
+    const componentLogging = fluentConfig.componentLogging;
+    if (componentLogging !== undefined) {
+      configuredAdapter = configuredAdapter.withComponentLogging(componentLogging);
+    }
+
+    return configuredAdapter;
   }
 
   /**

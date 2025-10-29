@@ -21,9 +21,16 @@ import type {
   RequestContext,
   SchemaFactory,
 } from '../domain/types';
+import { integrateLogger, type LoggerIntegrationConfig } from './LoggerIntegration';
+import { setComponentLoggingEnabled } from './LoggerHelper';
 
 export interface FluentAdapterConfig {
+  /** Enable Fastify built-in logger (legacy) */
   logger?: boolean;
+  /** Enable @syntrojs/logger integration */
+  syntroLogger?: LoggerIntegrationConfig | boolean;
+  /** Enable component-level logging (ErrorHandler, BackgroundTasks, etc.) */
+  componentLogging?: boolean;
   validation?: boolean;
   errorHandling?: boolean;
   dependencyInjection?: boolean;
@@ -95,6 +102,26 @@ export class FluentAdapter {
 
     // Create new instance with updated config (immutability)
     return this.createWithConfig({ logger: enabled });
+  }
+
+  withSyntroLogger(config: LoggerIntegrationConfig | boolean = true): this {
+    // Guard clause: validate type
+    if (typeof config !== 'boolean' && (typeof config !== 'object' || config === null)) {
+      throw new Error('SyntroLogger config must be a boolean or LoggerIntegrationConfig object');
+    }
+
+    // Create new instance with updated config (immutability)
+    return this.createWithConfig({ syntroLogger: config });
+  }
+
+  withComponentLogging(enabled = true): this {
+    // Guard clause: validate boolean
+    if (typeof enabled !== 'boolean') {
+      throw new Error('Component logging enabled must be a boolean');
+    }
+
+    // Create new instance with updated config (immutability)
+    return this.createWithConfig({ componentLogging: enabled });
   }
 
   withValidation(enabled = true): this {
@@ -246,6 +273,27 @@ export class FluentAdapter {
     const fastify = Fastify({
       logger: this.config.logger ?? false,
     });
+
+    // Integrate @syntrojs/logger if enabled
+    if (this.config.syntroLogger) {
+      const loggerConfig: LoggerIntegrationConfig =
+        typeof this.config.syntroLogger === 'boolean'
+          ? {
+              enabled: this.config.syntroLogger,
+              componentLogging: this.config.componentLogging,
+            }
+          : {
+              ...this.config.syntroLogger,
+              componentLogging:
+                this.config.componentLogging !== undefined
+                  ? this.config.componentLogging
+                  : this.config.syntroLogger.componentLogging,
+            };
+      integrateLogger(fastify, loggerConfig);
+    } else if (this.config.componentLogging !== undefined) {
+      // If only componentLogging is configured, set it directly
+      setComponentLoggingEnabled(this.config.componentLogging);
+    }
 
     // Registrar plugins solo si están habilitados
     this.registerPlugins(fastify);

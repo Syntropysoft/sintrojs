@@ -15,13 +15,18 @@ import { MiddlewareRegistry } from '../application/MiddlewareRegistry';
 import { SchemaValidator } from '../application/SchemaValidator';
 import type { Route } from '../domain/Route';
 import type { HttpMethod, RequestContext } from '../domain/types';
+import { integrateLogger, type LoggerIntegrationConfig } from './LoggerIntegration';
 
 /**
  * Fastify adapter configuration
  */
 export interface FastifyAdapterConfig {
+  /** Enable Fastify built-in logger (legacy) */
   logger?: boolean;
+  /** Disable Fastify request logging */
   disableRequestLogging?: boolean;
+  /** Enable @syntrojs/logger integration */
+  syntroLogger?: LoggerIntegrationConfig | boolean;
 }
 
 /**
@@ -44,6 +49,13 @@ class FastifyAdapterImpl {
       logger: config.logger ?? false,
       disableRequestLogging: config.disableRequestLogging ?? true,
     });
+
+    // Integrate @syntrojs/logger if enabled
+    if (config.syntroLogger) {
+      const loggerConfig: LoggerIntegrationConfig =
+        typeof config.syntroLogger === 'boolean' ? { enabled: config.syntroLogger } : config.syntroLogger;
+      integrateLogger(instance, loggerConfig);
+    }
 
     return instance;
   }

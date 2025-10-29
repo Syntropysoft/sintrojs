@@ -344,6 +344,7 @@ const app = new SyntroJS({
 - **WebSocket Support** - Real-time communication with room management
 - **Dependency Injection** - Simple, functional DI with singleton and request scopes
 - **Background Tasks** - Non-blocking task execution
+- **Structured Logging** - Automatic request/response logging with @syntrojs/logger integration
 - **Security** - JWT, OAuth2, API Key, HTTP Basic authentication
 - **Plugins** - CORS, Helmet, Compression, Rate Limiting
 
@@ -632,6 +633,42 @@ app.post('/users', {
 
 await app.listen(3000);
 ```
+
+### Structured Logging with @syntrojs/logger
+
+```javascript
+import { SyntroJS } from 'syntrojs';
+
+// Enable automatic request/response logging
+const app = new SyntroJS({
+  title: 'API with Logging',
+  syntroLogger: {
+    enabled: true,
+    level: 'info',
+    logHeaders: true,
+    logRequestBody: false, // Exclude sensitive data
+    componentLogging: true, // Enable logging for ErrorHandler, BackgroundTasks
+  },
+});
+
+app.get('/users', {
+  handler: () => ({ users: [] }),
+});
+
+// Automatic logging includes:
+// - Request: method, URL, IP, headers, correlation ID
+// - Response: status code, response time
+// - Errors: full error details with stack traces
+// - All logs include correlation ID for request tracking
+
+await app.listen(3000);
+```
+
+**Features:**
+- ✅ **Automatic correlation IDs** - Generated per request and propagated via AsyncContext
+- ✅ **Request/response logging** - Logged automatically with configurable verbosity
+- ✅ **Component logging** - ErrorHandler and BackgroundTasks log automatically
+- ✅ **Zero-config option** - Enable with `syntroLogger: true` (defaults)
 
 ---
 

@@ -6,6 +6,7 @@
 export * from './RouteRegistry';
 export * from './SchemaValidator';
 export * from './ErrorHandler';
+export * from './ErrorResponseBuilder';
 export * from './OpenAPIGenerator';
 export * from './DocsRenderer';
 export * from './DependencyInjector';
