@@ -24,6 +24,13 @@
 
 ---
 
+## 🎯 Recent Fixes (v0.3.12-alpha)
+
+*   **Fix**: Corrected issues in error handling (`handlerError`) and updated the `README.md`. 
+*   **Chore**: Incremented project version.
+
+---
+
 ## 🎯 What is SyntroJS?
 
 **SyntroJS is the world's first dual-runtime framework** that brings the simplicity and developer experience of FastAPI to the TypeScript ecosystem. Write your code once and run it on either **Node.js** for stability or **Bun** for maximum performance.
