@@ -26,6 +26,7 @@
 import type { ZodSchema } from 'zod';
 import { SyntroJS } from '../core';
 import type { HttpMethod } from '../domain/types';
+import { RouteRegistry } from '../application/RouteRegistry';
 
 /**
  * HTTP request options for testing
@@ -82,6 +83,12 @@ export interface PropertyTestOptions {
 export class TinyTest extends SyntroJS {
   private serverAddress: string | null = null;
   private isServerStarted = false;
+
+  constructor(config?: any) {
+    super(config);
+    // Clear route registry on instantiation for test isolation
+    RouteRegistry.clear();
+  }
 
   // NOTE: Test registry is reserved for future SmartMutator integration
   // /** Test registry for SmartMutator integration */
@@ -394,5 +401,7 @@ export class TinyTest extends SyntroJS {
       this.isServerStarted = false;
       this.serverAddress = null;
     }
+    // Clear route registry for testing isolation
+    RouteRegistry.clear();
   }
 }

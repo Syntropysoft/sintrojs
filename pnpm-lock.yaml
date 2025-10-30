@@ -13,7 +13,7 @@ importers:
         version: 7.0.4
       '@syntrojs/logger':
         specifier: ^0.2.1-alpha
-        version: link:../syntrojs-logger
+        version: 0.2.1-alpha
       fastify:
         specifier: ^4.26.0
         version: 4.29.1
@@ -27,9 +27,6 @@ importers:
       redoc:
         specifier: ^2.5.2
         version: 2.5.2(core-js@3.46.0)(mobx@6.15.0)(react-dom@19.2.0)(react@19.2.0)(styled-components@6.1.19)
-      swagger-ui-dist:
-        specifier: ^5.30.0
-        version: 5.30.0
     devDependencies:
       '@biomejs/biome':
         specifier: ^1.5.3
@@ -67,6 +64,9 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.1.0
+      swagger-ui-dist:
+        specifier: ^5.30.0
+        version: 5.30.0
       tsup:
         specifier: ^8.0.1
         version: 8.5.0(tsx@4.20.6)(typescript@5.9.3)
@@ -1572,8 +1572,7 @@ packages:
   /@scarf/scarf@1.4.0:
     resolution: {integrity: sha512-xxeapPiUXdZAE3che6f3xogoJPeZgig6omHEy1rIY5WVsB3H2BHNnZH+gHG6x91SCWyQCzWGsuL2Hh3ClO5/qQ==}
     requiresBuild: true
-    dev: false
-    optional: true
+    dev: true
 
   /@sec-ant/readable-stream@0.4.1:
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
@@ -1682,6 +1681,16 @@ packages:
       tslib: 2.7.0
       vitest: 1.6.1(@types/node@18.19.130)(@vitest/ui@1.6.1)
     dev: true
+
+  /@syntrojs/logger@0.2.1-alpha:
+    resolution: {integrity: sha512-E71puRQT+lTgkp0BSoeWMif+1TSs9KRN+wbg0ZUWRoyTt0x3FmALmWhLl1A5VzSgHZdLB12OaNqcR9U+LzIJYg==}
+    engines: {bun: '>=1.0.0', node: '>=18.0.0'}
+    dependencies:
+      chalk: 5.6.2
+    optionalDependencies:
+      pino: 10.1.0
+      safe-regex: 2.1.1
+    dev: false
 
   /@types/estree@1.0.8:
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
@@ -4349,6 +4358,7 @@ packages:
   /split2@4.2.0:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
+    requiresBuild: true
     dev: false
 
   /stackback@0.0.2:
@@ -4489,11 +4499,9 @@ packages:
 
   /swagger-ui-dist@5.30.0:
     resolution: {integrity: sha512-BoiDSeT9PCtHfDYMgX5UpB/qTQy44UoSFRmzHqvhGfgxzEVPHxIW78a+HMLUIHnSFu3z63wjtbq6L6+Rto20Rw==}
-    requiresBuild: true
     dependencies:
       '@scarf/scarf': 1.4.0
-    dev: false
-    optional: true
+    dev: true
 
   /swagger2openapi@7.0.8:
     resolution: {integrity: sha512-upi/0ZGkYgEcLeGieoz8gT74oWHA0E7JivX7aN9mAf+Tc7BQoRBvnIGHoPDw+f9TXTW4s6kGYCZJtauP6OYp7g==}

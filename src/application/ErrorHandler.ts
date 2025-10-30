@@ -7,7 +7,17 @@
  */
 
 import { z } from 'zod';
-import { HTTPException, ValidationException } from '../domain/HTTPException';
+import {
+  HTTPException,
+  ValidationException,
+  NotFoundException,
+  BadRequestException,
+  UnauthorizedException,
+  ForbiddenException,
+  ConflictException,
+  InternalServerException,
+  ServiceUnavailableException,
+} from '../domain/HTTPException';
 import type { ExceptionHandler, RequestContext, RouteResponse } from '../domain/types';
 import { getComponentLogger } from '../infrastructure/LoggerHelper';
 import { buildGenericErrorResponse, buildUnhandledErrorResponse } from './ErrorResponseBuilder';
@@ -64,11 +74,166 @@ class ErrorHandlerImpl {
       throw new Error('Context is required');
     }
 
-    // Try to find specific handler for error class
-    const handler = this.findHandler(error);
+    // NestJS-style: Check specific exceptions FIRST (most specific to least specific)
+    // This ensures child classes are handled before parent classes
+    // Use both instanceof AND constructor name check for reliability across module boundaries
+    
+    // 422 - ValidationException (most specific, has special errors array)
+    if (
+      error instanceof ValidationException ||
+      error.name === 'ValidationException' ||
+      error.constructor?.name === 'ValidationException'
+    ) {
+      const validationError = error as ValidationException;
+      return {
+        status: 422,
+        body: {
+          detail: validationError.detail,
+          errors: validationError.errors,
+          path: context.path,
+        },
+      };
+    }
 
-    if (handler) {
-      return handler(context, error);
+    // 400 - BadRequestException
+    if (
+      error instanceof BadRequestException ||
+      error.name === 'BadRequestException' ||
+      error.constructor?.name === 'BadRequestException'
+    ) {
+      const badRequest = error as BadRequestException;
+      return {
+        status: 400,
+        body: {
+          detail: badRequest.detail,
+          path: context.path,
+        },
+        headers: badRequest.headers,
+      };
+    }
+
+    // 401 - UnauthorizedException
+    if (
+      error instanceof UnauthorizedException ||
+      error.name === 'UnauthorizedException' ||
+      error.constructor?.name === 'UnauthorizedException'
+    ) {
+      const unauthorized = error as UnauthorizedException;
+      return {
+        status: 401,
+        body: {
+          detail: unauthorized.detail,
+          path: context.path,
+        },
+        headers: unauthorized.headers,
+      };
+    }
+
+    // 403 - ForbiddenException
+    if (
+      error instanceof ForbiddenException ||
+      error.name === 'ForbiddenException' ||
+      error.constructor?.name === 'ForbiddenException'
+    ) {
+      const forbidden = error as ForbiddenException;
+      return {
+        status: 403,
+        body: {
+          detail: forbidden.detail,
+          path: context.path,
+        },
+        headers: forbidden.headers,
+      };
+    }
+
+    // 404 - NotFoundException
+    if (
+      error instanceof NotFoundException ||
+      error.name === 'NotFoundException' ||
+      error.constructor?.name === 'NotFoundException'
+    ) {
+      const notFound = error as NotFoundException;
+      return {
+        status: 404,
+        body: {
+          detail: notFound.detail,
+          path: context.path,
+        },
+        headers: notFound.headers,
+      };
+    }
+
+    // 409 - ConflictException
+    if (error instanceof ConflictException) {
+      const conflict = error as ConflictException;
+      return {
+        status: 409,
+        body: {
+          detail: conflict.detail,
+          path: context.path,
+        },
+        headers: conflict.headers,
+      };
+    }
+
+    // 500 - InternalServerException
+    if (error instanceof InternalServerException) {
+      const internal = error as InternalServerException;
+      return {
+        status: 500,
+        body: {
+          detail: internal.detail,
+          path: context.path,
+        },
+        headers: internal.headers,
+      };
+    }
+
+    // 503 - ServiceUnavailableException
+    if (error instanceof ServiceUnavailableException) {
+      const unavailable = error as ServiceUnavailableException;
+      return {
+        status: 503,
+        body: {
+          detail: unavailable.detail,
+          path: context.path,
+        },
+        headers: unavailable.headers,
+      };
+    }
+
+    // Generic HTTPException (catches any HTTPException not caught above)
+    if (
+      error instanceof HTTPException ||
+      error.name === 'HTTPException' ||
+      error.constructor?.name === 'HTTPException' ||
+      (error as any).statusCode !== undefined
+    ) {
+      const httpError = error as HTTPException;
+      return {
+        status: httpError.statusCode,
+        body: {
+          detail: httpError.detail,
+          path: context.path,
+        },
+        headers: httpError.headers,
+      };
+    }
+
+    // ZodError handler (422)
+    if (error instanceof z.ZodError || error.name === 'ZodError' || error.constructor?.name === 'ZodError') {
+      const zodError = error as z.ZodError;
+      return {
+        status: 422,
+        body: {
+          detail: 'Validation Error',
+          errors: zodError.errors.map((err) => ({
+            field: err.path.join('.'),
+            ...err,
+          })),
+          path: context.path,
+        },
+      };
     }
 
     // Fallback: use generic error handler
@@ -85,13 +250,7 @@ class ErrorHandlerImpl {
    * @returns Handler if found, undefined otherwise
    */
   private findHandler(error: Error): ExceptionHandler | undefined {
-    // Check exact class match first (most specific)
-    const exactHandler = this.handlers.get(error.constructor as any);
-    if (exactHandler) {
-      return exactHandler;
-    }
-
-    // Find all matching handlers in inheritance chain
+    // Find all matching handlers in inheritance chain using instanceof
     const matches: Array<{ errorClass: new (...args: any[]) => Error; handler: ExceptionHandler }> =
       [];
 
@@ -111,34 +270,61 @@ class ErrorHandlerImpl {
       return matches[0]?.handler;
     }
 
-    // Multiple matches: find most specific (closest in prototype chain)
-    // Sort by specificity: child class instances are also instances of parent
-    // The most specific is the one that extends the others
-    let mostSpecific = matches[0];
-
-    if (!mostSpecific) {
-      return undefined;
+    // Multiple matches: find most specific (child class wins over parent class)
+    // Strategy: Find the class that is the deepest in the inheritance chain
+    // (the one that is NOT a parent of any other matched class)
+    
+    // Filter out generic Error handler (only use it as last resort)
+    const specificMatches = matches.filter((m) => m.errorClass !== Error);
+    
+    if (specificMatches.length === 0) {
+      // Only Error handler matched - return it
+      return matches.find((m) => m.errorClass === Error)?.handler;
     }
 
-    for (let i = 1; i < matches.length; i++) {
-      const current = matches[i];
+    // If only one specific handler, return it
+    if (specificMatches.length === 1) {
+      return specificMatches[0]?.handler;
+    }
 
-      if (!current) {
-        continue;
+    // Multiple specific handlers: find most specific by checking prototype chain
+    // The most specific is the one that is the CHILD of all others (deepest in inheritance)
+    // Strategy: Find the class that is NOT a parent of any other, but IS a child of at least one other
+    
+    // Sort matches by inheritance depth: child classes come after parent classes
+    // Find the class that is NOT a parent of any other
+    for (let i = 0; i < specificMatches.length; i++) {
+      const candidate = specificMatches[i];
+      if (!candidate) continue;
+
+      let isMostSpecific = true;
+
+      // Check if candidate is a parent of any other match
+      // If candidate is parent of other, then other is more specific (child)
+      for (let j = 0; j < specificMatches.length; j++) {
+        if (i === j) continue;
+        const other = specificMatches[j];
+        if (!other) continue;
+
+        // If candidate.prototype is in other's prototype chain, candidate is a parent
+        // This means other extends candidate, so candidate is NOT most specific
+        const candidateIsParent = candidate.errorClass.prototype.isPrototypeOf(
+          other.errorClass.prototype,
+        );
+        if (candidateIsParent) {
+          isMostSpecific = false;
+          break;
+        }
       }
 
-      // If current extends mostSpecific, current is more specific
-      if (
-        Object.prototype.isPrototypeOf.call(
-          mostSpecific.errorClass.prototype,
-          current.errorClass.prototype,
-        )
-      ) {
-        mostSpecific = current;
+      if (isMostSpecific) {
+        // Found the most specific handler (child class, not a parent of any other)
+        return candidate.handler;
       }
     }
 
-    return mostSpecific.handler;
+    // Fallback: if no clear winner, return the first one (shouldn't happen with proper inheritance)
+    return specificMatches[0]?.handler;
   }
 
   /**
@@ -146,24 +332,12 @@ class ErrorHandlerImpl {
    * Called on initialization
    */
   private registerDefaultHandlers(): void {
-    // HTTPException handler
-    this.register(HTTPException, (context, error) => {
-      const httpError = error as HTTPException;
-
-      return {
-        status: httpError.statusCode,
-        body: {
-          detail: httpError.detail,
-          path: context.path,
-        },
-        headers: httpError.headers,
-      };
-    });
-
-    // ValidationException handler (422)
+    // IMPORTANT: Register most specific handlers FIRST (child classes before parent classes)
+    // The findHandler will automatically select the most specific handler using instanceof
+    
+    // 422 - ValidationException (has special errors array)
     this.register(ValidationException, (context, error) => {
       const validationError = error as ValidationException;
-
       return {
         status: 422,
         body: {
@@ -171,6 +345,111 @@ class ErrorHandlerImpl {
           errors: validationError.errors,
           path: context.path,
         },
+      };
+    });
+
+    // 400 - BadRequestException
+    this.register(BadRequestException, (context, error) => {
+      const badRequest = error as BadRequestException;
+      return {
+        status: 400,
+        body: {
+          detail: badRequest.detail,
+          path: context.path,
+        },
+        headers: badRequest.headers,
+      };
+    });
+
+    // 401 - UnauthorizedException
+    this.register(UnauthorizedException, (context, error) => {
+      const unauthorized = error as UnauthorizedException;
+      return {
+        status: 401,
+        body: {
+          detail: unauthorized.detail,
+          path: context.path,
+        },
+        headers: unauthorized.headers,
+      };
+    });
+
+    // 403 - ForbiddenException
+    this.register(ForbiddenException, (context, error) => {
+      const forbidden = error as ForbiddenException;
+      return {
+        status: 403,
+        body: {
+          detail: forbidden.detail,
+          path: context.path,
+        },
+        headers: forbidden.headers,
+      };
+    });
+
+    // 404 - NotFoundException
+    this.register(NotFoundException, (context, error) => {
+      const notFound = error as NotFoundException;
+      return {
+        status: 404,
+        body: {
+          detail: notFound.detail,
+          path: context.path,
+        },
+        headers: notFound.headers,
+      };
+    });
+
+    // 409 - ConflictException
+    this.register(ConflictException, (context, error) => {
+      const conflict = error as ConflictException;
+      return {
+        status: 409,
+        body: {
+          detail: conflict.detail,
+          path: context.path,
+        },
+        headers: conflict.headers,
+      };
+    });
+
+    // 500 - InternalServerException
+    this.register(InternalServerException, (context, error) => {
+      const internal = error as InternalServerException;
+      return {
+        status: 500,
+        body: {
+          detail: internal.detail,
+          path: context.path,
+        },
+        headers: internal.headers,
+      };
+    });
+
+    // 503 - ServiceUnavailableException
+    this.register(ServiceUnavailableException, (context, error) => {
+      const unavailable = error as ServiceUnavailableException;
+      return {
+        status: 503,
+        body: {
+          detail: unavailable.detail,
+          path: context.path,
+        },
+        headers: unavailable.headers,
+      };
+    });
+
+    // Generic HTTPException handler - catches any HTTPException without specific handler
+    // Register AFTER all specific exceptions
+    this.register(HTTPException, (context, error) => {
+      const httpError = error as HTTPException;
+      return {
+        status: httpError.statusCode,
+        body: {
+          detail: httpError.detail,
+          path: context.path,
+        },
+        headers: httpError.headers,
       };
     });
 
@@ -192,13 +471,8 @@ class ErrorHandlerImpl {
     });
 
     // Generic Error handler - uses ErrorResponseBuilder (Strategy Pattern)
-    this.register(Error, (context, error) => {
-      return buildGenericErrorResponse(error, context);
-    });
-
-    // Unhandled Error handler (500) - logs and returns generic response
-    // Note: This is registered after generic Error handler as it's more specific
-    // but serves as fallback for truly unhandled errors
+    // Note: This should be the last fallback, but only for truly unhandled errors
+    // HTTPException and ValidationException should be caught by their specific handlers
     this.register(Error, (context, error) => {
       // Log error for debugging
       const logger = getComponentLogger('error-handler');
@@ -215,7 +489,7 @@ class ErrorHandlerImpl {
         'Unhandled error in request handler',
       );
 
-      return buildUnhandledErrorResponse(error, context);
+      return buildGenericErrorResponse(error, context);
     });
   }
 

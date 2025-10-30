@@ -832,7 +832,8 @@ export class SyntroJS {
     // By default, we use CDN for all users
     // Only if the user explicitly installs optionalDependencies, we serve locally
     const { swaggerInstalled, redocInstalled } = await this.detectLocalAssets();
-    const useLocalAssets = swaggerInstalled || redocInstalled;
+    // NOTE: Temporarily forcing CDN since we haven't implemented asset serving routes yet
+    const useLocalAssets = false; // swaggerInstalled || redocInstalled;
 
     // Register root endpoint with welcome page
     if (this.shouldEnableDocsEndpoint('landingPage') && !RouteRegistry.has('GET', '/')) {
@@ -840,7 +841,7 @@ export class SyntroJS {
         handler: async () => {
           return {
             status: 200,
-            body: this.renderWelcomePage(),
+            body: await this.renderWelcomePage(),
             headers: { 'Content-Type': 'text/html; charset=utf-8' },
           };
         },
@@ -917,9 +918,21 @@ export class SyntroJS {
   /**
    * Renders welcome page for root route
    */
-  private renderWelcomePage(): string {
+  private async renderWelcomePage(): Promise<string> {
     const title = this.config.title || 'SyntroJS API';
     const version = this.config.version || '1.0.0';
+    
+    // Check if we need to use CDN (local assets not available)
+    let swaggerInstalled = false;
+    try {
+      // Try to dynamically import package - will fail if not installed
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore - Package might not be installed
+      await import('swagger-ui-dist');
+      swaggerInstalled = true;
+    } catch {
+      swaggerInstalled = false;
+    }
 
     return `<!DOCTYPE html>
 <html>
@@ -953,8 +966,17 @@ export class SyntroJS {
     .subtitle {
       color: #666;
       font-size: 18px;
-      margin-bottom: 32px;
+      margin-bottom: 16px;
       line-height: 1.5;
+    }
+    .warning {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      color: #856404;
+      font-size: 14px;
     }
     .button {
       display: inline-block;
@@ -989,6 +1011,9 @@ export class SyntroJS {
     <div class="subtitle">
       API is running successfully. Explore the interactive API documentation.
     </div>
+    ${!swaggerInstalled ? `<div class="warning">
+      ⚠️ Documentation requires internet access for CDN assets. Air-gapped environments are not currently supported.
+    </div>` : ''}
     <div class="links">
       <a href="/docs" class="button">📖 Swagger UI</a>
       <a href="/redoc" class="button">📚 ReDoc</a>

@@ -16,7 +16,12 @@
       "import": "./dist/testing/index.js"
     }
   },
-  "files": ["dist", "README.md", "LICENSE", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "npm run build -- --watch",
@@ -79,8 +84,7 @@
     "zod-to-json-schema": "^3.22.4"
   },
   "optionalDependencies": {
-    "redoc": "^2.5.2",
-    "swagger-ui-dist": "^5.30.0"
+    "redoc": "^2.5.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.5.3",
@@ -95,6 +99,7 @@
     "@vitest/coverage-v8": "^1.2.2",
     "@vitest/ui": "^1.2.2",
     "express": "^5.1.0",
+    "swagger-ui-dist": "^5.30.0",
     "tsup": "^8.0.1",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3",
